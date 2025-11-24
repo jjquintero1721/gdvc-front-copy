@@ -88,12 +88,15 @@ function LoginPage() {
       // Llamar al servicio de autenticación
       const response = await authService.login(formData.email, formData.password)
 
+
+      console.log('✅ Login exitoso:', response.data)
+
       // Guardar usuario y tokens en el store
       login(
-        response.user,
+        response.data.usuario,
         {
-          access_token: response.access_token,
-          refresh_token: response.refresh_token
+          access_token: response.data.access_token,
+          refresh_token: response.data.refresh_token || null
         },
         formData.rememberMe
       )
@@ -101,6 +104,7 @@ function LoginPage() {
       // Redirigir al dashboard
       navigate('/dashboard')
     } catch (err) {
+      console.error('❌ Error en login:', err)
       setError(err.message || 'Error al iniciar sesión. Por favor, intenta nuevamente.')
     } finally {
       setLoading(false)
@@ -129,7 +133,6 @@ function LoginPage() {
             label="Correo Electrónico"
             type="email"
             name="email"
-            id="email"
             placeholder="tu@email.com"
             value={formData.email}
             onChange={handleChange}
@@ -137,6 +140,7 @@ function LoginPage() {
             icon={<AtSignIcon />}
             required
             autoComplete="email"
+            disabled={loading}
           />
 
           {/* Campo de Contraseña */}
@@ -144,13 +148,13 @@ function LoginPage() {
             label="Contraseña"
             type="password"
             name="password"
-            id="password"
             placeholder="********"
             value={formData.password}
             onChange={handleChange}
             error={fieldErrors.password}
             icon={<LockIcon />}
             required
+            disabled={loading}
             autoComplete="current-password"
           />
 
@@ -161,6 +165,7 @@ function LoginPage() {
               name="rememberMe"
               checked={formData.rememberMe}
               onChange={handleChange}
+              disabled={loading}
             />
             <Link to="/cambiar-contrasena" className="login-form__forgot caption">
               ¿Olvidaste tu contraseña?
@@ -176,7 +181,7 @@ function LoginPage() {
             loading={loading}
             disabled={loading}
           >
-            Iniciar Sesión
+            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </Button>
 
           {/* Link a Registro */}

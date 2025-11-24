@@ -3,13 +3,24 @@ import apiClient from './apiClient'
 /**
  * Servicio de Autenticación
  * Maneja todas las operaciones relacionadas con login, registro y gestión de contraseñas
+ *
+ * IMPORTANTE: Estructura de respuesta del backend
+ * ============================================
+ * El backend envuelve todas las respuestas en success_response:
+ * {
+ *   "status": "success",
+ *   "message": "Mensaje descriptivo",
+ *   "data": { ... datos reales ... }
+ * }
+ *
+ * Por lo tanto, siempre debemos acceder a response.data.data para obtener los datos reales
  */
 const authService = {
   /**
    * Login de usuario
    * @param {string} email - Correo electrónico
    * @param {string} password - Contraseña
-   * @returns {Promise} Datos del usuario y tokens
+   * @returns {Promise} Estructura: { status, message, data: { access_token, token_type, usuario } }
    */
   login: async (email, password) => {
     try {
@@ -17,6 +28,8 @@ const authService = {
         correo: email,
         contrasena: password
       })
+
+      // response.data contiene: { status, message, data: { access_token, token_type, usuario } }
       return response.data
     } catch (error) {
       throw handleAuthError(error)
@@ -26,26 +39,28 @@ const authService = {
   /**
    * Registro de nuevo usuario (propietario)
    * @param {Object} userData - Datos del usuario
-   * @returns {Promise} Datos del usuario creado
+   * @returns {Promise} Estructura: { status, message, data: { usuario } }
    */
   register: async (userData) => {
-  try {
-    // Transformar los datos al formato esperado por el backend
-    const backendData = {
-      nombre: userData.nombre || userData.full_name,
-      correo: userData.email || userData.correo,
-      telefono: userData.phone || userData.telefono,
-      contrasena: userData.password || userData.contrasena,
-      rol: userData.rol || 'propietario',  // Por defecto propietario
-      documento: userData.cedula || userData.documento
-    }
+    try {
+      // Transformar los datos al formato esperado por el backend
+      const backendData = {
+        nombre: userData.nombre || userData.full_name,
+        correo: userData.email || userData.correo,
+        telefono: userData.phone || userData.telefono,
+        contrasena: userData.password || userData.contrasena,
+        rol: userData.rol || 'propietario',  // Por defecto propietario
+        documento: userData.cedula || userData.documento
+      }
 
-    const response = await apiClient.post('/auth/register', backendData)
-    return response.data
-  } catch (error) {
-    throw handleAuthError(error)
-  }
-},
+      const response = await apiClient.post('/auth/register', backendData)
+
+      // response.data contiene: { status, message, data: { usuario } }
+      return response.data
+    } catch (error) {
+      throw handleAuthError(error)
+    }
+  },
 
   /**
    * Cambiar contraseña (requiere contraseña anterior)
@@ -98,11 +113,13 @@ const authService = {
 
   /**
    * Obtener información del usuario actual
-   * @returns {Promise} Datos del usuario
+   * @returns {Promise} Estructura: { status, message, data: { usuario } }
    */
   getCurrentUser: async () => {
     try {
-      const response = await apiClient.get('/auth/me')
+      const response = await apiClient.get('/users/me')
+
+      // response.data contiene: { status, message, data: { usuario } }
       return response.data
     } catch (error) {
       throw handleAuthError(error)
@@ -113,34 +130,42 @@ const authService = {
 /**
  * Manejador de errores de autenticación
  * Extrae y formatea los mensajes de error de la API
+ *
+ * @param {Error} error - Error de axios
+ * @returns {Error} Error formateado con mensaje legible
  */
 function handleAuthError(error) {
   if (error.response) {
     // Error de respuesta del servidor
     const { status, data } = error.response
 
+    // El backend puede devolver errores en formato:
+    // 1. { detail: "mensaje" } (FastAPI HTTPException)
+    // 2. { status: "error", message: "mensaje" } (error_response)
+    const errorMessage = data.detail || data.message || 'Error desconocido'
+
     switch (status) {
       case 400:
-        return new Error(data.detail || 'Datos de entrada inválidos')
+        return new Error(errorMessage || 'Datos de entrada inválidos')
       case 401:
-        return new Error(data.detail || 'Credenciales inválidas')
+        return new Error(errorMessage || 'Credenciales inválidas')
       case 403:
-        return new Error(data.detail || 'Acceso no autorizado')
+        return new Error(errorMessage || 'Acceso no autorizado')
       case 404:
-        return new Error(data.detail || 'Usuario no encontrado')
+        return new Error(errorMessage || 'Usuario no encontrado')
       case 409:
-        return new Error(data.detail || 'El usuario ya existe')
+        return new Error(errorMessage || 'El usuario ya existe')
       case 422:
         // Errores de validación de Pydantic
         if (data.detail && Array.isArray(data.detail)) {
           const messages = data.detail.map(err => err.msg).join(', ')
           return new Error(`Errores de validación: ${messages}`)
         }
-        return new Error(data.detail || 'Error de validación')
+        return new Error(errorMessage || 'Error de validación')
       case 500:
         return new Error('Error interno del servidor. Por favor, intenta más tarde.')
       default:
-        return new Error(data.detail || 'Error desconocido en el servidor')
+        return new Error(errorMessage)
     }
   } else if (error.request) {
     // Error de red o servidor no responde
