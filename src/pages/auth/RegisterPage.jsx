@@ -123,11 +123,11 @@ function RegisterPage() {
       // Preparar datos para el backend
       const userData = {
         nombre: formData.full_name,
-        cedula: formData.cedula,
-        telefono: formData.phone,
-        direccion: formData.address,
         email: formData.email,
-        password: formData.password
+        phone: formData.phone,
+        password: formData.password,
+        cedula: formData.cedula,
+        rol: 'propietario'
       }
 
       // Llamar al servicio de autenticación

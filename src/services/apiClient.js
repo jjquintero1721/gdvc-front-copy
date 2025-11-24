@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore'
  * Incluye interceptores para manejo de autenticación y errores
  */
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1`,
   timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000,
   headers: {
     'Content-Type': 'application/json',

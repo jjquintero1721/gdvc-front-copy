@@ -14,8 +14,8 @@ const authService = {
   login: async (email, password) => {
     try {
       const response = await apiClient.post('/auth/login', {
-        email,
-        password
+        correo: email,
+        contrasena: password
       })
       return response.data
     } catch (error) {
@@ -29,13 +29,23 @@ const authService = {
    * @returns {Promise} Datos del usuario creado
    */
   register: async (userData) => {
-    try {
-      const response = await apiClient.post('/auth/register', userData)
-      return response.data
-    } catch (error) {
-      throw handleAuthError(error)
+  try {
+    // Transformar los datos al formato esperado por el backend
+    const backendData = {
+      nombre: userData.nombre || userData.full_name,
+      correo: userData.email || userData.correo,
+      telefono: userData.phone || userData.telefono,
+      contrasena: userData.password || userData.contrasena,
+      rol: userData.rol || 'propietario',  // Por defecto propietario
+      documento: userData.cedula || userData.documento
     }
-  },
+
+    const response = await apiClient.post('/auth/register', backendData)
+    return response.data
+  } catch (error) {
+    throw handleAuthError(error)
+  }
+},
 
   /**
    * Cambiar contraseña (requiere contraseña anterior)
