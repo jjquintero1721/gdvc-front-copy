@@ -1,0 +1,111 @@
+.stat-card {
+  background-color: var(--gray-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  border: 1px solid var(--gray-200);
+  min-height: 140px;
+}
+
+.stat-card--clickable {
+  cursor: pointer;
+}
+
+.stat-card--clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card--clickable:active {
+  transform: translateY(0);
+}
+
+.stat-card__content {
+  flex: 1;
+}
+
+.stat-card__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-600);
+  margin: 0 0 var(--spacing-md) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card__value {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.stat-card__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+/* Variantes de color */
+.stat-card--blue .stat-card__value {
+  color: var(--primary-blue-500);
+}
+
+.stat-card--blue .stat-card__icon {
+  background-color: rgba(66, 133, 244, 0.1);
+}
+
+.stat-card--green .stat-card__value {
+  color: var(--success);
+}
+
+.stat-card--green .stat-card__icon {
+  background-color: rgba(22, 163, 74, 0.1);
+}
+
+.stat-card--yellow .stat-card__value {
+  color: var(--warning);
+}
+
+.stat-card--yellow .stat-card__icon {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.stat-card--red .stat-card__value {
+  color: var(--error);
+}
+
+.stat-card--red .stat-card__icon {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stat-card {
+    padding: var(--spacing-lg);
+    min-height: 120px;
+  }
+
+  .stat-card__title {
+    font-size: 12px;
+  }
+
+  .stat-card__value {
+    font-size: 28px;
+  }
+
+  .stat-card__icon {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+}

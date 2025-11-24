@@ -1,0 +1,122 @@
+.dashboard-home {
+  width: 100%;
+}
+
+.dashboard-home__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: var(--spacing-2xl);
+  gap: var(--spacing-lg);
+}
+
+.dashboard-home__title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.dashboard-home__subtitle {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+.dashboard-home__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.dashboard-home__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.dashboard-home__section {
+  min-height: 200px;
+}
+
+.dashboard-home__info {
+  margin-top: var(--spacing-2xl);
+}
+
+.dashboard-home__info-card {
+  background-color: var(--gray-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+}
+
+.dashboard-home__info-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.dashboard-home__info-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.dashboard-home__info-card li {
+  font-size: 14px;
+  color: var(--gray-700);
+  padding: var(--spacing-sm);
+  background-color: var(--gray-50);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dashboard-home__header {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .dashboard-home__actions {
+    width: 100%;
+  }
+
+  .dashboard-home__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-home__title {
+    font-size: 24px;
+  }
+
+  .dashboard-home__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .dashboard-home__actions button {
+    width: 100%;
+  }
+
+  .dashboard-home__info-card ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-home__title {
+    font-size: 20px;
+  }
+
+  .dashboard-home__subtitle {
+    font-size: 13px;
+  }
+}

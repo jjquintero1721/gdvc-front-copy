@@ -1,0 +1,41 @@
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--gray-100);
+}
+
+.dashboard-layout__content {
+  flex: 1;
+  margin-left: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-layout__main {
+  flex: 1;
+  padding: var(--spacing-2xl);
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-layout__content {
+    margin-left: 200px;
+  }
+
+  .dashboard-layout__main {
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-layout__content {
+    margin-left: 0;
+  }
+
+  .dashboard-layout__main {
+    padding: var(--spacing-md);
+  }
+}

@@ -1,0 +1,108 @@
+.appointments-list {
+  background-color: var(--gray-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+}
+
+.appointments-list__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.appointments-list__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.appointments-list__item {
+  padding: var(--spacing-lg);
+  background-color: var(--gray-50);
+  border-radius: var(--border-radius-md);
+  border-left: 4px solid var(--primary-blue-500);
+  transition: all var(--transition-fast);
+}
+
+.appointments-list__item:hover {
+  background-color: var(--gray-100);
+  transform: translateX(2px);
+}
+
+.appointments-list__item-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.appointments-list__pet-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.appointments-list__datetime {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+.appointments-list__status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+  margin-top: var(--spacing-xs);
+}
+
+.appointments-list__status--success {
+  background-color: rgba(22, 163, 74, 0.1);
+  color: var(--success);
+}
+
+.appointments-list__status--warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+}
+
+.appointments-list__status--info {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--info);
+}
+
+.appointments-list__status--error {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: var(--error);
+}
+
+.appointments-list__empty {
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--gray-500);
+}
+
+.appointments-list__empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .appointments-list {
+    padding: var(--spacing-lg);
+  }
+
+  .appointments-list__title {
+    font-size: 16px;
+  }
+
+  .appointments-list__item {
+    padding: var(--spacing-md);
+  }
+}

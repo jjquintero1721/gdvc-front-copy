@@ -1,16 +1,24 @@
+import Sidebar from './Sidebar'
+import './DashboardLayout.css'
+
 /**
  * Layout para el Dashboard
- * TODO: Implementar en futuras fases con sidebar, header, etc.
+ * Incluye Sidebar y área de contenido principal
+ *
+ * Principios SOLID:
+ * - Single Responsibility: Solo maneja layout del dashboard
+ * - Open/Closed: Flexible para agregar elementos sin modificar estructura
  */
 function DashboardLayout({ children }) {
   return (
     <div className="dashboard-layout">
-      <header className="dashboard-header">
-        <h1>GDCV - Dashboard</h1>
-      </header>
-      <main className="dashboard-main">
-        {children}
-      </main>
+      <Sidebar />
+
+      <div className="dashboard-layout__content">
+        <main className="dashboard-layout__main">
+          {children}
+        </main>
+      </div>
     </div>
   )
 }
