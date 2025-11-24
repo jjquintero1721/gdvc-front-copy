@@ -1,0 +1,254 @@
+/* Variables de diseño basadas en Figma */
+:root {
+  /* Colores Primarios */
+  --primary-blue-500: #4285F4;
+  --primary-blue-600: #3367D6;
+  --primary-blue-700: #2A56C6;
+
+  /* Grises */
+  --gray-white: #FFFFFF;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+
+  /* Colores de Material 3 */
+  --m3-on-surface: #1D1B20;
+
+  /* Estados */
+  --error: #DC2626;
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+
+  /* Tipografía */
+  --font-inter: 'Inter', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+
+  /* Espaciados */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Bordes */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 20.8px;
+
+  /* Sombras */
+  --shadow-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0px 5.2px 15.6px 0px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  /* Transiciones */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+}
+
+/* Reset básico */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-inter);
+  color: var(--gray-900);
+  background-color: var(--gray-100);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Tipografía */
+h1 {
+  font-family: var(--font-inter);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+h2 {
+  font-family: var(--font-inter);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+h3 {
+  font-family: var(--font-inter);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.body-l {
+  font-family: var(--font-inter);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.body-m {
+  font-family: var(--font-inter);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.caption {
+  font-family: var(--font-inter);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* Links */
+a {
+  color: var(--primary-blue-500);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-blue-600);
+}
+
+a:active {
+  color: var(--primary-blue-700);
+}
+
+/* Botones base */
+button {
+  font-family: var(--font-inter);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  transition: all var(--transition-fast);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Inputs base */
+input, textarea, select {
+  font-family: var(--font-roboto);
+  font-size: 16px;
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--gray-400);
+  opacity: 0.6;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-500);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Utilidades */
+.fade-in {
+  animation: fadeIn var(--transition-normal);
+}
+
+.slide-in {
+  animation: slideIn var(--transition-normal);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Container principal */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

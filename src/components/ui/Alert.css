@@ -1,0 +1,118 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  animation: slideIn var(--transition-normal);
+  margin-bottom: var(--spacing-md);
+}
+
+.alert__icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.alert__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.alert__title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.alert__message {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.alert__close {
+  background: none;
+  border: none;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.alert__close:hover {
+  opacity: 1;
+}
+
+/* Variantes */
+.alert--success {
+  background-color: #D1FAE5;
+  border-left: 4px solid var(--success);
+}
+
+.alert--success .alert__icon {
+  background-color: var(--success);
+  color: white;
+}
+
+.alert--success .alert__title,
+.alert--success .alert__message {
+  color: #065F46;
+}
+
+.alert--error {
+  background-color: #FEE2E2;
+  border-left: 4px solid var(--error);
+}
+
+.alert--error .alert__icon {
+  background-color: var(--error);
+  color: white;
+}
+
+.alert--error .alert__title,
+.alert--error .alert__message {
+  color: #991B1B;
+}
+
+.alert--warning {
+  background-color: #FEF3C7;
+  border-left: 4px solid var(--warning);
+}
+
+.alert--warning .alert__icon {
+  background-color: var(--warning);
+  color: white;
+}
+
+.alert--warning .alert__title,
+.alert--warning .alert__message {
+  color: #92400E;
+}
+
+.alert--info {
+  background-color: #DBEAFE;
+  border-left: 4px solid var(--info);
+}
+
+.alert--info .alert__icon {
+  background-color: var(--info);
+  color: white;
+}
+
+.alert--info .alert__title,
+.alert--info .alert__message {
+  color: #1E40AF;
+}

@@ -1,0 +1,142 @@
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.input-label {
+  color: var(--gray-900);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input-required {
+  color: var(--error);
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-field {
+  width: 100%;
+  height: 56px;
+  padding: 16px;
+  padding-left: 48px; /* Espacio para el icono */
+  font-family: var(--font-roboto);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--m3-on-surface);
+  background-color: var(--gray-white);
+  border: 1px solid rgba(29, 27, 32, 0.1);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--primary-blue-500);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.input-field::placeholder {
+  color: rgba(29, 27, 32, 0.38);
+  opacity: 1;
+}
+
+.input-field:disabled {
+  background-color: var(--gray-100);
+  color: var(--gray-400);
+  cursor: not-allowed;
+}
+
+/* Icono del input */
+.input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.input-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Botón para mostrar/ocultar contraseña */
+.input-toggle-password {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--gray-400);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.input-toggle-password:hover {
+  color: var(--gray-600);
+}
+
+.input-toggle-password:focus-visible {
+  outline: 2px solid var(--primary-blue-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Texto de ayuda */
+.input-helper-text {
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+
+/* Mensaje de error */
+.input-error {
+  color: var(--error);
+  margin-top: 4px;
+}
+
+/* Estado de error */
+.input-wrapper--error .input-field {
+  border-color: var(--error);
+}
+
+.input-wrapper--error .input-field:focus {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.input-wrapper--error .input-icon {
+  color: var(--error);
+}
+
+/* Estado deshabilitado */
+.input-wrapper--disabled .input-label {
+  color: var(--gray-400);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .input-field {
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}
