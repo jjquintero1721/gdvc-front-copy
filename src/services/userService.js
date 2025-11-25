@@ -4,6 +4,20 @@ import apiClient from './apiClient'
  * Servicio de Gestión de Usuarios
  * RF-02 | Gestión de usuarios internos (Superadmin)
  *
+ * IMPORTANTE: Estructura de respuesta del backend
+ * ============================================
+ * El backend envuelve todas las respuestas en success_response:
+ * {
+ *   "success": true,          // ← booleano, no string
+ *   "message": "Mensaje descriptivo",
+ *   "data": { ... datos reales ... }
+ * }
+ *
+ * Por lo tanto:
+ * - response.data.success → true/false (booleano)
+ * - response.data.data → objeto con los datos reales
+ * - response.data.message → mensaje descriptivo
+ *
  * Endpoints disponibles:
  * - GET /users/ - Listar todos los usuarios (con paginación y filtros)
  * - GET /users/me - Obtener usuario actual
@@ -39,6 +53,8 @@ const userService = {
       }
 
       const response = await apiClient.get(`/users?${queryParams.toString()}`)
+
+      // response.data contiene: { success: true, message: "...", data: { total, usuarios: [...] } }
       return response.data
     } catch (error) {
       throw handleUserError(error)

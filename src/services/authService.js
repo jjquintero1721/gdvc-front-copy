@@ -8,19 +8,22 @@ import apiClient from './apiClient'
  * ============================================
  * El backend envuelve todas las respuestas en success_response:
  * {
- *   "status": "success",
+ *   "success": true,          // ← booleano, no string
  *   "message": "Mensaje descriptivo",
  *   "data": { ... datos reales ... }
  * }
  *
- * Por lo tanto, siempre debemos acceder a response.data.data para obtener los datos reales
+ * Por lo tanto, con axios:
+ * - response.data.success → true/false (booleano)
+ * - response.data.data → objeto con los datos reales
+ * - response.data.message → mensaje descriptivo
  */
 const authService = {
   /**
    * Login de usuario
    * @param {string} email - Correo electrónico
    * @param {string} password - Contraseña
-   * @returns {Promise} Estructura: { status, message, data: { access_token, token_type, usuario } }
+   * @returns {Promise} Estructura: { success: true, message: "...", data: { access_token, token_type, usuario } }
    */
   login: async (email, password) => {
     try {
@@ -29,7 +32,7 @@ const authService = {
         contrasena: password
       })
 
-      // response.data contiene: { status, message, data: { access_token, token_type, usuario } }
+      // response.data contiene: { success: true, message: "...", data: { access_token, token_type, usuario } }
       return response.data
     } catch (error) {
       throw handleAuthError(error)
@@ -39,7 +42,7 @@ const authService = {
   /**
    * Registro de nuevo usuario (propietario)
    * @param {Object} userData - Datos del usuario
-   * @returns {Promise} Estructura: { status, message, data: { usuario } }
+   * @returns {Promise} Estructura: { success: true, message: "...", data: { usuario } }
    */
   register: async (userData) => {
     try {
@@ -55,7 +58,7 @@ const authService = {
 
       const response = await apiClient.post('/auth/register', backendData)
 
-      // response.data contiene: { status, message, data: { usuario } }
+      // response.data contiene: { success: true, message: "...", data: { usuario } }
       return response.data
     } catch (error) {
       throw handleAuthError(error)
@@ -113,13 +116,13 @@ const authService = {
 
   /**
    * Obtener información del usuario actual
-   * @returns {Promise} Estructura: { status, message, data: { usuario } }
+   * @returns {Promise} Estructura: { success: true, message: "...", data: usuario_object }
    */
   getCurrentUser: async () => {
     try {
       const response = await apiClient.get('/users/me')
 
-      // response.data contiene: { status, message, data: { usuario } }
+      // response.data contiene: { success: true, message: "...", data: usuario_object }
       return response.data
     } catch (error) {
       throw handleAuthError(error)
@@ -141,7 +144,7 @@ function handleAuthError(error) {
 
     // El backend puede devolver errores en formato:
     // 1. { detail: "mensaje" } (FastAPI HTTPException)
-    // 2. { status: "error", message: "mensaje" } (error_response)
+    // 2. { success: false, message: "mensaje" } (error_response)
     const errorMessage = data.detail || data.message || 'Error desconocido'
 
     switch (status) {
