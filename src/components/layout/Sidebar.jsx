@@ -1,66 +1,83 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import {
+  HomeIcon,
+  UserIcon,
+  PawIcon,
+  DnaIcon,
+  MedicalCrossIcon,
+  ClockIcon,
+  BriefcaseIcon,
+  CalendarIcon,
+  ClipboardIcon
+} from '@/assets/icons/DashboardIcons'
 import './Sidebar.css'
 
-// Iconos simulados (puedes reemplazarlos con iconos reales)
-const icons = {
-  dashboard: '📊',
-  users: '👥',
-  owners: '👤',
-  pets: '🐾',
-  species: '🦮',
-  breeds: '🐕',
-  vets: '⚕️',
-  schedules: '🕐',
-  services: '💼',
-  appointments: '📅',
-  medicalHistory: '📋'
-}
-
 /**
- * Configuración de navegación por rol
+ * Configuración de navegación por rol - CON ICONOS PROFESIONALES
  * Define qué elementos del sidebar puede ver cada rol
  */
 const navigationByRole = {
   superadmin: [
-    { name: 'Dashboard', path: '/dashboard', icon: icons.dashboard },
-    { name: 'Usuarios', path: '/usuarios', icon: icons.users },
-    { name: 'Propietarios', path: '/propietarios', icon: icons.owners },
-    { name: 'Mascotas', path: '/mascotas', icon: icons.pets },
-    { name: 'Especies', path: '/especies', icon: icons.species },
-    { name: 'Razas', path: '/razas', icon: icons.breeds },
-    { name: 'Veterinarios', path: '/veterinarios', icon: icons.vets },
-    { name: 'Horarios', path: '/horarios', icon: icons.schedules },
-    { name: 'Servicios', path: '/servicios', icon: icons.services },
-    { name: 'Citas', path: '/citas', icon: icons.appointments },
-    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: icons.medicalHistory }
+    { name: 'Dashboard', path: '/dashboard', icon: 'home' },
+    { name: 'Usuarios', path: '/usuarios', icon: 'users' },
+    { name: 'Propietarios', path: '/propietarios', icon: 'user' },
+    { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
+    { name: 'Especies', path: '/especies', icon: 'dna' },
+    { name: 'Razas', path: '/razas', icon: 'dna' },
+    { name: 'Veterinarios', path: '/veterinarios', icon: 'medical' },
+    { name: 'Horarios', path: '/horarios', icon: 'clock' },
+    { name: 'Servicios', path: '/servicios', icon: 'briefcase' },
+    { name: 'Citas', path: '/citas', icon: 'calendar' },
+    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
   ],
   veterinario: [
-    { name: 'Dashboard', path: '/dashboard', icon: icons.dashboard },
-    { name: 'Propietarios', path: '/propietarios', icon: icons.owners },
-    { name: 'Mascotas', path: '/mascotas', icon: icons.pets },
-    { name: 'Citas', path: '/citas', icon: icons.appointments },
-    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: icons.medicalHistory },
-    { name: 'Servicios', path: '/servicios', icon: icons.services },
-    { name: 'Horarios', path: '/horarios', icon: icons.schedules }
+    { name: 'Dashboard', path: '/dashboard', icon: 'home' },
+    { name: 'Propietarios', path: '/propietarios', icon: 'user' },
+    { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
+    { name: 'Citas', path: '/citas', icon: 'calendar' },
+    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
+    { name: 'Servicios', path: '/servicios', icon: 'briefcase' },
+    { name: 'Horarios', path: '/horarios', icon: 'clock' }
   ],
   auxiliar: [
-    { name: 'Dashboard', path: '/dashboard', icon: icons.dashboard },
-    { name: 'Propietarios', path: '/propietarios', icon: icons.owners },
-    { name: 'Mascotas', path: '/mascotas', icon: icons.pets },
-    { name: 'Citas', path: '/citas', icon: icons.appointments },
-    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: icons.medicalHistory }
+    { name: 'Dashboard', path: '/dashboard', icon: 'home' },
+    { name: 'Propietarios', path: '/propietarios', icon: 'user' },
+    { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
+    { name: 'Citas', path: '/citas', icon: 'calendar' },
+    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
   ],
   propietario: [
-    { name: 'Dashboard', path: '/dashboard', icon: icons.dashboard },
-    { name: 'Mis Mascotas', path: '/mis-mascotas', icon: icons.pets },
-    { name: 'Mis Citas', path: '/mis-citas', icon: icons.appointments }
+    { name: 'Dashboard', path: '/dashboard', icon: 'home' },
+    { name: 'Mis Mascotas', path: '/mis-mascotas', icon: 'paw' },
+    { name: 'Mis Citas', path: '/mis-citas', icon: 'calendar' }
   ]
 }
 
 /**
- * Componente Sidebar
- * Navegación lateral con filtro por roles
+ * Mapeo de iconos string a componentes SVG
+ */
+const iconComponents = {
+  home: HomeIcon,
+  users: UserIcon,
+  user: UserIcon,
+  paw: PawIcon,
+  dna: DnaIcon,
+  medical: MedicalCrossIcon,
+  clock: ClockIcon,
+  briefcase: BriefcaseIcon,
+  calendar: CalendarIcon,
+  clipboard: ClipboardIcon
+}
+
+/**
+ * Componente Sidebar - MEJORADO
+ * Navegación lateral con filtro por roles e iconos profesionales
+ *
+ * Mejoras:
+ * - Iconos SVG profesionales en lugar de emojis
+ * - Mejor hover y estados activos
+ * - Animaciones sutiles
  *
  * Principios SOLID aplicados:
  * - Single Responsibility: Solo maneja navegación
@@ -74,9 +91,17 @@ function Sidebar() {
   const userRole = user?.rol || 'propietario'
   const navigation = navigationByRole[userRole] || navigationByRole.propietario
 
+  // Función para obtener el componente de icono
+  const getIconComponent = (iconKey) => {
+    return iconComponents[iconKey] || HomeIcon
+  }
+
   return (
     <aside className="sidebar">
       <div className="sidebar__header">
+        <div className="sidebar__logo">
+          <PawIcon className="sidebar__logo-icon" />
+        </div>
         <h2 className="sidebar__title">Clínica Veterinaria</h2>
         <p className="sidebar__role">{userRole.toUpperCase()}</p>
       </div>
@@ -85,6 +110,7 @@ function Sidebar() {
         <ul className="sidebar__list">
           {navigation.map((item) => {
             const isActive = location.pathname === item.path
+            const IconComponent = getIconComponent(item.icon)
 
             return (
               <li key={item.path} className="sidebar__item">
@@ -92,7 +118,9 @@ function Sidebar() {
                   to={item.path}
                   className={`sidebar__link ${isActive ? 'sidebar__link--active' : ''}`}
                 >
-                  <span className="sidebar__icon">{item.icon}</span>
+                  <span className="sidebar__icon">
+                    <IconComponent className="w-5 h-5" />
+                  </span>
                   <span className="sidebar__text">{item.name}</span>
                 </Link>
               </li>
@@ -103,7 +131,9 @@ function Sidebar() {
 
       <div className="sidebar__footer">
         <div className="sidebar__user">
-          <div className="sidebar__user-icon">👤</div>
+          <div className="sidebar__user-icon">
+            <UserIcon className="w-6 h-6" />
+          </div>
           <div className="sidebar__user-info">
             <p className="sidebar__user-name">{user?.nombre || 'Usuario'}</p>
             <p className="sidebar__user-email">{user?.email || user?.correo}</p>

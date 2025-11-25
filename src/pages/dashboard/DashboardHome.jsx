@@ -1,18 +1,22 @@
 import { useAuthStore } from '@/store/authStore'
 import { useNavigate } from 'react-router-dom'
-import DashboardStats from '@/components/dashboard/DashboardStats'
-import AppointmentsList from '@/components/dashboard/AppointmentsList'
-import StockAlerts from '@/components/dashboard/StockAlerts'
+import DashboardStats from './DashboardStats_IMPROVED'
+import AppointmentsList from './AppointmentsList_IMPROVED'
+import StockAlerts from './StockAlerts_IMPROVED'
 import Button from '@/components/ui/Button'
+import { CheckIcon, ClockPendingIcon } from '@/assets/icons/DashboardIcons'
 import './DashboardHome.css'
+import './DashboardSections.css'
 
 /**
- * Dashboard Home - Página principal del dashboard
+ * Dashboard Home - MEJORADO
+ * Página principal del dashboard con diseño profesional
  *
- * Muestra:
- * - Estadísticas del día (filtradas por rol)
- * - Citas del día
- * - Alertas de stock (solo para staff)
+ * Mejoras:
+ * - Iconos SVG profesionales en lugar de emojis
+ * - Animaciones sutiles
+ * - Paleta de colores moderna
+ * - Mejor jerarquía visual
  *
  * Principios SOLID:
  * - Single Responsibility: Solo renderiza vista principal del dashboard
@@ -30,6 +34,18 @@ function DashboardHome() {
     logout()
     navigate('/login')
   }
+
+  // Lista de funcionalidades con estado
+  const features = [
+    { name: 'Gestión de Usuarios', status: 'completed' },
+    { name: 'Gestión de Propietarios', status: 'completed' },
+    { name: 'Gestión de Mascotas', status: 'completed' },
+    { name: 'Gestión de Citas', status: 'completed' },
+    { name: 'Historias Clínicas', status: 'completed' },
+    { name: 'Inventario', status: 'completed' },
+    { name: 'Notificaciones', status: 'completed' },
+    { name: 'Reportes y Estadísticas', status: 'pending' }
+  ]
 
   return (
     <div className="dashboard-home">
@@ -77,14 +93,22 @@ function DashboardHome() {
         <div className="dashboard-home__info-card">
           <h3>Próximas Funcionalidades</h3>
           <ul>
-            <li>✅ Gestión de Usuarios (implementado)</li>
-            <li>✅ Gestión de Propietarios (implementado)</li>
-            <li>✅ Gestión de Mascotas (implementado)</li>
-            <li>✅ Gestión de Citas (implementado)</li>
-            <li>✅ Historias Clínicas (implementado)</li>
-            <li>✅ Inventario (implementado)</li>
-            <li>✅ Notificaciones (implementado)</li>
-            <li>⏳ Reportes y Estadísticas (próximamente)</li>
+            {features.map((feature, index) => (
+              <li key={index}>
+                <div
+                  className={`feature-icon feature-icon--${feature.status}`}
+                >
+                  {feature.status === 'completed' ? (
+                    <CheckIcon className="w-4 h-4" />
+                  ) : (
+                    <ClockPendingIcon className="w-4 h-4" />
+                  )}
+                </div>
+                <span>
+                  {feature.name} ({feature.status === 'completed' ? 'implementado' : 'próximamente'})
+                </span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

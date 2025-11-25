@@ -1,10 +1,11 @@
-import { useAuthStore } from '@store/AuthStore.jsx'
+import { useAuthStore } from '@/store/authStore'
 import StatCard from './StatCard.jsx'
 import './DashboardStats.css'
 
 /**
- * Componente DashboardStats
+ * Componente DashboardStats - MEJORADO
  * Muestra las estadísticas del dashboard filtradas por rol
+ * Ahora usa iconos SVG profesionales en lugar de emojis
  *
  * Datos mock por ahora - En producción se conectarán a endpoints reales
  *
@@ -25,30 +26,31 @@ function DashboardStats() {
   }
 
   // Configuración de estadísticas visibles por rol
+  // ICONOS ACTUALIZADOS: calendar, users, alert, bell
   const statsByRole = {
     superadmin: [
       {
         title: 'Citas del Día',
         value: mockStats.citasDelDia,
-        icon: '📅',
+        icon: 'calendar',  // ✅ Icono profesional
         color: 'blue'
       },
       {
         title: 'Citas Programadas',
         value: mockStats.citasProgramadas,
-        icon: '👥',
+        icon: 'users',  // ✅ Icono profesional
         color: 'green'
       },
       {
         title: 'Stock Bajo',
         value: mockStats.stockBajo,
-        icon: '⚠️',
-        color: 'yellow'
+        icon: 'alert',  // ✅ Icono profesional
+        color: 'orange'
       },
       {
         title: 'Notificaciones',
         value: mockStats.notificaciones,
-        icon: '📦',
+        icon: 'bell',  // ✅ Icono profesional
         color: 'red'
       }
     ],
@@ -56,19 +58,19 @@ function DashboardStats() {
       {
         title: 'Citas del Día',
         value: mockStats.citasDelDia,
-        icon: '📅',
+        icon: 'calendar',
         color: 'blue'
       },
       {
         title: 'Citas Programadas',
         value: mockStats.citasProgramadas,
-        icon: '👥',
+        icon: 'users',
         color: 'green'
       },
       {
         title: 'Notificaciones',
         value: mockStats.notificaciones,
-        icon: '📦',
+        icon: 'bell',
         color: 'red'
       }
     ],
@@ -76,13 +78,13 @@ function DashboardStats() {
       {
         title: 'Citas del Día',
         value: mockStats.citasDelDia,
-        icon: '📅',
+        icon: 'calendar',
         color: 'blue'
       },
       {
         title: 'Citas Programadas',
         value: mockStats.citasProgramadas,
-        icon: '👥',
+        icon: 'users',
         color: 'green'
       }
     ],
@@ -90,13 +92,13 @@ function DashboardStats() {
       {
         title: 'Mis Citas',
         value: mockStats.citasProgramadas,
-        icon: '📅',
+        icon: 'calendar',
         color: 'blue'
       },
       {
         title: 'Notificaciones',
         value: mockStats.notificaciones,
-        icon: '📦',
+        icon: 'bell',
         color: 'red'
       }
     ]

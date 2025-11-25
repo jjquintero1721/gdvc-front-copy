@@ -1,49 +1,45 @@
-import './StockAlerts.css'
+import { CheckIcon } from '@/assets/icons/DashboardIcons'
+import './DashboardSections.css'
 
 /**
- * Componente StockAlerts
- * Muestra alertas de stock bajo en inventario
- *
- * Datos mock por ahora - En producción se conectarán a endpoints reales
+ * StockAlerts - MEJORADO
+ * Muestra alertas de stock bajo con diseño profesional
  *
  * Principios SOLID:
- * - Single Responsibility: Solo renderiza alertas de stock
+ * - Single Responsibility: Solo maneja alertas de inventario
  */
 function StockAlerts() {
   // Datos mock - Estos vendrán de la API en producción
-  const mockAlerts = []
-
-  if (mockAlerts.length === 0) {
-    return (
-      <div className="stock-alerts">
-        <h3 className="stock-alerts__title">Stock Bajo</h3>
-        <div className="stock-alerts__empty">
-          <p>No hay alertas de stock bajo</p>
-        </div>
-      </div>
-    )
-  }
+  const mockStockAlerts = []
 
   return (
     <div className="stock-alerts">
-      <h3 className="stock-alerts__title">Stock Bajo</h3>
-
-      <div className="stock-alerts__content">
-        {mockAlerts.map((alert, index) => (
-          <div key={index} className="stock-alerts__item">
-            <div className="stock-alerts__icon">⚠️</div>
-            <div className="stock-alerts__info">
-              <h4 className="stock-alerts__product-name">{alert.productName}</h4>
-              <p className="stock-alerts__quantity">
-                Stock actual: <strong>{alert.currentStock}</strong>
-              </p>
-              <p className="stock-alerts__min">
-                Stock mínimo: {alert.minStock}
-              </p>
-            </div>
-          </div>
-        ))}
+      <div className="stock-alerts__header">
+        <h3 className="stock-alerts__title">
+          Stock Bajo
+          <span className="stock-alerts__count">
+            {mockStockAlerts.length}
+          </span>
+        </h3>
       </div>
+
+      {mockStockAlerts.length === 0 ? (
+        <div className="stock-alerts__empty">
+          <CheckIcon className="stock-alerts__empty-icon" />
+          <p className="stock-alerts__empty-text">
+            No hay alertas de stock bajo
+          </p>
+        </div>
+      ) : (
+        <div className="stock-alerts__items">
+          {mockStockAlerts.map((item, index) => (
+            <div key={index} className="stock-alert-item">
+              {/* Aquí irá el contenido de cada alerta de stock */}
+              <p>{item.name}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

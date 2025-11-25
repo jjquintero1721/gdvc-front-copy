@@ -1,0 +1,368 @@
+/* ============================================
+   APPOINTMENTS LIST - ESTILOS MEJORADOS
+   ============================================ */
+
+.appointments-list {
+  background: var(--gray-white, #ffffff);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--gray-200, #e5e7eb);
+  min-height: 300px;
+}
+
+.appointments-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gray-200, #e5e7eb);
+}
+
+.appointments-list__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.appointments-list__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.appointments-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Item de cita mejorado */
+.appointment-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--gray-50, #f9fafb);
+  border-radius: 8px;
+  border: 1px solid var(--gray-200, #e5e7eb);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.appointment-item:hover {
+  background: var(--gray-100, #f3f4f6);
+  border-color: var(--gray-300, #d1d5db);
+  transform: translateX(4px);
+}
+
+.appointment-item__icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+
+.appointment-item__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.appointment-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.appointment-item__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appointment-item__time {
+  font-size: 13px;
+  color: var(--gray-600, #6b7280);
+  margin: 0;
+}
+
+.appointment-item__status {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.appointment-item__status--confirmed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.appointment-item__status--pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.appointment-item__status--attended {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* Estado vacío */
+.appointments-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--gray-500, #9ca3af);
+}
+
+.appointments-list__empty-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.appointments-list__empty-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-600, #6b7280);
+}
+
+/* ============================================
+   STOCK ALERTS - ESTILOS MEJORADOS
+   ============================================ */
+
+.stock-alerts {
+  background: var(--gray-white, #ffffff);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--gray-200, #e5e7eb);
+  min-height: 300px;
+}
+
+.stock-alerts__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gray-200, #e5e7eb);
+}
+
+.stock-alerts__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stock-alerts__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+/* Estado vacío */
+.stock-alerts__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--gray-500, #9ca3af);
+}
+
+.stock-alerts__empty-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+  color: #10b981;
+}
+
+.stock-alerts__empty-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-600, #6b7280);
+}
+
+/* ============================================
+   PRÓXIMAS FUNCIONALIDADES - ESTILOS MEJORADOS
+   ============================================ */
+
+.dashboard-home__info-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--gray-200, #e5e7eb);
+  transition: all 0.3s ease;
+}
+
+.dashboard-home__info-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--gray-300, #d1d5db);
+}
+
+.dashboard-home__info-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--gray-200, #e5e7eb);
+}
+
+.dashboard-home__info-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.dashboard-home__info-card li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--gray-700, #374151);
+  padding: 12px 16px;
+  background: var(--gray-white, #ffffff);
+  border-radius: 8px;
+  border: 1px solid var(--gray-200, #e5e7eb);
+  transition: all 0.2s ease;
+}
+
+.dashboard-home__info-card li:hover {
+  background: var(--gray-50, #f9fafb);
+  border-color: var(--gray-300, #d1d5db);
+  transform: translateX(4px);
+}
+
+/* Icono de check mejorado */
+.feature-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.feature-icon--completed {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.feature-icon--pending {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.appointments-list,
+.stock-alerts,
+.dashboard-home__info-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .appointments-list,
+  .stock-alerts {
+    padding: 20px;
+  }
+
+  .appointments-list__title,
+  .stock-alerts__title {
+    font-size: 16px;
+  }
+
+  .appointment-item {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .appointment-item__icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .appointment-item__name {
+    font-size: 14px;
+  }
+
+  .appointment-item__time {
+    font-size: 12px;
+  }
+
+  .dashboard-home__info-card {
+    padding: 20px;
+  }
+
+  .dashboard-home__info-card ul {
+    grid-template-columns: 1fr;
+  }
+}
