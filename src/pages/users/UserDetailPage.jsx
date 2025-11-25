@@ -84,8 +84,8 @@ function UserDetailPage() {
         setUser(userResponse.data)
 
         // Si es propietario, cargar sus mascotas
-        if (userResponse.data.rol === 'propietario') {
-          await loadPets(targetUserId)
+        if (userResponse.data.rol === 'propietario' && userResponse.data.propietario_id) {
+          await loadPets(userResponse.data.propietario_id)  // ✅ Usa propietario_id (tabla propietarios)
         }
 
         // Si es veterinario, cargar sus citas
@@ -106,13 +106,15 @@ function UserDetailPage() {
    */
   const loadPets = async (ownerId) => {
     try {
+      console.log('🐾 Obteniendo mascotas para propietario_id:', ownerId)
       const petsResponse = await petService.getPetsByOwner(ownerId)
 
       if (petsResponse.success && petsResponse.data) {
-        setPets(petsResponse.data.mascotas || [])
+        console.log('✅ Mascotas obtenidas:', petsResponse.data.mascotas?.length || 0)
+        setPets(petsResponse.data.pets || [])
       }
     } catch (err) {
-      console.error('Error al cargar mascotas:', err)
+      console.error('❌ Error al cargar mascotas:', err)
       // No mostramos error aquí, solo log
     }
   }
