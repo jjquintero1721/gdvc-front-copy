@@ -553,3 +553,82 @@
     padding: 0.75rem 0.5rem;
   }
 }
+.user-detail-page__appointments-table .table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.user-detail-page__appointments-table table {
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.user-detail-page__appointments-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+.user-detail-page__appointments-table td {
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+
+.user-detail-page__appointments-table tbody tr:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+/* ========================================
+   FIX – APPOINTMENTS TABLE WIDER
+   ======================================== */
+
+.user-detail-page__appointments-table {
+  width: 100%;
+  max-width: 1300px;      /* Antes no tenía ancho. Ahora se expande */
+  margin: 0 auto;         /* Centrado */
+  padding: 1.5rem;        /* Más respiración */
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+}
+
+.table th,
+.table td {
+  padding: 0.9rem 1.2rem; /* Más espacio entre columnas */
+  font-size: 0.9rem;
+}
+/* Fuerza a que el contenedor principal permita expandir la tabla */
+.page-content,
+.content,
+.main-content,
+.user-profile-page,
+.profile-content {
+  width: 100% !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+}
+/* =====================================
+   FIX PARA LIBERAR EL ANCHO COMPLETO
+   ===================================== */
+
+.user-detail-page {
+  width: 100% !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+}
+
+/* El contenedor donde están las citas */
+.user-detail-page__appointments-table {
+  width: 100% !important;
+  max-width: 1300px !important;
+  margin: 0 auto;
+}

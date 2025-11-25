@@ -485,24 +485,30 @@ function UserDetailPage() {
             ) : (
               <Card className="user-detail-page__appointments-table">
                 <div className="table-responsive">
-                  <table className="table">
+                  <table className="table" style={{ width: '100%', tableLayout: 'auto' }}>
                     <thead>
                       <tr>
-                        <th>Fecha y Hora</th>
-                        <th>Mascota</th>
-                        <th>Servicio</th>
-                        <th>Estado</th>
-                        <th>Motivo</th>
+                        <th style={{ minWidth: '180px', padding: '12px' }}>Fecha y Hora</th>
+                        <th style={{ minWidth: '150px', padding: '12px' }}>Mascota</th>
+                        <th style={{ minWidth: '200px', padding: '12px' }}>Servicio</th>
+                        <th style={{ minWidth: '130px', padding: '12px', textAlign: 'center' }}>Estado</th>
                       </tr>
                     </thead>
                     <tbody>
                       {appointments.map((appointment) => (
                         <tr key={appointment.id}>
-                          <td>{formatDateTime(appointment.fecha_hora)}</td>
-                          <td>{appointment.mascota?.nombre || 'N/A'}</td>
-                          <td>{appointment.servicio?.nombre || 'N/A'}</td>
-                          <td>{getAppointmentStatusBadge(appointment.estado)}</td>
-                          <td>{appointment.motivo || 'Sin motivo especificado'}</td>
+                          <td style={{ padding: '12px', whiteSpace: 'nowrap' }}>
+                            {formatDateTime(appointment.fecha_hora)}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            {appointment.mascota?.nombre || 'N/A'}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            {appointment.servicio?.nombre || 'N/A'}
+                          </td>
+                          <td style={{ padding: '12px', textAlign: 'center' }}>
+                            {getAppointmentStatusBadge(appointment.estado)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
