@@ -1,60 +1,18 @@
 import apiClient from './apiClient'
 
 /**
- * Servicio de Gestión de Usuarios
- * RF-02 | Gestión de usuarios internos (Superadmin)
- *
- * IMPORTANTE: Estructura de respuesta del backend
- * ============================================
- * El backend envuelve todas las respuestas en success_response:
- * {
- *   "success": true,          // ← booleano, no string
- *   "message": "Mensaje descriptivo",
- *   "data": { ... datos reales ... }
- * }
- *
- * Por lo tanto:
- * - response.data.success → true/false (booleano)
- * - response.data.data → objeto con los datos reales
- * - response.data.message → mensaje descriptivo
- *
- * Endpoints disponibles:
- * - GET /users/ - Listar todos los usuarios (con paginación y filtros)
- * - GET /users/me - Obtener usuario actual
- * - GET /users/search - Buscar usuarios por nombre o correo
- * - GET /users/rol/{rol} - Filtrar por rol
- * - GET /users/{user_id} - Obtener un usuario específico
- * - PUT /users/{user_id} - Actualizar usuario
- * - POST /users/{user_id}/change-password - Cambiar contraseña
- *
- * NOTA: Solo SUPERADMIN puede activar/desactivar usuarios
+ * Servicio de Usuarios
+ * Maneja todas las operaciones relacionadas con la gestión de usuarios
  */
 const userService = {
   /**
-   * Obtener todos los usuarios con paginación y filtros
-   * @param {Object} params - Parámetros de búsqueda
-   * @param {number} params.skip - Número de registros a omitir (default: 0)
-   * @param {number} params.limit - Límite de registros (default: 100)
-   * @param {boolean|null} params.activo - Filtrar por estado activo/inactivo
+   * Obtener todos los usuarios (solo SUPERADMIN)
+   * @param {Object} params - Parámetros de filtrado (role, activo, etc.)
    * @returns {Promise} Lista de usuarios
    */
   getAllUsers: async (params = {}) => {
     try {
-      const { skip = 0, limit = 100, activo = null } = params
-
-      const queryParams = new URLSearchParams({
-        skip: skip.toString(),
-        limit: limit.toString()
-      })
-
-      // Solo agregar filtro activo si tiene valor
-      if (activo !== null && activo !== undefined) {
-        queryParams.append('activo', activo.toString())
-      }
-
-      const response = await apiClient.get(`/users?${queryParams.toString()}`)
-
-      // response.data contiene: { success: true, message: "...", data: { total, usuarios: [...] } }
+      const response = await apiClient.get('/users', { params })
       return response.data
     } catch (error) {
       throw handleUserError(error)
@@ -62,50 +20,9 @@ const userService = {
   },
 
   /**
-   * Buscar usuarios por nombre o correo
-   * @param {string} query - Término de búsqueda
-   * @param {number} skip - Paginación
-   * @param {number} limit - Límite de resultados
-   * @returns {Promise} Resultados de búsqueda
-   */
-  searchUsers: async (query, skip = 0, limit = 100) => {
-    try {
-      const queryParams = new URLSearchParams({
-        q: query,
-        skip: skip.toString(),
-        limit: limit.toString()
-      })
-
-      const response = await apiClient.get(`/users/search?${queryParams.toString()}`)
-      return response.data
-    } catch (error) {
-      throw handleUserError(error)
-    }
-  },
-
-  /**
-   * Obtener usuarios por rol
-   * @param {string} rol - Rol a filtrar (superadmin, veterinario, auxiliar, propietario)
-   * @param {boolean} activo - Solo usuarios activos
-   * @returns {Promise} Usuarios del rol especificado
-   */
-  getUsersByRole: async (rol, activo = true) => {
-    try {
-      const queryParams = new URLSearchParams({
-        activo: activo.toString()
-      })
-
-      const response = await apiClient.get(`/users/rol/${rol}?${queryParams.toString()}`)
-      return response.data
-    } catch (error) {
-      throw handleUserError(error)
-    }
-  },
-
-  /**
-   * Obtener un usuario específico por ID
+   * Obtener un usuario por ID
    * @param {string} userId - ID del usuario
-   * @returns {Promise} Datos del usuario
+   * @returns {Promise} Usuario
    */
   getUserById: async (userId) => {
     try {
@@ -117,13 +34,23 @@ const userService = {
   },
 
   /**
-   * Actualizar datos de un usuario
-   * Solo SUPERADMIN puede cambiar el campo 'activo'
+   * Crear un nuevo usuario (solo SUPERADMIN)
+   * @param {Object} userData - Datos del usuario
+   * @returns {Promise} Usuario creado
+   */
+  createUser: async (userData) => {
+    try {
+      const response = await apiClient.post('/users', userData)
+      return response.data
+    } catch (error) {
+      throw handleUserError(error)
+    }
+  },
+
+  /**
+   * Actualizar un usuario
    * @param {string} userId - ID del usuario
    * @param {Object} userData - Datos a actualizar
-   * @param {string} userData.nombre - Nombre del usuario
-   * @param {string} userData.telefono - Teléfono del usuario
-   * @param {boolean} userData.activo - Estado activo (solo SUPERADMIN)
    * @returns {Promise} Usuario actualizado
    */
   updateUser: async (userId, userData) => {
@@ -164,16 +91,20 @@ const userService = {
   },
 
   /**
-   * Cambiar contraseña de un usuario
-   * @param {string} userId - ID del usuario
-   * @param {string} oldPassword - Contraseña anterior
+   * ✅ CORREGIDO: Cambiar contraseña de un usuario
+   *
+   * @param {string} userId - ID del usuario (UUID)
+   * @param {string} oldPassword - Contraseña actual
    * @param {string} newPassword - Nueva contraseña
    * @returns {Promise} Confirmación
+   *
+   * Endpoint: POST /api/v1/users/{userId}/change-password
+   * Body: { contrasena_actual: string, contrasena_nueva: string }
    */
   changeUserPassword: async (userId, oldPassword, newPassword) => {
     try {
       const response = await apiClient.post(`/users/${userId}/change-password`, {
-        contrasena_anterior: oldPassword,
+        contrasena_actual: oldPassword,    // ✅ CORREGIDO: Era "contrasena_anterior", ahora "contrasena_actual"
         contrasena_nueva: newPassword
       })
       return response.data
@@ -205,6 +136,7 @@ function handleUserError(error) {
       case 409:
         return new Error(errorMessage || 'Conflicto: El usuario ya existe')
       case 422:
+        // Manejo especial de errores de validación de Pydantic
         if (data.detail && Array.isArray(data.detail)) {
           const messages = data.detail.map(err => err.msg).join(', ')
           return new Error(`Errores de validación: ${messages}`)

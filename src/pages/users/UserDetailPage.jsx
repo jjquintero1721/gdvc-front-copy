@@ -159,22 +159,34 @@ function UserDetailPage() {
    * Validar formulario de contraseña
    */
   const validatePasswordForm = () => {
-    if (!passwordData.oldPassword) {
-      throw new Error('La contraseña actual es requerida')
-    }
-
-    if (!passwordData.newPassword) {
-      throw new Error('La nueva contraseña es requerida')
-    }
-
-    if (passwordData.newPassword.length < 8) {
-      throw new Error('La nueva contraseña debe tener al menos 8 caracteres')
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      throw new Error('Las contraseñas no coinciden')
-    }
+  // Validar contraseña actual
+  if (!passwordData.oldPassword) {
+    throw new Error('La contraseña actual es requerida')
   }
+
+  // Validar nueva contraseña
+  if (!passwordData.newPassword) {
+    throw new Error('La nueva contraseña es requerida')
+  }
+
+  if (passwordData.newPassword.length < 8) {
+    throw new Error('La nueva contraseña debe tener al menos 8 caracteres')
+  }
+
+  // Validar confirmación
+  if (!passwordData.confirmPassword) {
+    throw new Error('Debes confirmar la nueva contraseña')
+  }
+
+  if (passwordData.newPassword !== passwordData.confirmPassword) {
+    throw new Error('Las contraseñas no coinciden')
+  }
+
+  // Validar que la nueva sea diferente a la actual
+  if (passwordData.oldPassword === passwordData.newPassword) {
+    throw new Error('La nueva contraseña debe ser diferente a la actual')
+  }
+}
 
   /**
    * Cambiar contraseña

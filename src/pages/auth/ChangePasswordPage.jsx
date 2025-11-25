@@ -22,7 +22,10 @@ import './ChangePasswordPage.css'
  */
 function ChangePasswordPage() {
   const navigate = useNavigate()
+
+  // ✅ CORREGIDO: Obtener usuario autenticado y su ID del store
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const currentUser = useAuthStore((state) => state.user)
 
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -91,24 +94,38 @@ function ChangePasswordPage() {
       return
     }
 
+    // ✅ CORREGIDO: Validar que el usuario esté autenticado y tenga ID
+    if (!currentUser || !currentUser.id) {
+      setError('No se pudo obtener la información del usuario. Por favor, inicia sesión nuevamente.')
+      return
+    }
+
     setLoading(true)
 
     try {
-      // Llamar al servicio de autenticación
-      await authService.changePassword(formData.oldPassword, formData.newPassword)
+      // ✅ CORREGIDO: Llamar al servicio con userId, oldPassword, newPassword
+      await authService.changePassword(
+        currentUser.id,           // ✅ userId del usuario autenticado
+        formData.oldPassword,     // ✅ Contraseña actual
+        formData.newPassword      // ✅ Nueva contraseña
+      )
 
       // Mostrar mensaje de éxito
       setSuccess(true)
 
       // Redirigir al login después de 2 segundos
       setTimeout(() => {
+        // Limpiar sesión ya que cambió la contraseña
+        localStorage.clear()
+
         navigate('/login', {
           state: {
-            message: 'Contraseña cambiada exitosamente. Por favor inicia sesión nuevamente.'
+            message: 'Contraseña cambiada exitosamente. Por favor inicia sesión nuevamente con tu nueva contraseña.'
           }
         })
       }, 2000)
     } catch (err) {
+      console.error('Error al cambiar contraseña:', err)
       setError(err.message || 'Error al cambiar la contraseña. Por favor, intenta nuevamente.')
     } finally {
       setLoading(false)
@@ -139,8 +156,8 @@ function ChangePasswordPage() {
   return (
     <div className="change-password-page">
       <Card
-        title={isAuthenticated ? "Cambiar contraseña" : "Actualiza tu contraseña"}
-        subtitle={isAuthenticated ? "Ingresa tu contraseña actual y tu nueva contraseña" : "Para cambiar tu contraseña necesitas estar autenticado"}
+        title={isAuthenticated ? "Cambiar Contraseña" : "Actualiza tu contraseña"}
+        subtitle={isAuthenticated ? "Actualiza tu contraseña regularmente para mantener tu cuenta segura" : "Para cambiar tu contraseña necesitas estar autenticado"}
         headerIcon={<AccountCircleIcon />}
       >
         {!isAuthenticated ? (
@@ -170,13 +187,22 @@ function ChangePasswordPage() {
               />
             )}
 
+            {/* Información del usuario actual */}
+            <div className="user-info-alert">
+              <Alert
+                type="info"
+                title="Información"
+                message={`Cambiando contraseña para: ${currentUser?.nombre || currentUser?.correo || 'Usuario'}`}
+              />
+            </div>
+
             {/* Contraseña Actual */}
             <Input
               label="Contraseña Actual"
               type="password"
               name="oldPassword"
               id="oldPassword"
-              placeholder="********"
+              placeholder="Ingresa tu contraseña actual"
               value={formData.oldPassword}
               onChange={handleChange}
               error={fieldErrors.oldPassword}
@@ -191,15 +217,34 @@ function ChangePasswordPage() {
               type="password"
               name="newPassword"
               id="newPassword"
-              placeholder="********"
+              placeholder="Ingresa tu nueva contraseña"
               value={formData.newPassword}
               onChange={handleChange}
               error={fieldErrors.newPassword}
-              helperText="Mínimo 8 caracteres, incluye números y símbolos para mayor seguridad"
+              helperText="Mínimo 8 caracteres, incluye números y símbolos"
               icon={<LockIcon />}
               required
               autoComplete="new-password"
             />
+
+            {/* Requisitos de la contraseña */}
+            <div className="password-requirements">
+              <p className="caption">Requisitos de la contraseña:</p>
+              <ul className="caption">
+                <li className={formData.newPassword.length >= 8 ? 'valid' : ''}>
+                  Mínimo 8 caracteres
+                </li>
+                <li className={/[A-Z]/.test(formData.newPassword) ? 'valid' : ''}>
+                  Al menos una letra mayúscula
+                </li>
+                <li className={/[a-z]/.test(formData.newPassword) ? 'valid' : ''}>
+                  Al menos una letra minúscula
+                </li>
+                <li className={/[0-9]/.test(formData.newPassword) ? 'valid' : ''}>
+                  Al menos un número
+                </li>
+              </ul>
+            </div>
 
             {/* Confirmar Nueva Contraseña */}
             <Input
@@ -207,7 +252,7 @@ function ChangePasswordPage() {
               type="password"
               name="confirmPassword"
               id="confirmPassword"
-              placeholder="********"
+              placeholder="Confirma tu nueva contraseña"
               value={formData.confirmPassword}
               onChange={handleChange}
               error={fieldErrors.confirmPassword}
@@ -225,12 +270,12 @@ function ChangePasswordPage() {
               loading={loading}
               disabled={loading}
             >
-              Cambiar Contraseña
+              {loading ? 'Actualizando...' : 'Actualizar Contraseña'}
             </Button>
 
-            {/* Link a Login */}
-            <div className="change-password-form__login caption">
-              <Link to="/login">Volver al inicio de sesión</Link>
+            {/* Link de regreso */}
+            <div className="change-password-form__back caption">
+              <Link to="/dashboard">← Volver al Dashboard</Link>
             </div>
           </form>
         )}

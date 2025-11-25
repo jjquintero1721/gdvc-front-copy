@@ -66,23 +66,27 @@ const authService = {
   },
 
   /**
-   * Cambiar contraseña (requiere contraseña anterior)
+   * ✅ CORREGIDO: Cambiar contraseña del usuario autenticado
+   *
+   * @param {string} userId - ID del usuario (UUID)
+   * @param {string} oldPassword - Contraseña actual
+   * @param {string} newPassword - Nueva contraseña
    * @returns {Promise} Confirmación del cambio
-   * @param userId
-   * @param contrasenaNueva
-   * @param contrasenaActual
+   *
+   * Endpoint: POST /api/v1/users/{userId}/change-password
+   * Body: { contrasena_actual: string, contrasena_nueva: string }
    */
-  changePassword: async (userId, contrasenaNueva, contrasenaActual) => {
-      try {
-        const response = await apiClient.post(`/users/${userId}/change-password`, {
-          contrasena_actual: contrasenaActual,
-          contrasena_nueva: contrasenaNueva
-        })
-        return response.data
-      } catch (error) {
-        throw handleAuthError(error)
-      }
-    },
+  changePassword: async (userId, oldPassword, newPassword) => {
+    try {
+      const response = await apiClient.post(`/users/${userId}/change-password`, {
+        contrasena_actual: oldPassword,    // ✅ Nombre correcto según backend
+        contrasena_nueva: newPassword      // ✅ Nombre correcto según backend
+      })
+      return response.data
+    } catch (error) {
+      throw handleAuthError(error)
+    }
+  },
 
   /**
    * Cerrar sesión
@@ -93,37 +97,17 @@ const authService = {
       const response = await apiClient.post('/auth/logout')
       return response.data
     } catch (error) {
-      // Incluso si falla el logout en el servidor, limpiamos el estado local
-      console.error('Error during logout:', error)
-      return { success: true }
-    }
-  },
-
-  /**
-   * Refrescar token de acceso
-   * @param {string} refreshToken - Token de refresco
-   * @returns {Promise} Nuevos tokens
-   */
-  refreshToken: async (refreshToken) => {
-    try {
-      const response = await apiClient.post('/auth/refresh', {
-        refresh_token: refreshToken
-      })
-      return response.data
-    } catch (error) {
       throw handleAuthError(error)
     }
   },
 
   /**
-   * Obtener información del usuario actual
-   * @returns {Promise} Estructura: { success: true, message: "...", data: usuario_object }
+   * Validar token actual
+   * @returns {Promise} Usuario actual
    */
-  getCurrentUser: async () => {
+  validateToken: async () => {
     try {
-      const response = await apiClient.get('/users/me')
-
-      // response.data contiene: { success: true, message: "...", data: usuario_object }
+      const response = await apiClient.get('/auth/me')
       return response.data
     } catch (error) {
       throw handleAuthError(error)
@@ -132,50 +116,41 @@ const authService = {
 }
 
 /**
- * Manejador de errores de autenticación
- * Extrae y formatea los mensajes de error de la API
- *
+ * Manejador de errores del servicio de autenticación
  * @param {Error} error - Error de axios
- * @returns {Error} Error formateado con mensaje legible
+ * @returns {Error} Error formateado
  */
 function handleAuthError(error) {
   if (error.response) {
-    // Error de respuesta del servidor
     const { status, data } = error.response
-
-    // El backend puede devolver errores en formato:
-    // 1. { detail: "mensaje" } (FastAPI HTTPException)
-    // 2. { success: false, message: "mensaje" } (error_response)
     const errorMessage = data.detail || data.message || 'Error desconocido'
 
     switch (status) {
       case 400:
-        return new Error(errorMessage || 'Datos de entrada inválidos')
+        return new Error(errorMessage || 'Datos inválidos')
       case 401:
-        return new Error(errorMessage || 'Credenciales inválidas')
+        return new Error('Credenciales inválidas. Verifica tu correo y contraseña.')
       case 403:
-        return new Error(errorMessage || 'Acceso no autorizado')
+        return new Error(errorMessage || 'No tienes permisos para realizar esta acción')
       case 404:
-        return new Error(errorMessage || 'Usuario no encontrado')
+        return new Error('Usuario no encontrado')
       case 409:
-        return new Error(errorMessage || 'El usuario ya existe')
+        return new Error(errorMessage || 'El correo ya está registrado')
       case 422:
-        // Errores de validación de Pydantic
+        // Manejo especial de errores de validación de Pydantic
         if (data.detail && Array.isArray(data.detail)) {
           const messages = data.detail.map(err => err.msg).join(', ')
           return new Error(`Errores de validación: ${messages}`)
         }
-        return new Error(errorMessage || 'Error de validación')
+        return new Error(errorMessage || 'Error de validación. Verifica los datos ingresados.')
       case 500:
         return new Error('Error interno del servidor. Por favor, intenta más tarde.')
       default:
         return new Error(errorMessage)
     }
   } else if (error.request) {
-    // Error de red o servidor no responde
-    return new Error('No se pudo conectar con el servidor. Verifica tu conexión.')
+    return new Error('No se pudo conectar con el servidor. Verifica tu conexión a internet.')
   } else {
-    // Error en la configuración de la petición
     return new Error(error.message || 'Error al procesar la solicitud')
   }
 }
