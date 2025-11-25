@@ -67,21 +67,22 @@ const authService = {
 
   /**
    * Cambiar contraseña (requiere contraseña anterior)
-   * @param {string} oldPassword - Contraseña anterior
-   * @param {string} newPassword - Nueva contraseña
    * @returns {Promise} Confirmación del cambio
+   * @param userId
+   * @param contrasenaNueva
+   * @param contrasenaActual
    */
-  changePassword: async (oldPassword, newPassword) => {
-    try {
-      const response = await apiClient.post('/auth/change-password', {
-        old_password: oldPassword,
-        new_password: newPassword
-      })
-      return response.data
-    } catch (error) {
-      throw handleAuthError(error)
-    }
-  },
+  changePassword: async (userId, contrasenaNueva, contrasenaActual) => {
+      try {
+        const response = await apiClient.post(`/users/${userId}/change-password`, {
+          contrasena_actual: contrasenaActual,
+          contrasena_nueva: contrasenaNueva
+        })
+        return response.data
+      } catch (error) {
+        throw handleAuthError(error)
+      }
+    },
 
   /**
    * Cerrar sesión

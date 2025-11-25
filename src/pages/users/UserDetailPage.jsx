@@ -50,8 +50,8 @@ function UserDetailPage() {
 
   // Estados de cambio de contraseña
   const [passwordData, setPasswordData] = useState({
-    oldPassword: '',
-    newPassword: '',
+    contrasena_actual: '',
+    contrasena_nueva: '',
     confirmPassword: ''
   })
   const [passwordLoading, setPasswordLoading] = useState(false)
@@ -191,8 +191,9 @@ function UserDetailPage() {
 
       // Llamar al servicio
       await authService.changePassword(
-        passwordData.oldPassword,
-        passwordData.newPassword
+        targetUserId,
+        passwordData.contrasena_actual,
+        passwordData.contrasena_nueva
       )
 
       // Éxito
@@ -413,7 +414,7 @@ function UserDetailPage() {
                   <span className="user-detail-page__info-value">{user.documento}</span>
                 </div>
               )}
-                
+
 
               <div className="user-detail-page__info-item">
                 <span className="user-detail-page__info-label">Estado</span>
