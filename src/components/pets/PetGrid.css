@@ -1,0 +1,147 @@
+/* ===========================
+   PET GRID - GRID RESPONSIVO
+   =========================== */
+
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+/* ===========================
+   ESTADO VACÍO
+   =========================== */
+
+.pet-grid__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  min-height: 400px;
+}
+
+.pet-grid__empty-icon-svg {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pet-grid__empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 8px 0;
+}
+
+.pet-grid__empty-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 24px 0;
+  max-width: 400px;
+}
+
+/* ===========================
+   ESTADO DE CARGA
+   =========================== */
+
+.pet-grid__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  min-height: 400px;
+}
+
+.pet-grid__spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #4285F4;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pet-grid__loading p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .pet-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .pet-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .pet-grid__empty {
+    padding: 40px 20px;
+    min-height: 320px;
+  }
+
+  .pet-grid__empty-icon-svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .pet-grid__empty-title {
+    font-size: 18px;
+  }
+
+  .pet-grid__empty-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* Pantallas pequeñas */
+@media (max-width: 480px) {
+  .pet-grid {
+    padding: 0;
+  }
+
+  .pet-grid__empty {
+    border-radius: 12px;
+    padding: 32px 16px;
+  }
+}

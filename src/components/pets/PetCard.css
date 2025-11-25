@@ -1,0 +1,234 @@
+/* ===========================
+   PET CARD - ESTILOS PROFESIONALES
+   =========================== */
+
+.pet-card {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 320px;
+}
+
+/* Hover effect */
+.pet-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ===========================
+   ICONO DE MASCOTA
+   =========================== */
+
+.pet-card__icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  transition: background 0.3s ease;
+}
+
+.pet-card:hover .pet-card__icon-container {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+
+.pet-card__pet-icon-svg {
+  width: 90px;
+  height: 90px;
+  transition: transform 0.3s ease;
+}
+
+.pet-card:hover .pet-card__pet-icon-svg {
+  transform: scale(1.1);
+}
+
+/* ===========================
+   CONTENIDO
+   =========================== */
+
+.pet-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* Nombre de la mascota */
+.pet-card__name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* ===========================
+   INFORMACIÓN
+   =========================== */
+
+.pet-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.pet-card__info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.pet-card__info-item:hover {
+  background: #f1f5f9;
+}
+
+.pet-card__info-item--chip {
+  background: #eff6ff;
+}
+
+.pet-card__info-item--chip:hover {
+  background: #dbeafe;
+}
+
+.pet-card__info-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.01em;
+}
+
+.pet-card__info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  text-align: right;
+}
+
+.pet-card__microchip {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #2563eb;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #bfdbfe;
+}
+
+/* ===========================
+   ACCIONES
+   =========================== */
+
+.pet-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pet-card__actions button {
+  flex: 1;
+}
+
+/* ===========================
+   BADGE DE ESTADO
+   =========================== */
+
+.pet-card__status-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pet-card__status-badge--inactive {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 768px) {
+  .pet-card {
+    min-height: auto;
+    padding: 20px;
+  }
+
+  .pet-card__icon-container {
+    height: 100px;
+  }
+
+  .pet-card__pet-icon-svg {
+    width: 70px;
+    height: 70px;
+  }
+
+  .pet-card__name {
+    font-size: 18px;
+  }
+
+  .pet-card__info-label {
+    font-size: 12px;
+  }
+
+  .pet-card__info-value {
+    font-size: 13px;
+  }
+
+  .pet-card__actions {
+    flex-direction: column;
+  }
+}
+
+/* ===========================
+   ANIMACIONES
+   =========================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pet-card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* Delay progresivo para múltiples cards */
+.pet-card:nth-child(1) { animation-delay: 0s; }
+.pet-card:nth-child(2) { animation-delay: 0.1s; }
+.pet-card:nth-child(3) { animation-delay: 0.2s; }
+.pet-card:nth-child(4) { animation-delay: 0.3s; }
+.pet-card:nth-child(5) { animation-delay: 0.4s; }
+.pet-card:nth-child(6) { animation-delay: 0.5s; }
