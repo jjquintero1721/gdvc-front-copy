@@ -10,8 +10,11 @@ import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import ChangePasswordPage from '@/pages/auth/ChangePasswordPage'
 
-// Dashboard Pages (placeholder)
+// Dashboard Pages
 import DashboardHome from '@/pages/dashboard/DashboardHome'
+
+// Users Pages
+import UsersPage from '@/pages/users/UsersPage'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -79,6 +82,18 @@ function AppRoutes() {
           <ProtectedRoute>
             <DashboardLayout>
               <DashboardHome />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Ruta de Gestión de Usuarios (Solo SUPERADMIN) */}
+      <Route
+        path="/usuarios"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <UsersPage />
             </DashboardLayout>
           </ProtectedRoute>
         }

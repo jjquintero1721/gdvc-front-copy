@@ -1,0 +1,432 @@
+/* ========================================
+   PÁGINA DE GESTIÓN DE USUARIOS
+   Basado en el estilo del dashboard existente
+======================================== */
+
+.users-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+
+.users-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.users-page__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem 0;
+}
+
+.users-page__subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ========================================
+   FILTROS Y BÚSQUEDA
+======================================== */
+
+.users-page__filters {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.users-page__search {
+  flex: 1;
+  min-width: 250px;
+}
+
+.users-page__filter-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.users-page__select {
+  padding: 0.625rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 150px;
+}
+
+.users-page__select:hover {
+  border-color: #9ca3af;
+}
+
+.users-page__select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ========================================
+   ESTADÍSTICAS
+======================================== */
+
+.users-page__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.user-stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #3b82f6;
+}
+
+.user-stat-card--success {
+  border-left-color: #10b981;
+}
+
+.user-stat-card--danger {
+  border-left-color: #ef4444;
+}
+
+.user-stat-card--info {
+  border-left-color: #8b5cf6;
+}
+
+.user-stat-card__value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.user-stat-card__label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ========================================
+   TABLA DE USUARIOS
+======================================== */
+
+.users-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table thead {
+  background: #f9fafb;
+}
+
+.users-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.users-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+}
+
+.users-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.users-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.users-table td {
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+/* Fila de usuario inactivo */
+.user-row--inactive {
+  opacity: 0.6;
+  background-color: #fef2f2;
+}
+
+.user-row--inactive:hover {
+  background-color: #fee2e2;
+}
+
+/* ========================================
+   CELDA DE USUARIO
+======================================== */
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-cell__icon {
+  font-size: 1.5rem;
+}
+
+.user-cell__name {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+/* ========================================
+   BADGES
+======================================== */
+
+.user-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-badge--superadmin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.user-badge--veterinario {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.user-badge--auxiliar {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.user-badge--propietario {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.user-badge--default {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Badge de Estado */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge--active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge--inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ========================================
+   ACCIONES
+======================================== */
+
+.user-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.125rem;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.action-btn--view {
+  color: #3b82f6;
+}
+
+.action-btn--view:hover {
+  background: #eff6ff;
+}
+
+.action-btn--edit {
+  color: #8b5cf6;
+}
+
+.action-btn--edit:hover {
+  background: #f5f3ff;
+}
+
+.action-btn--activate {
+  color: #10b981;
+}
+
+.action-btn--activate:hover {
+  background: #ecfdf5;
+}
+
+.action-btn--deactivate {
+  color: #ef4444;
+}
+
+.action-btn--deactivate:hover {
+  background: #fef2f2;
+}
+
+/* ========================================
+   ESTADOS DE CARGA Y VACÍO
+======================================== */
+
+.users-page__loading {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.users-page__loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.users-page__loading p {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.users-page__empty {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #6b7280;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 1024px) {
+  .users-page {
+    padding: 1.5rem;
+  }
+
+  .users-page__filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .users-page__search {
+    min-width: 100%;
+  }
+
+  .users-page__filter-group {
+    width: 100%;
+  }
+
+  .users-page__select {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .users-page {
+    padding: 1rem;
+  }
+
+  .users-page__title {
+    font-size: 1.5rem;
+  }
+
+  .users-page__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .users-table-container {
+    overflow-x: auto;
+  }
+
+  .users-table {
+    min-width: 800px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-page__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .user-stat-card__value {
+    font-size: 1.5rem;
+  }
+}
