@@ -52,7 +52,7 @@ function PetsPage() {
 
   // Verificar permisos
   const canViewAll = ['superadmin', 'veterinario', 'auxiliar'].includes(currentUser?.rol)
-  const canCreate = true // Todos los roles pueden crear mascotas
+  const canCreate = ['superadmin', 'veterinario', 'auxiliar'].includes(currentUser?.rol)
 
   /**
    * Cargar mascotas según el rol del usuario

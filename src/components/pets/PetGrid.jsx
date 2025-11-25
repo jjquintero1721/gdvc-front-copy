@@ -72,7 +72,7 @@ function PetGrid({
           key={pet.id}
           pet={pet}
           onEdit={onEditPet}
-          showActions={!!onEditPet}
+          showActions={false}
         />
       ))}
     </div>

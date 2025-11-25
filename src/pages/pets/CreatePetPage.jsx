@@ -63,15 +63,17 @@ function CreatePetPage() {
   const loadOwners = async () => {
     try {
       setLoadingOwners(true)
-      const response = await userService.getUsers({
-        page: 1,
-        pageSize: 100,
-        rol: 'propietario',
-        activo: true
+      // ✅ Método correcto: getAllUsers con filtro por rol
+      const response = await userService.getAllUsers({
+        skip: 0,
+        limit: 100,
+        rol: 'propietario'
       })
 
       if (response.success && response.data) {
-        const ownersList = response.data.users || []
+        // ✅ La respuesta viene en response.data.usuarios (no users)
+        const ownersList = response.data.usuarios || []
+
         // Mapear usuarios propietarios a propietarios con propietario_id
         const mappedOwners = ownersList
           .filter(u => u.propietario_id) // Solo usuarios que tienen propietario_id
@@ -81,10 +83,15 @@ function CreatePetPage() {
             correo: u.correo
           }))
         setOwners(mappedOwners)
+
+        // Si no hay propietarios, mostrar advertencia
+        if (mappedOwners.length === 0) {
+          console.warn('No se encontraron propietarios con propietario_id')
+        }
       }
     } catch (err) {
       console.error('Error al cargar propietarios:', err)
-      setError('Error al cargar la lista de propietarios')
+      setError('Error al cargar la lista de propietarios. ' + (err.message || ''))
     } finally {
       setLoadingOwners(false)
     }

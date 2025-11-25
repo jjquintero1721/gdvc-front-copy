@@ -14,7 +14,7 @@ function AuthLayout({ children }) {
       {/* Footer opcional */}
       <footer className="auth-layout__footer">
         <div className="auth-layout__footer-content">
-          <p className="caption">© 2024 GDCV - Gestión de Clínica Veterinaria</p>
+          <p className="caption">© 2025 GDCV - Gestión de Clínica Veterinaria</p>
           <div className="auth-layout__footer-links">
             <a href="#" className="caption">Términos de servicio</a>
             <span className="caption">•</span>

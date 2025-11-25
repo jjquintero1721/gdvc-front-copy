@@ -45,11 +45,11 @@ const petService = {
   getAllPets: async (params = {}) => {
     try {
       const { page = 1, pageSize = 10, activo = null } = params
-      const skip = (page - 1) * pageSize
 
+      // ✅ CORREGIDO: El backend espera 'page' y 'page_size', no 'skip' y 'limit'
       const queryParams = new URLSearchParams({
-        skip: skip.toString(),
-        limit: pageSize.toString()
+        page: page.toString(),
+        page_size: pageSize.toString()
       })
 
       if (activo !== null) {
@@ -96,19 +96,21 @@ function handlePetError(error) {
       case 403:
         return new Error('No tienes permisos para realizar esta acción.')
       case 404:
-        return new Error('Propietario o mascota no encontrado.')
+        return new Error('Mascota o propietario no encontrado.')
+      case 409:
+        return new Error('Ya existe una mascota con el mismo nombre y especie para este propietario.')
       case 500:
-        return new Error('Error del servidor. Por favor, intenta más tarde.')
+        return new Error('Error del servidor. Por favor, intenta nuevamente.')
       default:
-        return new Error(data.detail || 'Error al procesar la solicitud.')
+        return new Error(data.detail || data.message || 'Error al procesar la solicitud.')
     }
   }
 
   if (error.request) {
-    return new Error('Error de conexión. Por favor, verifica tu internet.')
+    return new Error('No se pudo conectar con el servidor. Verifica tu conexión.')
   }
 
-  return new Error(error.message || 'Error desconocido')
+  return new Error(error.message || 'Error desconocido.')
 }
 
 export default petService

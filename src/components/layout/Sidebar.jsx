@@ -23,12 +23,11 @@ const navigationByRole = {
     { name: 'Usuarios', path: '/usuarios', icon: 'users' },
     { name: 'Propietarios', path: '/propietarios', icon: 'user' },
     { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
-    { name: 'Especies', path: '/especies', icon: 'dna' },
-    { name: 'Razas', path: '/razas', icon: 'dna' },
     { name: 'Veterinarios', path: '/veterinarios', icon: 'medical' },
     { name: 'Horarios', path: '/horarios', icon: 'clock' },
     { name: 'Servicios', path: '/servicios', icon: 'briefcase' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
+    { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
   ],
   veterinario: [
@@ -36,6 +35,7 @@ const navigationByRole = {
     { name: 'Propietarios', path: '/propietarios', icon: 'user' },
     { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
+    { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
     { name: 'Servicios', path: '/servicios', icon: 'briefcase' },
     { name: 'Horarios', path: '/horarios', icon: 'clock' }
@@ -45,6 +45,7 @@ const navigationByRole = {
     { name: 'Propietarios', path: '/propietarios', icon: 'user' },
     { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
+    { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
   ],
   propietario: [
