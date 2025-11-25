@@ -4,12 +4,20 @@ import userService from '@/services/userService'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Alert from '@/components/ui/Alert'
+import ConfirmModal from '@/components/ui/ConfirmModal'
+import UserActionsMenu from '@/components/users/UserActionsMenu'
 import UserModal from '@/components/users/UserModal'
 import './UsersPage.css'
 
 /**
- * Página de Gestión de Usuarios
+ * Página de Gestión de Usuarios - Versión Mejorada
  * RF-02 | Gestión de usuarios internos (Solo SUPERADMIN)
+ *
+ * Mejoras implementadas:
+ * - Modal de confirmación profesional (reemplaza alert nativo)
+ * - Menú de acciones con mejores iconos y tooltips
+ * - Animaciones suaves y transiciones
+ * - Mejor manejo de estados de carga
  *
  * Funcionalidades:
  * - Listar todos los usuarios con paginación
@@ -35,10 +43,20 @@ function UsersPage() {
   const [filterRole, setFilterRole] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all') // all, active, inactive
 
-  // Estados de modal
+  // Estados de modal de edición/vista
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [modalMode, setModalMode] = useState('view') // view, edit
+
+  // Estados de modal de confirmación
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'warning',
+    onConfirm: null,
+    loading: false
+  })
 
   // Cargar usuarios al montar el componente
   useEffect(() => {
@@ -50,6 +68,17 @@ function UsersPage() {
     applyFilters()
   }, [users, searchTerm, filterRole, filterStatus])
 
+  // Auto-ocultar mensajes después de 5 segundos
+  useEffect(() => {
+    if (success || error) {
+      const timer = setTimeout(() => {
+        setSuccess(null)
+        setError(null)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [success, error])
+
   /**
    * Cargar todos los usuarios desde el backend
    */
@@ -58,26 +87,15 @@ function UsersPage() {
       setLoading(true)
       setError(null)
 
-      const response = await userService.getAllUsers({
-        skip: 0,
-        limit: 100,
-        activo: null // Traer todos (activos e inactivos)
-      })
+      const response = await userService.getAllUsers({ skip: 0, limit: 100 })
 
-      console.log('📦 Respuesta del backend:', response)
-
-      // ✅ CORRECCIÓN: El backend devuelve { success: true, data: { total, usuarios: [...] } }
-      // No es { status: 'success', data: {...} }
       if (response.success && response.data) {
-        const usuariosArray = response.data.usuarios || []
-        console.log('✅ Usuarios cargados:', usuariosArray.length)
-        setUsers(usuariosArray)
+        setUsers(response.data.usuarios || [])
       } else {
-        console.warn('⚠️ Respuesta sin usuarios:', response)
         setUsers([])
       }
     } catch (err) {
-      console.error('❌ Error al cargar usuarios:', err)
+      console.error('Error al cargar usuarios:', err)
       setError(err.message || 'Error al cargar los usuarios')
     } finally {
       setLoading(false)
@@ -90,21 +108,22 @@ function UsersPage() {
   const applyFilters = () => {
     let filtered = [...users]
 
-    // Filtro de búsqueda por nombre o correo
+    // Filtro de búsqueda
     if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase()
-      filtered = filtered.filter(user =>
-        user.nombre?.toLowerCase().includes(searchLower) ||
-        user.correo?.toLowerCase().includes(searchLower)
+      const search = searchTerm.toLowerCase()
+      filtered = filtered.filter(
+        user =>
+          user.nombre.toLowerCase().includes(search) ||
+          user.correo.toLowerCase().includes(search)
       )
     }
 
-    // Filtro por rol
+    // Filtro de rol
     if (filterRole !== 'all') {
       filtered = filtered.filter(user => user.rol === filterRole)
     }
 
-    // Filtro por estado (activo/inactivo)
+    // Filtro de estado
     if (filterStatus === 'active') {
       filtered = filtered.filter(user => user.activo === true)
     } else if (filterStatus === 'inactive') {
@@ -119,7 +138,6 @@ function UsersPage() {
    */
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
-      // Si no hay término de búsqueda, recargar todos
       await loadUsers()
       return
     }
@@ -130,7 +148,6 @@ function UsersPage() {
 
       const response = await userService.searchUsers(searchTerm)
 
-      // ✅ CORRECCIÓN: Usar response.success en lugar de response.status
       if (response.success && response.data) {
         setUsers(response.data.usuarios || [])
       } else {
@@ -173,28 +190,65 @@ function UsersPage() {
   }
 
   /**
-   * Activar/Desactivar usuario
+   * Mostrar modal de confirmación para activar/desactivar usuario
    */
-  const handleToggleUserStatus = async (user) => {
-    if (!window.confirm(`¿Estás seguro de ${user.activo ? 'desactivar' : 'activar'} a ${user.nombre}?`)) {
-      return
-    }
+  const handleToggleUserStatus = (user) => {
+    const isDeactivating = user.activo
 
+    setConfirmModal({
+      isOpen: true,
+      title: isDeactivating ? '¿Desactivar usuario?' : '¿Activar usuario?',
+      message: isDeactivating
+        ? `El usuario ${user.nombre} no podrá acceder al sistema hasta que sea reactivado.`
+        : `El usuario ${user.nombre} podrá acceder nuevamente al sistema.`,
+      variant: isDeactivating ? 'danger' : 'success',
+      confirmText: isDeactivating ? 'Desactivar' : 'Activar',
+      onConfirm: () => executeToggleUserStatus(user),
+      loading: false
+    })
+  }
+
+  /**
+   * Ejecutar la acción de activar/desactivar usuario
+   */
+  const executeToggleUserStatus = async (user) => {
     try {
-      setError(null)
+      // Activar estado de carga en el modal
+      setConfirmModal(prev => ({ ...prev, loading: true }))
 
       const response = user.activo
         ? await userService.deactivateUser(user.id)
         : await userService.activateUser(user.id)
 
-      // ✅ CORRECCIÓN: Usar response.success
       if (response.success) {
         setSuccess(`Usuario ${user.activo ? 'desactivado' : 'activado'} exitosamente`)
+
+        // Cerrar modal
+        setConfirmModal({
+          isOpen: false,
+          title: '',
+          message: '',
+          variant: 'warning',
+          onConfirm: null,
+          loading: false
+        })
+
+        // Recargar usuarios
         await loadUsers()
       }
     } catch (err) {
       console.error('Error al cambiar estado:', err)
       setError(err.message || 'Error al cambiar el estado del usuario')
+
+      // Cerrar modal incluso si hay error
+      setConfirmModal({
+        isOpen: false,
+        title: '',
+        message: '',
+        variant: 'warning',
+        onConfirm: null,
+        loading: false
+      })
     }
   }
 
@@ -207,7 +261,6 @@ function UsersPage() {
 
       const response = await userService.updateUser(userId, userData)
 
-      // ✅ CORRECCIÓN: Usar response.success
       if (response.success) {
         setSuccess('Usuario actualizado exitosamente')
         setModalOpen(false)
@@ -216,6 +269,22 @@ function UsersPage() {
     } catch (err) {
       console.error('Error al actualizar usuario:', err)
       setError(err.message || 'Error al actualizar el usuario')
+    }
+  }
+
+  /**
+   * Cerrar modal de confirmación
+   */
+  const handleCloseConfirmModal = () => {
+    if (!confirmModal.loading) {
+      setConfirmModal({
+        isOpen: false,
+        title: '',
+        message: '',
+        variant: 'warning',
+        onConfirm: null,
+        loading: false
+      })
     }
   }
 
@@ -229,6 +298,7 @@ function UsersPage() {
 
   return (
     <div className="users-page">
+      {/* Header */}
       <div className="users-page__header">
         <div className="users-page__header-content">
           <h1 className="users-page__title">Gestión de Usuarios</h1>
@@ -238,19 +308,15 @@ function UsersPage() {
 
       {/* Alertas */}
       {error && (
-        <Alert
-          type="error"
-          message={error}
-          onClose={() => setError(null)}
-        />
+        <Alert variant="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
       )}
 
       {success && (
-        <Alert
-          type="success"
-          message={success}
-          onClose={() => setSuccess(null)}
-        />
+        <Alert variant="success" onClose={() => setSuccess(null)}>
+          {success}
+        </Alert>
       )}
 
       {/* Filtros y búsqueda */}
@@ -262,7 +328,16 @@ function UsersPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="11" cy="11" r="8" strokeWidth="2" />
+                <path d="m21 21-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            }
           />
+          <Button onClick={handleSearch} disabled={loading}>
+            Buscar
+          </Button>
         </div>
 
         <div className="users-page__filter-group">
@@ -288,50 +363,54 @@ function UsersPage() {
             <option value="inactive">Inactivos</option>
           </select>
 
-          <Button
-            variant="secondary"
-            onClick={handleClearFilters}
-          >
-            🔄 Recargar
+          <Button variant="secondary" onClick={handleClearFilters}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ width: '18px', height: '18px' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Recargar
           </Button>
         </div>
       </div>
 
       {/* Estadísticas */}
       <div className="users-page__stats">
-        <div className="stat-card stat-card--primary">
-          <div className="stat-card__value">{stats.total}</div>
-          <div className="stat-card__label">Total Usuarios</div>
+        <div className="users-page__stat-card">
+          <div className="users-page__stat-value">{stats.total}</div>
+          <div className="users-page__stat-label">Total Usuarios</div>
         </div>
 
-        <div className="stat-card stat-card--success">
-          <div className="stat-card__value">{stats.active}</div>
-          <div className="stat-card__label">Activos</div>
+        <div className="users-page__stat-card users-page__stat-card--success">
+          <div className="users-page__stat-value">{stats.active}</div>
+          <div className="users-page__stat-label">Activos</div>
         </div>
 
-        <div className="stat-card stat-card--warning">
-          <div className="stat-card__value">{stats.inactive}</div>
-          <div className="stat-card__label">Inactivos</div>
+        <div className="users-page__stat-card users-page__stat-card--danger">
+          <div className="users-page__stat-value">{stats.inactive}</div>
+          <div className="users-page__stat-label">Inactivos</div>
         </div>
 
-        <div className="stat-card stat-card--info">
-          <div className="stat-card__value">{stats.filtered}</div>
-          <div className="stat-card__label">Filtrados</div>
+        <div className="users-page__stat-card users-page__stat-card--info">
+          <div className="users-page__stat-value">{stats.filtered}</div>
+          <div className="users-page__stat-label">Filtrados</div>
         </div>
       </div>
 
       {/* Tabla de usuarios */}
-      {loading ? (
-        <div className="users-page__loading">
-          <p>Cargando usuarios...</p>
-        </div>
-      ) : filteredUsers.length === 0 ? (
-        <div className="users-page__empty">
-          <p>No se encontraron usuarios con los filtros aplicados</p>
-        </div>
-      ) : (
-        <div className="users-page__table-container">
-          <table className="users-table">
+      <div className="users-page__table-container">
+        {loading ? (
+          <div className="users-page__loading">
+            <div className="users-page__loading-spinner"></div>
+            <p>Cargando usuarios...</p>
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="users-page__empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p>No se encontraron usuarios</p>
+          </div>
+        ) : (
+          <table className="users-page__table">
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -345,72 +424,70 @@ function UsersPage() {
             </thead>
             <tbody>
               {filteredUsers.map((user) => (
-                <tr key={user.id} className={!user.activo ? 'user-row--inactive' : ''}>
-                  <td>{user.nombre}</td>
-                  <td>{user.correo}</td>
-                  <td>{user.telefono || 'N/A'}</td>
-                  <td>
-                    <span className={`role-badge role-badge--${user.rol}`}>
+                <tr key={user.id} className="users-page__table-row">
+                  <td className="users-page__table-cell users-page__table-cell--name">
+                    {user.nombre}
+                  </td>
+                  <td className="users-page__table-cell">{user.correo}</td>
+                  <td className="users-page__table-cell">{user.telefono || '-'}</td>
+                  <td className="users-page__table-cell">
+                    <span className={`users-page__role-badge users-page__role-badge--${user.rol}`}>
                       {user.rol}
                     </span>
                   </td>
-                  <td>
-                    <span className={`status-badge status-badge--${user.activo ? 'active' : 'inactive'}`}>
+                  <td className="users-page__table-cell">
+                    <span
+                      className={`users-page__status-badge ${
+                        user.activo
+                          ? 'users-page__status-badge--active'
+                          : 'users-page__status-badge--inactive'
+                      }`}
+                    >
                       {user.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
-                  <td>
-                    {user.fecha_creacion
-                      ? new Date(user.fecha_creacion).toLocaleDateString()
-                      : 'N/A'}
+                  <td className="users-page__table-cell">
+                    {new Date(user.fecha_creacion).toLocaleDateString('es-ES')}
                   </td>
-                  <td>
-                    <div className="users-table__actions">
-                      <button
-                        className="btn-icon btn-icon--view"
-                        onClick={() => handleViewUser(user)}
-                        title="Ver detalles"
-                      >
-                        👁️
-                      </button>
-
-                      {currentUser?.rol === 'superadmin' && (
-                        <>
-                          <button
-                            className="btn-icon btn-icon--edit"
-                            onClick={() => handleEditUser(user)}
-                            title="Editar"
-                          >
-                            ✏️
-                          </button>
-
-                          <button
-                            className={`btn-icon ${user.activo ? 'btn-icon--deactivate' : 'btn-icon--activate'}`}
-                            onClick={() => handleToggleUserStatus(user)}
-                            title={user.activo ? 'Desactivar' : 'Activar'}
-                          >
-                            {user.activo ? '🚫' : '✅'}
-                          </button>
-                        </>
-                      )}
-                    </div>
+                  <td className="users-page__table-cell users-page__table-cell--actions">
+                    <UserActionsMenu
+                      user={user}
+                      onView={handleViewUser}
+                      onEdit={handleEditUser}
+                      onToggleStatus={handleToggleUserStatus}
+                      disabled={loading}
+                    />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Modal de usuario */}
+      {/* Modal de edición/vista de usuario */}
       {modalOpen && (
         <UserModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
           user={selectedUser}
           mode={modalMode}
-          onClose={() => setModalOpen(false)}
           onSave={handleSaveUser}
         />
       )}
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={handleCloseConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        confirmText={confirmModal.confirmText || 'Confirmar'}
+        cancelText="Cancelar"
+        loading={confirmModal.loading}
+      />
     </div>
   )
 }

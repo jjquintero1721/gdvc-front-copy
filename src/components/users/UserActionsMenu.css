@@ -1,0 +1,173 @@
+/* ========================================
+   USER ACTIONS MENU - Menú de Acciones
+   ======================================== */
+
+.user-actions-menu {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.user-actions-menu__item {
+  position: relative;
+}
+
+/* Botones de acción */
+.user-actions-menu__button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: transparent;
+  padding: 0;
+}
+
+.user-actions-menu__button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.user-actions-menu__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botón Ver */
+.user-actions-menu__button--view {
+  color: #3b82f6;
+}
+
+.user-actions-menu__button--view:hover:not(:disabled) {
+  background-color: #dbeafe;
+  transform: scale(1.05);
+}
+
+.user-actions-menu__button--view:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Botón Editar */
+.user-actions-menu__button--edit {
+  color: #8b5cf6;
+}
+
+.user-actions-menu__button--edit:hover:not(:disabled) {
+  background-color: #ede9fe;
+  transform: scale(1.05);
+}
+
+.user-actions-menu__button--edit:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Botón Desactivar */
+.user-actions-menu__button--deactivate {
+  color: #dc2626;
+}
+
+.user-actions-menu__button--deactivate:hover:not(:disabled) {
+  background-color: #fee2e2;
+  transform: scale(1.05);
+}
+
+.user-actions-menu__button--deactivate:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Botón Activar */
+.user-actions-menu__button--activate {
+  color: #10b981;
+}
+
+.user-actions-menu__button--activate:hover:not(:disabled) {
+  background-color: #d1fae5;
+  transform: scale(1.05);
+}
+
+.user-actions-menu__button--activate:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Tooltip */
+.user-actions-menu__tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
+
+  /* Animación de entrada */
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+/* Flecha del tooltip */
+.user-actions-menu__tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1f2937;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .user-actions-menu {
+    gap: 0.375rem;
+  }
+
+  .user-actions-menu__button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .user-actions-menu__button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .user-actions-menu__tooltip {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+  }
+}
+
+/* Animación de carga para botones deshabilitados */
+.user-actions-menu__button:disabled {
+  animation: buttonDisabledPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes buttonDisabledPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
