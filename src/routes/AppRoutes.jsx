@@ -16,6 +16,7 @@ import DashboardHome from '@/pages/dashboard/DashboardHome'
 // Users Pages
 import UsersPage from '@/pages/users/UsersPage'
 import UserDetailPage from '@/pages/users/UserDetailPage'
+import PropietariosPage from '@pages/owners/PropietariosPage.jsx'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -111,6 +112,18 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+          path="/propietarios"
+          element={
+            <ProtectedRoute>
+                <DashboardLayout>
+                    <PropietariosPage />
+                </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
 
       {/* Ver perfil propio (desde botón del sidebar) */}
       <Route
