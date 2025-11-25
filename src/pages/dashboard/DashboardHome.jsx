@@ -1,12 +1,12 @@
 import { useAuthStore } from '@/store/authStore'
 import { useNavigate } from 'react-router-dom'
-import DashboardStats from './DashboardStats_IMPROVED'
-import AppointmentsList from './AppointmentsList_IMPROVED'
-import StockAlerts from './StockAlerts_IMPROVED'
+import DashboardStats from '../../components/dashboard/DashboardStats.jsx'
+import AppointmentsList from '../../components/dashboard/AppointmentsList.jsx'
+import StockAlerts from '../../components/dashboard/StockAlerts'
 import Button from '@/components/ui/Button'
 import { CheckIcon, ClockPendingIcon } from '@/assets/icons/DashboardIcons'
 import './DashboardHome.css'
-import './DashboardSections.css'
+import '../../components/dashboard/DashboardSections.css'
 
 /**
  * Dashboard Home - MEJORADO
