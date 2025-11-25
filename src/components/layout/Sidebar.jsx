@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import {
   HomeIcon,
@@ -71,13 +71,14 @@ const iconComponents = {
 }
 
 /**
- * Componente Sidebar - MEJORADO
+ * Componente Sidebar - ACTUALIZADO CON PERFIL CLICKEABLE
  * Navegación lateral con filtro por roles e iconos profesionales
  *
  * Mejoras:
  * - Iconos SVG profesionales en lugar de emojis
  * - Mejor hover y estados activos
  * - Animaciones sutiles
+ * - Footer clickeable que navega al perfil del usuario
  *
  * Principios SOLID aplicados:
  * - Single Responsibility: Solo maneja navegación
@@ -85,6 +86,7 @@ const iconComponents = {
  */
 function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { user } = useAuthStore()
 
   // Obtener navegación según el rol del usuario
@@ -94,6 +96,13 @@ function Sidebar() {
   // Función para obtener el componente de icono
   const getIconComponent = (iconKey) => {
     return iconComponents[iconKey] || HomeIcon
+  }
+
+  /**
+   * Navegar al perfil del usuario
+   */
+  const handleProfileClick = () => {
+    navigate('/mi-perfil')
   }
 
   return (
@@ -130,7 +139,11 @@ function Sidebar() {
       </nav>
 
       <div className="sidebar__footer">
-        <div className="sidebar__user">
+        <button
+          className="sidebar__user"
+          onClick={handleProfileClick}
+          aria-label="Ver mi perfil"
+        >
           <div className="sidebar__user-icon">
             <UserIcon className="w-6 h-6" />
           </div>
@@ -138,7 +151,7 @@ function Sidebar() {
             <p className="sidebar__user-name">{user?.nombre || 'Usuario'}</p>
             <p className="sidebar__user-email">{user?.email || user?.correo}</p>
           </div>
-        </div>
+        </button>
       </div>
     </aside>
   )

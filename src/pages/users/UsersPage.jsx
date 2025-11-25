@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import userService from '@/services/userService'
 import Button from '@/components/ui/Button'
@@ -10,10 +11,11 @@ import UserModal from '@/components/users/UserModal'
 import './UsersPage.css'
 
 /**
- * Página de Gestión de Usuarios - Versión Mejorada
+ * Página de Gestión de Usuarios - Versión Actualizada
  * RF-02 | Gestión de usuarios internos (Solo SUPERADMIN)
  *
  * Mejoras implementadas:
+ * - Navegación a UserDetailPage para ver detalles completos
  * - Modal de confirmación profesional (reemplaza alert nativo)
  * - Menú de acciones con mejores iconos y tooltips
  * - Animaciones suaves y transiciones
@@ -23,12 +25,14 @@ import './UsersPage.css'
  * - Listar todos los usuarios con paginación
  * - Buscar usuarios por nombre o correo
  * - Filtrar por rol y estado (activo/inactivo)
+ * - Ver detalles de usuario (navega a UserDetailPage)
  * - Editar información de usuarios
  * - Activar/Desactivar usuarios
  *
  * IMPORTANTE: Esta página solo es accesible para SUPERADMIN
  */
 function UsersPage() {
+  const navigate = useNavigate()
   const { user: currentUser } = useAuthStore()
 
   // Estados de datos
@@ -43,10 +47,10 @@ function UsersPage() {
   const [filterRole, setFilterRole] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all') // all, active, inactive
 
-  // Estados de modal de edición/vista
+  // Estados de modal de edición (mantener para edición rápida)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
-  const [modalMode, setModalMode] = useState('view') // view, edit
+  const [modalMode, setModalMode] = useState('edit') // solo edición en modal
 
   // Estados de modal de confirmación
   const [confirmModal, setConfirmModal] = useState({
@@ -172,16 +176,15 @@ function UsersPage() {
   }
 
   /**
-   * Abrir modal para ver detalles de un usuario
+   * Navegar a la página de detalle del usuario
+   * CAMBIO IMPORTANTE: Ahora navega en vez de abrir modal
    */
   const handleViewUser = (user) => {
-    setSelectedUser(user)
-    setModalMode('view')
-    setModalOpen(true)
+    navigate(`/usuarios/${user.id}`)
   }
 
   /**
-   * Abrir modal para editar un usuario
+   * Abrir modal para editar un usuario (edición rápida)
    */
   const handleEditUser = (user) => {
     setSelectedUser(user)
@@ -306,20 +309,17 @@ function UsersPage() {
         </div>
       </div>
 
-      {/* Alertas fijas en la esquina superior derecha */}
-      <div className="users-page__alerts">
-        {error && (
-          <Alert variant="error" onClose={() => setError(null)}>
-            {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert variant="success" onClose={() => setSuccess(null)}>
-            {success}
-          </Alert>
-        )}
-      </div>
+      {/* Mensajes de éxito/error */}
+      {success && (
+        <Alert variant="success" onClose={() => setSuccess(null)}>
+          {success}
+        </Alert>
+      )}
+      {error && (
+        <Alert variant="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
 
       {/* Filtros y búsqueda */}
       <div className="users-page__filters">
@@ -330,70 +330,74 @@ function UsersPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="11" cy="11" r="8" strokeWidth="2" />
-                <path d="m21 21-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            }
           />
           <Button onClick={handleSearch} disabled={loading}>
             Buscar
           </Button>
         </div>
 
-        <div className="users-page__filter-group">
-          <select
-            className="users-page__select"
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-          >
-            <option value="all">Todos los roles</option>
-            <option value="superadmin">Superadmin</option>
-            <option value="veterinario">Veterinario</option>
-            <option value="auxiliar">Auxiliar</option>
-            <option value="propietario">Propietario</option>
-          </select>
+        <div className="users-page__filter-row">
+          <div className="users-page__filter-group">
+            <label>Rol:</label>
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="users-page__select"
+              disabled={loading}
+            >
+              <option value="all">Todos los roles</option>
+              <option value="superadmin">Superadmin</option>
+              <option value="veterinario">Veterinario</option>
+              <option value="auxiliar">Auxiliar</option>
+              <option value="propietario">Propietario</option>
+            </select>
+          </div>
 
-          <select
-            className="users-page__select"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">Todos los estados</option>
-            <option value="active">Activos</option>
-            <option value="inactive">Inactivos</option>
-          </select>
+          <div className="users-page__filter-group">
+            <label>Estado:</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="users-page__select"
+              disabled={loading}
+            >
+              <option value="all">Todos los estados</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+            </select>
+          </div>
 
-          <Button variant="secondary" onClick={handleClearFilters}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ width: '18px', height: '18px' }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Recargar
+          <Button
+            variant="secondary"
+            onClick={handleClearFilters}
+            disabled={loading}
+            size="small"
+          >
+            🔄 Recargar
           </Button>
         </div>
       </div>
 
       {/* Estadísticas */}
       <div className="users-page__stats">
-        <div className="users-page__stat-card">
+        <div className="users-page__stat-card users-page__stat-card--primary">
           <div className="users-page__stat-value">{stats.total}</div>
-          <div className="users-page__stat-label">Total Usuarios</div>
+          <div className="users-page__stat-label">TOTAL USUARIOS</div>
         </div>
 
         <div className="users-page__stat-card users-page__stat-card--success">
           <div className="users-page__stat-value">{stats.active}</div>
-          <div className="users-page__stat-label">Activos</div>
+          <div className="users-page__stat-label">ACTIVOS</div>
         </div>
 
         <div className="users-page__stat-card users-page__stat-card--danger">
           <div className="users-page__stat-value">{stats.inactive}</div>
-          <div className="users-page__stat-label">Inactivos</div>
+          <div className="users-page__stat-label">INACTIVOS</div>
         </div>
 
         <div className="users-page__stat-card users-page__stat-card--info">
           <div className="users-page__stat-value">{stats.filtered}</div>
-          <div className="users-page__stat-label">Filtrados</div>
+          <div className="users-page__stat-label">FILTRADOS</div>
         </div>
       </div>
 
@@ -401,40 +405,37 @@ function UsersPage() {
       <div className="users-page__table-container">
         {loading ? (
           <div className="users-page__loading">
-            <div className="users-page__loading-spinner"></div>
+            <div className="spinner"></div>
             <p>Cargando usuarios...</p>
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="users-page__empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
             <p>No se encontraron usuarios</p>
           </div>
         ) : (
           <table className="users-page__table">
-            <thead>
+            <thead className="users-page__table-header">
               <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Fecha Creación</th>
-                <th>Acciones</th>
+                <th className="users-page__table-header-cell">NOMBRE</th>
+                <th className="users-page__table-header-cell">CORREO</th>
+                <th className="users-page__table-header-cell">TELÉFONO</th>
+                <th className="users-page__table-header-cell">ROL</th>
+                <th className="users-page__table-header-cell">ESTADO</th>
+                <th className="users-page__table-header-cell">FECHA CREACIÓN</th>
+                <th className="users-page__table-header-cell users-page__table-header-cell--actions">
+                  ACCIONES
+                </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="users-page__table-body">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="users-page__table-row">
-                  <td className="users-page__table-cell users-page__table-cell--name">
-                    {user.nombre}
-                  </td>
+                  <td className="users-page__table-cell">{user.nombre}</td>
                   <td className="users-page__table-cell">{user.correo}</td>
-                  <td className="users-page__table-cell">{user.telefono || '-'}</td>
+                  <td className="users-page__table-cell">{user.telefono || 'N/A'}</td>
                   <td className="users-page__table-cell">
                     <span className={`users-page__role-badge users-page__role-badge--${user.rol}`}>
-                      {user.rol}
+                      {user.rol.charAt(0).toUpperCase() + user.rol.slice(1)}
                     </span>
                   </td>
                   <td className="users-page__table-cell">
@@ -467,7 +468,7 @@ function UsersPage() {
         )}
       </div>
 
-      {/* Modal de edición/vista de usuario */}
+      {/* Modal de edición (solo para edición rápida) */}
       {modalOpen && (
         <UserModal
           isOpen={modalOpen}

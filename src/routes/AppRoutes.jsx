@@ -15,6 +15,7 @@ import DashboardHome from '@/pages/dashboard/DashboardHome'
 
 // Users Pages
 import UsersPage from '@/pages/users/UsersPage'
+import UserDetailPage from '@/pages/users/UserDetailPage'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -94,6 +95,30 @@ function AppRoutes() {
           <ProtectedRoute>
             <DashboardLayout>
               <UsersPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Ver detalle de un usuario específico (desde gestión de usuarios) */}
+      <Route
+        path="/usuarios/:userId"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <UserDetailPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Ver perfil propio (desde botón del sidebar) */}
+      <Route
+        path="/mi-perfil"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <UserDetailPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
