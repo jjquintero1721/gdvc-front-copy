@@ -306,18 +306,20 @@ function UsersPage() {
         </div>
       </div>
 
-      {/* Alertas */}
-      {error && (
-        <Alert variant="error" onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+      {/* Alertas fijas en la esquina superior derecha */}
+      <div className="users-page__alerts">
+        {error && (
+          <Alert variant="error" onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
 
-      {success && (
-        <Alert variant="success" onClose={() => setSuccess(null)}>
-          {success}
-        </Alert>
-      )}
+        {success && (
+          <Alert variant="success" onClose={() => setSuccess(null)}>
+            {success}
+          </Alert>
+        )}
+      </div>
 
       {/* Filtros y búsqueda */}
       <div className="users-page__filters">

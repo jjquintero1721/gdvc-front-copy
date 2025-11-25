@@ -11,7 +11,7 @@ import './UserModal.css'
  * - onClose: function - Función para cerrar el modal
  * - user: object - Datos del usuario
  * - mode: string - 'view' o 'edit'
- * - onSave: function - Función para guardar cambios
+ * - onSave: function - Función para guardar cambios (userId, userData)
  */
 function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
   const [formData, setFormData] = useState({
@@ -42,8 +42,11 @@ function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
         activo: user.activo,
         fecha_creacion: user.fecha_creacion || ''
       })
+      // Limpiar errores al abrir
+      setError(null)
+      setFieldErrors({})
     }
-  }, [user])
+  }, [user, isOpen])
 
   /**
    * Manejador de cambios en los inputs
@@ -97,7 +100,11 @@ function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
     setLoading(true)
 
     try {
-      await onSave(formData)
+      // ✅ CORRECCIÓN: Pasar userId y userData por separado
+      await onSave(formData.id, {
+        nombre: formData.nombre.trim(),
+        telefono: formData.telefono.trim()
+      })
       // El componente padre maneja el cierre y la recarga
     } catch (err) {
       console.error('Error al guardar usuario:', err)
@@ -150,10 +157,11 @@ function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
         <div className="modal-body">
           {error && (
             <Alert
-              type="error"
-              message={error}
+              variant="error"
               onClose={() => setError(null)}
-            />
+            >
+              {error}
+            </Alert>
           )}
 
           <form onSubmit={handleSubmit} className="user-form">
@@ -170,8 +178,10 @@ function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
                 onChange={handleChange}
                 disabled={!isEditMode}
                 placeholder="Nombre del usuario"
-                error={fieldErrors.nombre}
               />
+              {fieldErrors.nombre && (
+                <span className="form-error">{fieldErrors.nombre}</span>
+              )}
             </div>
 
             {/* Correo (no editable) */}
@@ -203,8 +213,10 @@ function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
                 onChange={handleChange}
                 disabled={!isEditMode}
                 placeholder="Número de teléfono"
-                error={fieldErrors.telefono}
               />
+              {fieldErrors.telefono && (
+                <span className="form-error">{fieldErrors.telefono}</span>
+              )}
             </div>
 
             {/* Rol (no editable) */}
@@ -260,7 +272,7 @@ function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
 
         {/* Footer */}
         <div className="modal-footer">
-          <Button onClick={onClose} variant="outline" disabled={loading}>
+          <Button onClick={onClose} variant="secondary" disabled={loading}>
             {isEditMode ? 'Cancelar' : 'Cerrar'}
           </Button>
 
@@ -268,9 +280,9 @@ function UserModal({ isOpen, onClose, user, mode = 'view', onSave }) {
             <Button
               onClick={handleSubmit}
               variant="primary"
-              disabled={loading}
+              loading={loading}
             >
-              {loading ? 'Guardando...' : '💾 Guardar Cambios'}
+              💾 Guardar Cambios
             </Button>
           )}
         </div>
