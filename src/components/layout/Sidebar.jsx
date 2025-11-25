@@ -34,6 +34,7 @@ const navigationByRole = {
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
     { name: 'Propietarios', path: '/propietarios', icon: 'user' },
     { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
+    { name: 'Veterinarios', path: '/veterinarios', icon: 'medical' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
@@ -44,6 +45,7 @@ const navigationByRole = {
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
     { name: 'Propietarios', path: '/propietarios', icon: 'user' },
     { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
+    { name: 'Veterinarios', path: '/veterinarios', icon: 'medical' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }

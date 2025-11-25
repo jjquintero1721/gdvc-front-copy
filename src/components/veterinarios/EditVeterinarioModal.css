@@ -1,0 +1,63 @@
+/* Reutilizamos los estilos del modal de creación */
+@import './CreateVeterinarioModal.css';
+
+/* Estilos adicionales específicos para el modal de edición */
+
+.form-help {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-indicator--active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-indicator--active::before {
+  background: #10b981;
+}
+
+.status-indicator--inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-indicator--inactive::before {
+  background: #ef4444;
+}
+
+/* Input deshabilitado con estilo especial */
+.form-input[disabled][readonly] {
+  background: #fafafa;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+}
