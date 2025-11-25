@@ -18,6 +18,10 @@ import UsersPage from '@/pages/users/UsersPage'
 import UserDetailPage from '@/pages/users/UserDetailPage'
 import PropietariosPage from '@pages/owners/PropietariosPage.jsx'
 
+
+// Pets Pages
+import PetsPage from '@/pages/pets/PetsPage'
+import CreatePetPage from '@/pages/pets/CreatePetPage'
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -132,6 +136,41 @@ function AppRoutes() {
           <ProtectedRoute>
             <DashboardLayout>
               <UserDetailPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/mascotas"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <PetsPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Crear nueva mascota */}
+      <Route
+        path="/mascotas/crear"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CreatePetPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Ruta alternativa para propietarios: "Mis Mascotas" */}
+      <Route
+        path="/mis-mascotas"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <PetsPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
