@@ -12,11 +12,46 @@ import apiClient from './apiClient'
  *   "message": "Mensaje descriptivo",
  *   "data": { ... datos reales ... }
  * }
+ *
+ * 🔧 CORRECCIÓN APLICADA (v2):
+ * - Las rutas usan el prefijo /patients/owners/
+ * - Se agregó método getMyOwnerProfile() para propietarios autenticados
  */
 const ownerService = {
   /**
+   * ✅ NUEVO: Obtener mi perfil de propietario (usuario autenticado)
+   * Este endpoint permite a un propietario obtener su propio registro
+   * sin necesidad de conocer su owner_id previamente
+   *
+   * @returns {Promise} Propietario del usuario autenticado
+   */
+  getMyOwnerProfile: async () => {
+    try {
+      console.log('🔍 Obteniendo mi perfil de propietario...')
+
+      // ✅ Usar el nuevo endpoint /patients/owners/me
+      const response = await apiClient.get('/patients/owners/me')
+
+      const owner = response.data?.data || null
+
+      if (!owner) {
+        console.warn('⚠️ No se encontró registro de propietario')
+        return null
+      }
+
+      console.log(`✅ Propietario encontrado: ${owner.id}`)
+      return owner
+    } catch (error) {
+      console.error('❌ Error al obtener mi perfil de propietario:', error)
+      throw handleOwnerError(error)
+    }
+  },
+
+  /**
    * Obtener propietario por usuario_id
-   * Útil para obtener el registro de propietario del usuario autenticado
+   *
+   * ⚠️ DEPRECADO: Usar getMyOwnerProfile() en su lugar para propietarios autenticados
+   * Este método se mantiene para compatibilidad con código existente
    *
    * @param {string} usuarioId - ID del usuario
    * @returns {Promise} Propietario encontrado
@@ -25,11 +60,13 @@ const ownerService = {
     try {
       console.log(`🔍 Buscando propietario para usuario: ${usuarioId}`)
 
-      // Obtener todos los propietarios y filtrar por usuario_id
-      // Nota: Si el backend tiene un endpoint específico, usar ese en su lugar
-      const response = await apiClient.get('/owners/')
+      // ⚠️ Este método requiere permisos de staff
+      // Para propietarios autenticados, usar getMyOwnerProfile() en su lugar
+      const response = await apiClient.get('/patients/owners/', {
+        params: { page: 1, page_size: 100 }
+      })
 
-      const owners = response.data?.data?.propietarios || response.data?.propietarios || []
+      const owners = response.data?.data?.owners || []
       const owner = owners.find(o => o.usuario_id === usuarioId)
 
       if (!owner) {
@@ -41,6 +78,13 @@ const ownerService = {
       return owner
     } catch (error) {
       console.error(`❌ Error al buscar propietario:`, error)
+
+      // Si es error 403 (Forbidden), sugerir usar getMyOwnerProfile()
+      if (error.response?.status === 403) {
+        console.warn('⚠️ Acceso denegado. Si eres propietario, usa getMyOwnerProfile() en su lugar')
+        throw new Error('No tienes permisos para acceder a este endpoint. Por favor, contacta al administrador.')
+      }
+
       throw handleOwnerError(error)
     }
   },
@@ -52,7 +96,7 @@ const ownerService = {
    */
   getOwnerById: async (ownerId) => {
     try {
-      const response = await apiClient.get(`/owners/${ownerId}`)
+      const response = await apiClient.get(`/patients/owners/${ownerId}`)
       return response.data?.data || response.data
     } catch (error) {
       throw handleOwnerError(error)
@@ -61,6 +105,8 @@ const ownerService = {
 
   /**
    * Obtener todos los propietarios
+   * ⚠️ Requiere permisos de staff (SUPERADMIN, VETERINARIO, AUXILIAR)
+   *
    * @param {Object} params - Parámetros de búsqueda
    * @returns {Promise} Lista de propietarios
    */
@@ -68,11 +114,18 @@ const ownerService = {
     try {
       const queryParams = new URLSearchParams()
 
-      if (params.skip !== undefined) queryParams.append('skip', params.skip)
-      if (params.limit !== undefined) queryParams.append('limit', params.limit)
-      if (params.activo !== undefined) queryParams.append('activo', params.activo)
+      // Parámetros de paginación
+      const page = params.page || 1
+      const page_size = params.page_size || params.limit || 10
 
-      const response = await apiClient.get(`/owners/?${queryParams}`)
+      queryParams.append('page', page)
+      queryParams.append('page_size', page_size)
+
+      if (params.activo !== undefined) {
+        queryParams.append('activo', params.activo)
+      }
+
+      const response = await apiClient.get(`/patients/owners/?${queryParams}`)
       return response.data
     } catch (error) {
       throw handleOwnerError(error)

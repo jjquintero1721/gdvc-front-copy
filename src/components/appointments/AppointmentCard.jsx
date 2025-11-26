@@ -126,7 +126,7 @@ function AppointmentCard({
         <div className="appointment-card__section">
           <span className="appointment-card__label">Veterinario</span>
           <span className="appointment-card__value">
-            Dr. {appointment.veterinario?.nombre || 'No asignado'}
+            {appointment.veterinario?.nombre || 'No asignado'}
           </span>
         </div>
 

@@ -85,7 +85,7 @@ function OwnerAppointmentsPage() {
         console.log('🔍 Obteniendo registro de propietario para usuario:', currentUser.id)
 
         try {
-          const owner = await ownerService.getOwnerByUserId(currentUser.id)
+          const owner = await ownerService.getMyOwnerProfile()
 
           if (!owner) {
             setError('No se encontró tu registro de propietario. Por favor, contacta al administrador.')
@@ -123,37 +123,56 @@ function OwnerAppointmentsPage() {
    * Cargar citas filtradas por propietario
    */
   const loadAppointmentsWithOwner = async (ownerId) => {
-    console.log('📅 Cargando citas para propietario:', ownerId)
+      try {
+        console.log('📅 Cargando citas para propietario:', ownerId)
 
-    const response = await appointmentService.getAllAppointments({
-      skip: 0,
-      limit: 100
-    })
+        // 1️⃣ Obtener el propietario CON sus mascotas
+        const ownerData = await ownerService.getMyOwnerProfile()
 
-    const allAppointments = response.data?.citas || []
+        if (!ownerData || !ownerData.mascotas || ownerData.mascotas.length === 0) {
+          console.warn('⚠️ El propietario no tiene mascotas registradas')
+          setAppointments([])
+          return
+        }
 
-    console.log('📊 Total de citas en el sistema:', allAppointments.length)
+        // 2️⃣ Extraer los IDs de todas las mascotas del propietario
+        const petIds = ownerData.mascotas.map(pet => pet.id)
+        console.log('🐾 IDs de mascotas del propietario:', petIds)
 
-    // Filtrar citas donde la mascota pertenece al propietario
-    const ownerAppointments = allAppointments.filter(apt => {
-      if (!apt.mascota) {
-        console.warn('⚠️ Cita sin mascota:', apt.id)
-        return false
+        // 3️⃣ Obtener todas las citas
+        const response = await appointmentService.getAllAppointments({
+          skip: 0,
+          limit: 100
+        })
+
+        const allAppointments = response.data?.citas || []
+        console.log('📊 Total de citas en el sistema:', allAppointments.length)
+
+        // 4️⃣ Filtrar citas que pertenecen a las mascotas del propietario
+        const ownerAppointments = allAppointments.filter(apt => {
+          if (!apt.mascota_id) {
+            console.warn('⚠️ Cita sin mascota_id:', apt.id)
+            return false
+          }
+
+          // Verificar si el mascota_id de la cita está en la lista de IDs del propietario
+          const belongsToOwner = petIds.includes(apt.mascota_id)
+
+          if (belongsToOwner) {
+            const mascota = ownerData.mascotas.find(p => p.id === apt.mascota_id)
+            console.log('✓ Cita del propietario:', apt.id, '- Mascota:', mascota?.nombre || apt.mascota_id)
+          }
+
+          return belongsToOwner
+        })
+
+        console.log('✅ Citas del propietario encontradas:', ownerAppointments.length)
+        setAppointments(ownerAppointments)
+      } catch (error) {
+        console.error('❌ Error al cargar citas del propietario:', error)
+        throw error
       }
-
-      // Comparar con el propietario_id de la mascota
-      const isOwnerAppointment = apt.mascota.propietario_id === ownerId
-
-      if (isOwnerAppointment) {
-        console.log('✓ Cita del propietario:', apt.id, '- Mascota:', apt.mascota.nombre)
-      }
-
-      return isOwnerAppointment
-    })
-
-    console.log('✅ Citas del propietario encontradas:', ownerAppointments.length)
-    setAppointments(ownerAppointments)
-  }
+    }
 
   /**
    * Cargar todas las citas (para superadmin)
