@@ -259,11 +259,18 @@ const handleAppointmentError = (error) => {
   if (error.response) {
     // Error del servidor
     const status = error.response.status
-    const message = error.response.data?.detail || error.response.data?.message || 'Error en la operación'
+    const detail = error.response.data?.detail
+
+    // 🔍 LOG DETALLADO PARA DEBUG
+    console.error('❌ ERROR COMPLETO:', {
+      status,
+      detail,
+      fullError: error.response.data
+    })
 
     switch (status) {
       case 400:
-        return new Error(`Datos inválidos: ${message}`)
+        return new Error(`Datos inválidos: ${JSON.stringify(detail)}`)
       case 401:
         return new Error('No autorizado. Por favor, inicia sesión nuevamente.')
       case 403:
@@ -271,11 +278,16 @@ const handleAppointmentError = (error) => {
       case 404:
         return new Error('Cita no encontrada.')
       case 422:
-        return new Error(`Error de validación: ${message}`)
+        // ✅ MEJORADO: Mostrar detalles de validación
+        if (Array.isArray(detail)) {
+          const messages = detail.map(err => `${err.loc?.join('.')}: ${err.msg}`).join(', ')
+          return new Error(`Error de validación: ${messages}`)
+        }
+        return new Error(`Error de validación: ${JSON.stringify(detail)}`)
       case 500:
         return new Error('Error del servidor. Por favor, intenta más tarde.')
       default:
-        return new Error(message)
+        return new Error(JSON.stringify(detail) || 'Error desconocido')
     }
   } else if (error.request) {
     // Error de red
