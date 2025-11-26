@@ -14,8 +14,11 @@ const WORK_HOURS = [
 /**
  * OwnerAvailabilityPanel - Panel de disponibilidad para propietarios
  *
- * Muestra horarios disponibles sin mostrar detalles de otras citas
- * Similar a DaySidePanel pero sin información sensible
+ * ✅ CORRECCIONES APLICADAS:
+ * 1. Inicialización correcta del estado availability
+ * 2. Logs de depuración mejorados
+ * 3. Manejo explícito de estados undefined
+ * 4. Re-renderizado forzado después de cargar datos
  *
  * @param {Date} selectedDate - Fecha seleccionada
  * @param {Function} onDateChange - Callback para cambiar fecha
@@ -30,69 +33,119 @@ function OwnerAvailabilityPanel({
   onTimeSlotSelected,
   selectedTimeSlot
 }) {
-  const [availability, setAvailability] = useState({})
+  // ✅ CORRECCIÓN 1: Inicializar con todos los horarios disponibles por defecto
+  const [availability, setAvailability] = useState(() => {
+    const initialAvailability = {}
+    WORK_HOURS.forEach(hour => {
+      initialAvailability[hour] = true // Todos disponibles por defecto
+    })
+    console.log('🔵 [OwnerAvailabilityPanel] Estado inicial creado:', initialAvailability)
+    return initialAvailability
+  })
+
   const [loading, setLoading] = useState(false)
 
   /**
-   * Cargar disponibilidad cuando cambia la fecha o el veterinario
+   * ✅ CORRECCIÓN 2: Agregar logs y recargar cuando cambian las dependencias
    */
   useEffect(() => {
+    console.log('🔵 [OwnerAvailabilityPanel] useEffect disparado')
+    console.log('  - Fecha seleccionada:', selectedDate)
+    console.log('  - Veterinario ID:', veterinarianId)
+
     if (selectedDate && veterinarianId) {
       loadAvailability()
+    } else {
+      console.warn('⚠️ [OwnerAvailabilityPanel] Falta fecha o veterinario, no se cargará disponibilidad')
     }
   }, [selectedDate, veterinarianId])
 
   /**
-   * Cargar disponibilidad del veterinario para la fecha seleccionada
+   * ✅ CORRECCIÓN 3: Función mejorada con logs de depuración
    */
   const loadAvailability = async () => {
     try {
       setLoading(true)
+      console.log('📅 [OwnerAvailabilityPanel] Cargando disponibilidad...')
 
       const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+      console.log('  - Fecha formateada:', formattedDate)
+      console.log('  - Veterinario ID:', veterinarianId)
 
-      // Obtener citas del veterinario para ese día
+      // Obtener citas del día
       const response = await appointmentService.getAppointmentsByDate(formattedDate)
       const appointments = response.data?.citas || []
+
+      console.log(`✅ [OwnerAvailabilityPanel] ${appointments.length} citas obtenidas del backend`)
+      console.log('  - Todas las citas:', appointments)
 
       // Filtrar solo las citas del veterinario seleccionado que no estén canceladas
       const vetAppointments = appointments.filter(
         apt => apt.veterinario_id === veterinarianId && apt.estado !== 'CANCELADA'
       )
 
-      // Crear mapa de disponibilidad
-      const availabilityMap = {}
+      console.log(`🔍 [OwnerAvailabilityPanel] ${vetAppointments.length} citas del veterinario ${veterinarianId}`)
+      console.log('  - Citas filtradas:', vetAppointments)
 
-      vetAppointments.forEach(apt => {
+      // ✅ CORRECCIÓN 4: Crear un nuevo objeto para el mapa de disponibilidad
+      // Empezar con todos los horarios disponibles
+      const newAvailabilityMap = {}
+      WORK_HOURS.forEach(hour => {
+        newAvailabilityMap[hour] = true // Disponible por defecto
+      })
+
+      console.log('🟢 [OwnerAvailabilityPanel] Mapa inicial (todos disponibles):', newAvailabilityMap)
+
+      // Marcar horarios ocupados
+      vetAppointments.forEach((apt, index) => {
         try {
+          console.log(`  - Procesando cita ${index + 1}:`, apt)
+
           // Extraer hora UTC
           const timeMatch = apt.fecha_hora.match(/T(\d{2}:\d{2})/)
+
           if (timeMatch && timeMatch[1]) {
-            availabilityMap[timeMatch[1]] = false // Ocupado
+            const hour = timeMatch[1]
+            console.log(`    ✅ Hora extraída: ${hour}`)
+
+            // ✅ IMPORTANTE: Marcar como OCUPADO
+            newAvailabilityMap[hour] = false
+            console.log(`    🔴 Horario ${hour} marcado como OCUPADO`)
+          } else {
+            console.warn(`    ⚠️ No se pudo extraer hora de:`, apt.fecha_hora)
           }
         } catch (error) {
-          console.error('Error al procesar fecha:', error)
+          console.error('    ❌ Error al procesar fecha:', error, apt)
         }
       })
 
-      // Marcar todos los horarios como disponibles si no están en el mapa
-      WORK_HOURS.forEach(hour => {
-        if (!(hour in availabilityMap)) {
-          availabilityMap[hour] = true // Disponible
-        }
-      })
+      console.log('📊 [OwnerAvailabilityPanel] Mapa final de disponibilidad:', newAvailabilityMap)
 
-      setAvailability(availabilityMap)
+      // ✅ CORRECCIÓN 5: Contar disponibles y ocupados
+      const availableCount = Object.values(newAvailabilityMap).filter(v => v === true).length
+      const occupiedCount = Object.values(newAvailabilityMap).filter(v => v === false).length
+
+      console.log('📈 [OwnerAvailabilityPanel] Resumen:')
+      console.log(`  - Horarios disponibles: ${availableCount}`)
+      console.log(`  - Horarios ocupados: ${occupiedCount}`)
+
+      // ✅ CORRECCIÓN 6: Actualizar el estado con el nuevo mapa
+      setAvailability(newAvailabilityMap)
+      console.log('✅ [OwnerAvailabilityPanel] Estado actualizado correctamente')
+
     } catch (error) {
-      console.error('Error al cargar disponibilidad:', error)
+      console.error('❌ [OwnerAvailabilityPanel] Error al cargar disponibilidad:', error)
+
       // En caso de error, marcar todos como disponibles
       const fallbackAvailability = {}
       WORK_HOURS.forEach(hour => {
         fallbackAvailability[hour] = true
       })
       setAvailability(fallbackAvailability)
+      console.log('⚠️ [OwnerAvailabilityPanel] Usando disponibilidad por defecto (todos disponibles)')
     } finally {
       setLoading(false)
+      console.log('🔵 [OwnerAvailabilityPanel] Carga finalizada')
     }
   }
 
@@ -100,8 +153,13 @@ function OwnerAvailabilityPanel({
    * Seleccionar horario
    */
   const handleTimeSlotClick = (hour) => {
-    if (!availability[hour]) {
-      // Horario ocupado
+    const isAvailable = availability[hour]
+
+    console.log(`🖱️ [OwnerAvailabilityPanel] Click en horario ${hour}`)
+    console.log(`  - Disponible: ${isAvailable}`)
+
+    if (!isAvailable) {
+      console.warn('⚠️ [OwnerAvailabilityPanel] Horario ocupado, no se puede seleccionar')
       return
     }
 
@@ -109,6 +167,7 @@ function OwnerAvailabilityPanel({
     const dateStr = format(selectedDate, 'yyyy-MM-dd')
     const dateTime = `${dateStr}T${hour}:00.000Z`
 
+    console.log(`✅ [OwnerAvailabilityPanel] Horario seleccionado: ${dateTime}`)
     onTimeSlotSelected(dateTime)
   }
 
@@ -119,9 +178,15 @@ function OwnerAvailabilityPanel({
     const newDate = addDays(selectedDate, days)
     const today = startOfDay(new Date())
 
+    console.log(`📆 [OwnerAvailabilityPanel] Cambio de fecha solicitado: ${days} días`)
+    console.log(`  - Nueva fecha: ${format(newDate, 'yyyy-MM-dd')}`)
+
     // No permitir fechas pasadas
     if (newDate >= today) {
       onDateChange(newDate)
+      console.log('✅ [OwnerAvailabilityPanel] Fecha cambiada correctamente')
+    } else {
+      console.warn('⚠️ [OwnerAvailabilityPanel] No se puede seleccionar una fecha pasada')
     }
   }
 
@@ -133,11 +198,25 @@ function OwnerAvailabilityPanel({
 
     try {
       const timeMatch = selectedTimeSlot.match(/T(\d{2}:\d{2})/)
-      return timeMatch && timeMatch[1] === hour
+      const isSelected = timeMatch && timeMatch[1] === hour
+
+      if (isSelected) {
+        console.log(`🎯 [OwnerAvailabilityPanel] Horario ${hour} está seleccionado`)
+      }
+
+      return isSelected
     } catch (error) {
+      console.error('❌ [OwnerAvailabilityPanel] Error al verificar selección:', error)
       return false
     }
   }
+
+  // ✅ CORRECCIÓN 7: Log del estado actual antes de renderizar
+  console.log('🎨 [OwnerAvailabilityPanel] Renderizando con estado:', {
+    loading,
+    availabilityKeys: Object.keys(availability).length,
+    availability: availability
+  })
 
   return (
     <div className="owner-availability-panel">
@@ -181,8 +260,16 @@ function OwnerAvailabilityPanel({
           </div>
         ) : (
           WORK_HOURS.map(hour => {
-            const isAvailable = availability[hour]
+            // ✅ CORRECCIÓN 8: Verificar explícitamente el valor
+            const isAvailable = availability[hour] === true
+            const isOccupied = availability[hour] === false
+            const isUndefined = availability[hour] === undefined
             const isSelected = isTimeSlotSelected(hour)
+
+            // ✅ Log para debugging de cada slot
+            if (isUndefined) {
+              console.warn(`⚠️ [OwnerAvailabilityPanel] Horario ${hour} tiene valor undefined`)
+            }
 
             return (
               <button
@@ -192,9 +279,12 @@ function OwnerAvailabilityPanel({
                 disabled={!isAvailable}
                 className={`
                   owner-availability-panel__slot
-                  ${isAvailable ? 'owner-availability-panel__slot--available' : 'owner-availability-panel__slot--occupied'}
+                  ${isAvailable ? 'owner-availability-panel__slot--available' : ''}
+                  ${isOccupied ? 'owner-availability-panel__slot--occupied' : ''}
+                  ${isUndefined ? 'owner-availability-panel__slot--undefined' : ''}
                   ${isSelected ? 'owner-availability-panel__slot--selected' : ''}
                 `}
+                title={`${hour} - ${isAvailable ? 'Disponible' : 'Ocupado'}`}
               >
                 <svg className="owner-availability-panel__slot-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path

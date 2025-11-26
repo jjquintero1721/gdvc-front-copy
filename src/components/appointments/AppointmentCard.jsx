@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { motion } from 'framer-motion'
+import { CheckCircle, Calendar, Eye, X, RotateCcw } from 'lucide-react'
 import './AppointmentCard.css'
 
 /**
@@ -60,7 +61,8 @@ function AppointmentCard({
       CONFIRMADA: 'Confirmada',
       ATENDIDA: 'Atendida',
       CANCELADA: 'Cancelada',
-      PENDIENTE: 'Pendiente'
+      PENDIENTE: 'Pendiente',
+      EN_PROCESO: 'En Proceso'
     }
     return labels[estado] || estado
   }
@@ -70,33 +72,24 @@ function AppointmentCard({
                      ['AGENDADA', 'PENDIENTE'].includes(appointment.estado)
 
   const canCancel = ['superadmin', 'propietario'].includes(userRole) &&
-                    !['CANCELADA', 'ATENDIDA'].includes(appointment.estado)
+                    !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(appointment.estado)
 
   const canReschedule = ['superadmin', 'propietario'].includes(userRole) &&
-                        !['CANCELADA', 'ATENDIDA'].includes(appointment.estado)
+                        !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(appointment.estado)
 
   return (
     <motion.div
+      className="appointment-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="appointment-card"
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -4 }}
     >
-      {/* Header con icono y estado */}
+      {/* Header */}
       <div className="appointment-card__header">
         <div className="appointment-card__icon">
-          <svg
-            className="appointment-card__icon-svg"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
+          <svg className="appointment-card__icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
         <span className={`appointment-card__status appointment-card__status--${getStatusColor(appointment.estado)}`}>
@@ -104,30 +97,16 @@ function AppointmentCard({
         </span>
       </div>
 
-      {/* Información principal */}
+      {/* Body */}
       <div className="appointment-card__body">
-        {/* Mascota */}
-        <div className="appointment-card__section">
-          <span className="appointment-card__label">Mascota</span>
-          <span className="appointment-card__value">
-            {appointment.mascota?.nombre || 'No especificada'}
-          </span>
-        </div>
-
-        {/* Servicio */}
-        <div className="appointment-card__section">
-          <span className="appointment-card__label">Servicio</span>
-          <span className="appointment-card__value">
-            {appointment.servicio?.nombre || 'No especificado'}
-          </span>
-        </div>
-
-        {/* Veterinario */}
-        <div className="appointment-card__section">
-          <span className="appointment-card__label">Veterinario</span>
-          <span className="appointment-card__value">
-            {appointment.veterinario?.nombre || 'No asignado'}
-          </span>
+        {/* Información del paciente */}
+        <div className="appointment-card__patient">
+          <h3 className="appointment-card__patient-name">
+            {appointment.mascota?.nombre || 'Paciente'}
+          </h3>
+          <p className="appointment-card__patient-species">
+            {appointment.mascota?.especie || 'Especie no especificada'}
+          </p>
         </div>
 
         {/* Fecha y Hora */}
@@ -146,6 +125,24 @@ function AppointmentCard({
           </div>
         </div>
 
+        {/* Servicio */}
+        <div className="appointment-card__service">
+          <span className="appointment-card__label">Servicio</span>
+          <span className="appointment-card__service-name">
+            {appointment.servicio?.nombre || 'Consulta general'}
+          </span>
+        </div>
+
+        {/* Veterinario */}
+        {appointment.veterinario && (
+          <div className="appointment-card__vet">
+            <span className="appointment-card__label">Veterinario</span>
+            <span className="appointment-card__vet-name">
+              {appointment.veterinario.nombre || 'No asignado'}
+            </span>
+          </div>
+        )}
+
         {/* Motivo */}
         {appointment.motivo && (
           <div className="appointment-card__motivo">
@@ -157,32 +154,31 @@ function AppointmentCard({
 
       {/* Footer con botones de acción */}
       <div className="appointment-card__footer">
+        {/* Botón de Ver Detalles (siempre visible) */}
         <button
           onClick={() => onViewDetails(appointment)}
-          className="appointment-card__button appointment-card__button--primary"
+          className="appointment-card__button appointment-card__button--secondary"
           disabled={isLoading}
         >
-          <svg className="appointment-card__button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-          Ver Detalles
+          <Eye size={18} />
+          <span>Ver Detalles</span>
         </button>
 
-        <div className="appointment-card__actions">
-          {canConfirm && (
-            <button
-              onClick={() => onConfirm(appointment)}
-              className="appointment-card__action-button appointment-card__action-button--confirm"
-              title="Confirmar cita"
-              disabled={isLoading}
-            >
-              <svg className="appointment-card__action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </button>
-          )}
+        {/* Botón de Confirmar (solo para AGENDADA/PENDIENTE) */}
+        {canConfirm && (
+          <button
+            onClick={() => onConfirm(appointment)}
+            className="appointment-card__button appointment-card__button--success"
+            disabled={isLoading}
+            title="Confirmar cita"
+          >
+            <CheckCircle size={18} />
+            <span>Confirmar Cita</span>
+          </button>
+        )}
 
+        {/* Botones de acción secundarios */}
+        <div className="appointment-card__actions">
           {canReschedule && (
             <button
               onClick={() => onReschedule(appointment)}
@@ -190,9 +186,7 @@ function AppointmentCard({
               title="Reprogramar cita"
               disabled={isLoading}
             >
-              <svg className="appointment-card__action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <RotateCcw size={20} />
             </button>
           )}
 
@@ -203,9 +197,7 @@ function AppointmentCard({
               title="Cancelar cita"
               disabled={isLoading}
             >
-              <svg className="appointment-card__action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X size={20} />
             </button>
           )}
         </div>

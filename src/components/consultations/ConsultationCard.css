@@ -1,0 +1,264 @@
+/* ============================================
+   CONSULTATION CARD - ESTILOS
+   Tarjeta de cita confirmada lista para consulta
+   ============================================ */
+
+.consultation-card {
+  background: white;
+  border-radius: 16px;
+  border: 2px solid #e5e7eb;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-width: 320px;
+  max-width: 400px;
+}
+
+.consultation-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.consultation-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.consultation-card__icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.consultation-card__icon-svg {
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.consultation-card__status {
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.15);
+}
+
+/* ============================================
+   BODY
+   ============================================ */
+
+.consultation-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Paciente */
+.consultation-card__patient {
+  padding: 12px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 12px;
+}
+
+.consultation-card__patient-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.consultation-card__patient-owner {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Fecha y Hora */
+.consultation-card__datetime {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 12px;
+}
+
+.consultation-card__date,
+.consultation-card__time {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.consultation-card__date-icon,
+.consultation-card__time-icon {
+  width: 20px;
+  height: 20px;
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.consultation-card__date > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.consultation-card__day {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3b82f6;
+  text-transform: capitalize;
+}
+
+.consultation-card__full-date {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1e40af;
+  text-transform: capitalize;
+}
+
+.consultation-card__time span {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+/* Información adicional */
+.consultation-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.consultation-card__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.consultation-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.consultation-card__value {
+  font-size: 0.9375rem;
+  color: #111827;
+  font-weight: 500;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.consultation-card__footer {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 2px solid #f3f4f6;
+}
+
+.consultation-card__button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.consultation-card__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.consultation-card__button--primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.consultation-card__button--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+
+.consultation-card__button--secondary {
+  background: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+}
+
+.consultation-card__button--secondary:hover:not(:disabled) {
+  background: #eff6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.15);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .consultation-card {
+    padding: 20px;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .consultation-card__footer {
+    flex-direction: column;
+  }
+
+  .consultation-card__button {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.consultation-card__icon {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

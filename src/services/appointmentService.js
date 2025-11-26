@@ -246,7 +246,52 @@ const appointmentService = {
         console.error(`❌ Error al obtener disponibilidad del veterinario ${veterinarioId}:`, error)
         throw handleAppointmentError(error)
       }
+    },
+
+    /**
+     * Inicia una cita (cambia estado a EN_PROCESO)
+     * POST /appointments/{appointment_id}/start
+     */
+    async startAppointment(appointmentId) {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.post(
+          `${API_URL}/appointments/${appointmentId}/start`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+        return response.data
+      } catch (error) {
+        throw this.handleError(error)
+      }
+    },
+
+    /**
+     * Completa una cita (cambia estado a COMPLETADA)
+     * POST /appointments/{appointment_id}/complete
+     */
+    async completeAppointment(appointmentId) {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.post(
+          `${API_URL}/appointments/${appointmentId}/complete`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+        return response.data
+      } catch (error) {
+        throw this.handleError(error)
+      }
     }
+
 
 }
 

@@ -1,6 +1,6 @@
 /* ============================================
-   APPOINTMENT CARD - ESTILOS
-   Tarjeta de cita con diseño similar a PetCard
+   APPOINTMENT CARD - ESTILOS ACTUALIZADOS
+   Con botón de CONFIRMAR más visible
    ============================================ */
 
 .appointment-card {
@@ -18,7 +18,6 @@
 .appointment-card:hover {
   border-color: #3b82f6;
   box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
-  transform: translateY(-2px);
 }
 
 /* ============================================
@@ -99,7 +98,62 @@
   gap: 12px;
 }
 
-.appointment-card__section {
+/* Paciente */
+.appointment-card__patient {
+  padding: 10px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 10px;
+}
+
+.appointment-card__patient-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.appointment-card__patient-species {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+/* Fecha y Hora */
+.appointment-card__date-section {
+  display: flex;
+  gap: 16px;
+}
+
+.appointment-card__date,
+.appointment-card__time {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #eff6ff;
+  border-radius: 8px;
+}
+
+.appointment-card__date-icon,
+.appointment-card__time-icon {
+  width: 18px;
+  height: 18px;
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.appointment-card__date span,
+.appointment-card__time span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+/* Servicio y Veterinario */
+.appointment-card__service,
+.appointment-card__vet {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -113,47 +167,18 @@
   letter-spacing: 0.05em;
 }
 
-.appointment-card__value {
-  font-size: 0.938rem;
-  font-weight: 500;
+.appointment-card__service-name,
+.appointment-card__vet-name {
+  font-size: 0.9375rem;
   color: #111827;
-}
-
-/* Fecha y Hora */
-.appointment-card__date-section {
-  display: flex;
-  gap: 16px;
-  margin-top: 8px;
-  padding: 12px;
-  background: #f9fafb;
-  border-radius: 8px;
-}
-
-.appointment-card__date,
-.appointment-card__time {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  color: #374151;
-  font-weight: 500;
-}
-
-.appointment-card__date-icon,
-.appointment-card__time-icon {
-  width: 18px;
-  height: 18px;
-  color: #3b82f6;
-  flex-shrink: 0;
+  font-weight: 600;
 }
 
 /* Motivo */
 .appointment-card__motivo {
-  margin-top: 8px;
-  padding: 12px;
-  background: #f0f9ff;
-  border-left: 3px solid #3b82f6;
-  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .appointment-card__motivo-text {
@@ -164,32 +189,31 @@
 }
 
 /* ============================================
-   FOOTER - BOTONES DE ACCIÓN
+   FOOTER
    ============================================ */
 
 .appointment-card__footer {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
+  flex-direction: column;
+  gap: 10px;
   padding-top: 16px;
   border-top: 1px solid #f3f4f6;
 }
 
-/* Botón principal (Ver detalles) */
 .appointment-card__button {
-  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 0.875rem;
+  border-radius: 10px;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .appointment-card__button:disabled {
@@ -197,36 +221,60 @@
   cursor: not-allowed;
 }
 
-.appointment-card__button--primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
+/* Botón de Ver Detalles (Secundario) */
+.appointment-card__button--secondary {
+  background: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
 }
 
-.appointment-card__button--primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+.appointment-card__button--secondary:hover:not(:disabled) {
+  background: #eff6ff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
-.appointment-card__button-icon {
-  width: 18px;
-  height: 18px;
+/* ⭐ Botón de CONFIRMAR (Destacado) */
+.appointment-card__button--success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: pulse-green 2s ease-in-out infinite;
 }
 
-/* Botones de acciones secundarias */
+.appointment-card__button--success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  animation: none;
+}
+
+/* Animación de pulso para el botón de confirmar */
+@keyframes pulse-green {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+  }
+}
+
+/* Acciones secundarias (Reprogramar, Cancelar) */
 .appointment-card__actions {
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .appointment-card__action-button {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid;
-  border-radius: 8px;
+  border-radius: 10px;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -235,17 +283,6 @@
 .appointment-card__action-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.appointment-card__action-button--confirm {
-  border-color: #10b981;
-  color: #10b981;
-}
-
-.appointment-card__action-button--confirm:hover:not(:disabled) {
-  background: #10b981;
-  color: white;
-  transform: scale(1.05);
 }
 
 .appointment-card__action-button--reschedule {
@@ -270,11 +307,6 @@
   transform: scale(1.05);
 }
 
-.appointment-card__action-icon {
-  width: 20px;
-  height: 20px;
-}
-
 /* ============================================
    RESPONSIVE
    ============================================ */
@@ -290,15 +322,23 @@
   }
 
   .appointment-card__footer {
-    flex-direction: column;
+    gap: 12px;
   }
+}
 
-  .appointment-card__button {
-    width: 100%;
-  }
+/* ============================================
+   VARIANTE: Card con estado AGENDADA
+   (Llamar la atención para confirmar)
+   ============================================ */
 
-  .appointment-card__actions {
-    width: 100%;
-    justify-content: center;
-  }
+.appointment-card[data-status="AGENDADA"],
+.appointment-card[data-status="PENDIENTE"] {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.appointment-card[data-status="AGENDADA"]:hover,
+.appointment-card[data-status="PENDIENTE"]:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 8px 16px rgba(245, 158, 11, 0.2);
 }

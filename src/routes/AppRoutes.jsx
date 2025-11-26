@@ -26,6 +26,7 @@ import VeterinariosListPage from "@pages/veterinarios/VeterinariosListPage.jsx";
 import CalendarPage from "@pages/appointments/CalendarPage.jsx";
 import ServicesPage from "@pages/services/ServicesPage.jsx";
 import OwnerAppointmentsPage from "@pages/appointments/OwnerAppointmentsPage.jsx";
+import ConsultasPage from "@pages/consultations/ConsultasPage.jsx";
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -220,6 +221,17 @@ function AppRoutes() {
               <DashboardLayout>
                 <OwnerAppointmentsPage />
               </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+      <Route
+          path="/consultas"
+          element={
+            <ProtectedRoute allowedRoles={['superadmin', 'veterinario']}>
+                <DashboardLayout>
+                    <ConsultasPage />
+                </DashboardLayout>
             </ProtectedRoute>
           }
         />
