@@ -90,6 +90,17 @@ const userService = {
     }
   },
 
+  getUsersByRole: async (rol, activo = true) => {
+    try {
+      const response = await apiClient.get(`/users/rol/${rol}`, {
+        params: { activo }
+      })
+      return response.data
+    } catch (error) {
+      throw handleUserError(error)
+    }
+  },
+
   /**
    * ✅ CORREGIDO: Cambiar contraseña de un usuario
    *
