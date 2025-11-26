@@ -1,3 +1,4 @@
+import { Power, PowerOff, Edit } from 'lucide-react'
 import './ServiceCard.css'
 
 /**
@@ -42,13 +43,15 @@ const MoneyIcon = () => (
  * - Iconos informativos
  * - Información organizada jerárquicamente
  * - Badge de estado
+ * - Botones de editar y activar/desactivar
  *
  * @param {Object} service - Datos del servicio
  * @param {Function} onEdit - Callback para editar servicio
  * @param {Function} onView - Callback para ver detalles
+ * @param {Function} onToggleStatus - Callback para activar/desactivar servicio
  * @param {boolean} showActions - Mostrar botones de acción
  */
-function ServiceCard({ service, onEdit, onView, showActions = true }) {
+function ServiceCard({ service, onEdit, onView, onToggleStatus, showActions = true }) {
 
   /**
    * Formatear costo a moneda colombiana
@@ -128,15 +131,37 @@ function ServiceCard({ service, onEdit, onView, showActions = true }) {
       {/* Acciones */}
       {showActions && onEdit && (
         <div className="service-card__actions">
+          {/* Botón de editar */}
           <button
             className="service-card__action-btn service-card__action-btn--edit"
             onClick={(e) => {
               e.stopPropagation()
               onEdit(service)
             }}
+            title="Editar servicio"
           >
-            Editar
+            <Edit size={16} />
+            <span>Editar</span>
           </button>
+
+          {/* Botón de activar/desactivar */}
+          {onToggleStatus && (
+            <button
+              className={`service-card__action-btn ${
+                service.activo 
+                  ? 'service-card__action-btn--deactivate' 
+                  : 'service-card__action-btn--activate'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation()
+                onToggleStatus(service)
+              }}
+              title={service.activo ? 'Desactivar servicio' : 'Activar servicio'}
+            >
+              {service.activo ? <PowerOff size={16} /> : <Power size={16} />}
+              <span>{service.activo ? 'Desactivar' : 'Activar'}</span>
+            </button>
+          )}
         </div>
       )}
     </div>

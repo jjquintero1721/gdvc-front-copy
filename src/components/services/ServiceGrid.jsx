@@ -28,6 +28,7 @@ const EmptyServicesIcon = () => (
  * @param {Function} onAddService - Callback para agregar servicio
  * @param {Function} onEditService - Callback para editar servicio
  * @param {Function} onViewService - Callback para ver detalles
+ * @param {Function} onToggleStatus - Callback para activar/desactivar servicio
  * @param {boolean} loading - Estado de carga
  * @param {string} emptyMessage - Mensaje personalizado de estado vacío
  */
@@ -36,6 +37,7 @@ function ServiceGrid({
   onAddService,
   onEditService,
   onViewService,
+  onToggleStatus,
   loading = false,
   emptyMessage = 'No hay servicios registrados'
 }) {
@@ -74,7 +76,8 @@ function ServiceGrid({
           service={service}
           onEdit={onEditService}
           onView={onViewService}
-          showActions={!!onEditService}
+          onToggleStatus={onToggleStatus}
+          showActions={!!(onEditService || onToggleStatus)}
         />
       ))}
     </div>

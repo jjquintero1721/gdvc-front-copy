@@ -205,3 +205,96 @@
     height: 32px;
   }
 }
+
+/* ============================================
+   ESTILOS ADICIONALES PARA ServiceCard.css
+   Agregar estos estilos al archivo existente
+   ============================================ */
+
+/* ===== ACCIONES - ACTUALIZADAS ===== */
+.service-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #E2E8F0;
+}
+
+.service-card__action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.service-card__action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.service-card__action-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Botón Editar */
+.service-card__action-btn--edit {
+  background: #3B82F6;
+  color: white;
+}
+
+.service-card__action-btn--edit:hover:not(:disabled) {
+  background: #2563EB;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Botón Desactivar */
+.service-card__action-btn--deactivate {
+  background: #EF4444;
+  color: white;
+}
+
+.service-card__action-btn--deactivate:hover:not(:disabled) {
+  background: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Botón Activar */
+.service-card__action-btn--activate {
+  background: #10B981;
+  color: white;
+}
+
+.service-card__action-btn--activate:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.service-card__action-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* ===== RESPONSIVE - ACCIONES ===== */
+@media (max-width: 768px) {
+  .service-card__actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .service-card__action-btn {
+    width: 100%;
+  }
+}

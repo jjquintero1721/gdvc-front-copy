@@ -129,6 +129,20 @@ const serviceService = {
     }
   },
 
+   /**
+  * Activar un servicio previamente desactivado
+  * @param {string} serviceId - ID del servicio (UUID)
+  * @returns {Promise} Confirmación de activación
+  */
+  activateService: async (serviceId) => {
+    try {
+      const response = await apiClient.put(`/services/${serviceId}/activate`)
+      return response.data
+    } catch (error) {
+      throw handleServiceError(error)
+    }
+  },
+
   /**
    * Buscar servicios por término
    * @param {string} searchTerm - Término de búsqueda

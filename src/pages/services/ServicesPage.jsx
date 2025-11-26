@@ -4,16 +4,17 @@ import serviceService from '@/services/serviceService'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Alert from '@/components/ui/Alert'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 import ServiceGrid from '@/components/services/ServiceGrid'
 import CreateServiceModal from '@/components/services/CreateServiceModal'
 import './ServicesPage.css'
 
 /**
- * Página de Gestión de Servicios
+ * Página de Gestión de Servicios - Versión Actualizada
  * RF-09 | Gestión de servicios ofrecidos por la clínica
  *
  * Permisos por rol:
- * - SUPERADMIN, VETERINARIO, AUXILIAR: Acceso completo (ver, crear, editar, desactivar)
+ * - SUPERADMIN, VETERINARIO, AUXILIAR: Acceso completo (ver, crear, editar, activar/desactivar)
  * - PROPIETARIO: Sin acceso
  *
  * Funcionalidades:
@@ -22,7 +23,7 @@ import './ServicesPage.css'
  * - Filtrar por estado (activo/todos)
  * - Crear nuevo servicio
  * - Editar servicio
- * - Desactivar servicio
+ * - Activar/Desactivar servicio con modal de confirmación
  */
 function ServicesPage() {
   const { user: currentUser } = useAuthStore()
@@ -38,10 +39,21 @@ function ServicesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('active') // active, all
 
-  // Estados del modal
+  // Estados del modal de crear/editar
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const [modalLoading, setModalLoading] = useState(false)
+
+  // Estado del modal de confirmación
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'warning',
+    confirmText: 'Confirmar',
+    onConfirm: null,
+    loading: false
+  })
 
   // Verificar permisos
   const canManage = ['superadmin', 'veterinario', 'auxiliar'].includes(currentUser?.rol)
@@ -131,7 +143,7 @@ function ServicesPage() {
   }
 
   /**
-   * Cerrar modal
+   * Cerrar modal de crear/editar
    */
   const handleCloseModal = () => {
     setModalOpen(false)
@@ -176,21 +188,84 @@ function ServicesPage() {
   }
 
   /**
-   * Desactivar servicio
+   * Mostrar modal de confirmación para activar/desactivar servicio
    */
-  const handleDeactivateService = async (serviceId) => {
-    if (!window.confirm('¿Está seguro de desactivar este servicio?')) {
-      return
-    }
+  const handleToggleServiceStatus = (service) => {
+    const isDeactivating = service.activo
 
+    setConfirmModal({
+      isOpen: true,
+      title: isDeactivating ? '¿Desactivar servicio?' : '¿Activar servicio?',
+      message: isDeactivating
+        ? `El servicio "${service.nombre}" quedará inactivo y no podrá ser seleccionado para nuevas citas hasta que sea reactivado.`
+        : `El servicio "${service.nombre}" será activado y estará disponible para agendar citas.`,
+      variant: isDeactivating ? 'danger' : 'success',
+      confirmText: isDeactivating ? 'Desactivar' : 'Activar',
+      onConfirm: () => executeToggleServiceStatus(service),
+      loading: false
+    })
+  }
+
+  /**
+   * Ejecutar la acción de activar/desactivar servicio
+   */
+  const executeToggleServiceStatus = async (service) => {
     try {
-      await serviceService.deactivateService(serviceId)
-      setSuccess('Servicio desactivado exitosamente')
-      await loadServices()
-      setTimeout(() => setSuccess(null), 3000)
+      // Activar estado de carga en el modal
+      setConfirmModal(prev => ({ ...prev, loading: true }))
+
+      const response = service.activo
+        ? await serviceService.deactivateService(service.id)
+        : await serviceService.activateService(service.id)
+
+      if (response.success) {
+        setSuccess(`Servicio ${service.activo ? 'desactivado' : 'activado'} exitosamente`)
+
+        // Cerrar modal
+        setConfirmModal({
+          isOpen: false,
+          title: '',
+          message: '',
+          variant: 'warning',
+          onConfirm: null,
+          loading: false
+        })
+
+        // Recargar servicios
+        await loadServices()
+
+        // Limpiar mensaje después de 3 segundos
+        setTimeout(() => setSuccess(null), 3000)
+      }
     } catch (err) {
-      setError(err.message || 'Error al desactivar servicio')
-      console.error('Error deactivating service:', err)
+      console.error('Error al cambiar estado:', err)
+      setError(err.message || 'Error al cambiar el estado del servicio')
+
+      // Cerrar modal incluso si hay error
+      setConfirmModal({
+        isOpen: false,
+        title: '',
+        message: '',
+        variant: 'warning',
+        onConfirm: null,
+        loading: false
+      })
+    }
+  }
+
+  /**
+   * Cerrar modal de confirmación
+   */
+  const handleCloseConfirmModal = () => {
+    if (!confirmModal.loading) {
+      setConfirmModal({
+        isOpen: false,
+        title: '',
+        message: '',
+        variant: 'warning',
+        onConfirm: null,
+        loading: false
+      })
     }
   }
 
@@ -261,6 +336,7 @@ function ServicesPage() {
         loading={loading}
         onAddService={canManage ? handleCreateService : null}
         onEditService={canManage ? handleEditService : null}
+        onToggleStatus={canManage ? handleToggleServiceStatus : null}
         emptyMessage={
           searchTerm
             ? 'No se encontraron servicios que coincidan con tu búsqueda'
@@ -278,6 +354,19 @@ function ServicesPage() {
           loading={modalLoading}
         />
       )}
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={handleCloseConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        confirmText={confirmModal.confirmText || 'Confirmar'}
+        cancelText="Cancelar"
+        loading={confirmModal.loading}
+      />
     </div>
   )
 }
