@@ -67,63 +67,45 @@ const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUser
         // Determinar color según estado
         let backgroundColor = '#3b82f6'; // Azul por defecto
         let borderColor = '#2563eb';
-        let title = '';
 
-        const esAnonima = appointment.es_mi_cita === false && appointment.titulo_anonimo;
+        if (appointment.estado === 'CANCELADA') {
+          backgroundColor = '#ef4444'; // Rojo
+          borderColor = '#dc2626';
+        } else if (appointment.estado === 'COMPLETADA') {
+          backgroundColor = '#10b981'; // Verde
+          borderColor = '#059669';
+        } else if (appointment.estado === 'PENDIENTE' || appointment.estado === 'AGENDADA') {
+          backgroundColor = '#f59e0b'; // Naranja
+          borderColor = '#d97706';
+        } else if (appointment.estado === 'CONFIRMADA') {
+          backgroundColor = '#3b82f6'; // Azul
+          borderColor = '#2563eb';
+        }
 
-        if (esAnonima) {
-            // ✅ Cita anónima - Mostrar título genérico
-            title = appointment.titulo_anonimo || 'Cita agendada';
-            backgroundColor = '#94a3b8'; // Gris neutro
-            borderColor = '#64748b';
-          } else {
-            // Cita con información completa
-            title = `${appointment.mascota_nombre || 'Mascota'} - ${appointment.propietario_nombre || 'Cliente'}`;
+        // Si es mi cita (del veterinario actual), usar azul más intenso
+        if (appointment.veterinario_id === currentUserId) {
+          backgroundColor = '#3b82f6';
+          borderColor = '#1d4ed8';
+        }
 
-            // Colores según estado
-            if (appointment.estado === 'CANCELADA') {
-              backgroundColor = '#ef4444';
-              borderColor = '#dc2626';
-            } else if (appointment.estado === 'COMPLETADA') {
-              backgroundColor = '#10b981';
-              borderColor = '#059669';
-            } else if (appointment.estado === 'PENDIENTE' || appointment.estado === 'AGENDADA') {
-              backgroundColor = '#f59e0b';
-              borderColor = '#d97706';
-            } else if (appointment.estado === 'CONFIRMADA') {
-              backgroundColor = '#3b82f6';
-              borderColor = '#2563eb';
-            }
-
-            // Si es mi cita como veterinario, usar azul más intenso
-            if (appointment.veterinario_id === currentUserId) {
-              backgroundColor = '#3b82f6';
-              borderColor = '#1d4ed8';
-            }
+        return {
+          id: appointment.id,
+          title: `${appointment.mascota?.nombre || 'Mascota'} - ${appointment.propietario?.nombre || 'Cliente'}`,
+          start: appointment.fecha_hora,
+          end: appointment.fecha_fin || appointment.fecha_hora, // Si no hay fecha_fin, usar la misma
+          backgroundColor,
+          borderColor,
+          textColor: '#ffffff',
+          classNames: [
+            'fc-event-custom',
+            appointment.veterinario_id === currentUserId ? 'fc-event-mine' : 'fc-event-other'
+          ],
+          extendedProps: {
+            appointment: appointment,
+            estado: appointment.estado,
+            veterinario: appointment.veterinario?.nombre || 'Sin asignar',
+            motivo: appointment.motivo || 'Sin motivo especificado'
           }
-
-          return {
-            id: appointment.id,
-            title: title,
-            start: appointment.fecha_hora,
-            end: appointment.fecha_fin || appointment.fecha_hora,
-            backgroundColor,
-            borderColor,
-            textColor: '#ffffff',
-            classNames: [
-              'fc-event-custom',
-              esAnonima ? 'fc-event-anonymous' : '',
-              appointment.veterinario_id === currentUserId ? 'fc-event-mine' : 'fc-event-other',
-              appointment.es_mi_cita ? 'fc-event-my-appointment' : ''
-            ].filter(Boolean),
-            extendedProps: {
-              appointment: appointment,
-              estado: appointment.estado,
-              veterinario: appointment.veterinario_nombre || 'Sin asignar',
-              motivo: appointment.motivo || 'Sin motivo especificado',
-              esAnonima: esAnonima,
-              esMiCita: appointment.es_mi_cita
-            }
         };
       });
 

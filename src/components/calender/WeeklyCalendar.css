@@ -492,32 +492,3 @@
   transition-timing-function: ease-in-out;
 }
 
-/* ============================================
-   ESTILOS PARA CITAS ANÓNIMAS (PROPIETARIOS)
-   ============================================ */
-
-/* Evento anónimo en el calendario */
-.fc-event.fc-event-anonymous {
-  background-color: #94a3b8 !important;
-  border-color: #64748b !important;
-  opacity: 0.85;
-  cursor: not-allowed;
-}
-
-.fc-event.fc-event-anonymous:hover {
-  background-color: #78858b !important;
-  transform: none;
-}
-
-/* Indicador de cita propia */
-.fc-event.fc-event-my-appointment {
-  border-left: 4px solid #10b981 !important;
-}
-
-.fc-event.fc-event-my-appointment::before {
-  content: '⭐';
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 0.75rem;
-}

@@ -35,20 +35,20 @@ const CalendarPage = () => {
       return;
     }
 
+    // Restricción: propietarios no pueden acceder
+    if (user.role === 'propietario') {
+      navigate('/dashboard');
+      return;
+    }
   }, [user, navigate]);
 
   /**
    * Handler cuando se selecciona un día en el calendario
    */
-  const handleDayClick = (date, isAvailableSlot = false) => {
-      // Si es propietario o superadmin, solo abrir panel en disponibles
-      if ((user.role === 'propietario' || user.role === 'superadmin') && !isAvailableSlot) {
-        return; // No hacer nada si hace click en cita existente
-      }
-
-      setSelectedDate(date);
-      setIsPanelOpen(true);
-    };
+  const handleDayClick = (date) => {
+    setSelectedDate(date);
+    setIsPanelOpen(true);
+  };
 
   /**
    * Handler para cerrar el panel lateral
@@ -75,24 +75,9 @@ const CalendarPage = () => {
   };
 
   // Si no hay usuario o no tiene permisos, no renderizar nada
-  if (!user ) {
+  if (!user || user.role === 'propietario') {
     return null;
   }
-
-  const getHeaderMessage = () => {
-      if (user.role === 'propietario') {
-        return {
-          title: 'Horarios Disponibles',
-          subtitle: 'Haz click en un horario disponible para agendar una cita'
-        };
-      }
-      return {
-        title: 'Gestión de Horarios',
-        subtitle: 'Vista completa del calendario de citas'
-      };
-    };
-
-    const { title, subtitle } = getHeaderMessage();
 
   return (
     <div className="calendar-page">
