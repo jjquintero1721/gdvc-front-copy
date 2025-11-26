@@ -1,0 +1,220 @@
+/* ============================================
+   OWNER APPOINTMENTS PAGE - ESTILOS
+   Página de gestión de citas para propietarios
+   ============================================ */
+
+.owner-appointments-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.owner-appointments-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.owner-appointments-page__title-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.owner-appointments-page__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.owner-appointments-page__subtitle {
+  font-size: 0.938rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ============================================
+   FILTROS
+   ============================================ */
+
+.owner-appointments-page__filters {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 2px solid #e5e7eb;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.owner-appointments-page__filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.owner-appointments-page__filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.owner-appointments-page__filter-select {
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.938rem;
+  color: #111827;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.owner-appointments-page__filter-select:hover {
+  border-color: #3b82f6;
+}
+
+.owner-appointments-page__filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ============================================
+   GRID DE CITAS
+   ============================================ */
+
+.owner-appointments-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* ============================================
+   ESTADO VACÍO
+   ============================================ */
+
+.owner-appointments-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 16px;
+  border: 2px dashed #e5e7eb;
+}
+
+.owner-appointments-page__empty-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.owner-appointments-page__empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.owner-appointments-page__empty-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+  max-width: 400px;
+}
+
+/* ============================================
+   ESTADO DE CARGA
+   ============================================ */
+
+.owner-appointments-page__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.owner-appointments-page__spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.owner-appointments-page__loading p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .owner-appointments-page__grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .owner-appointments-page {
+    padding: 16px;
+  }
+
+  .owner-appointments-page__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .owner-appointments-page__title {
+    font-size: 1.5rem;
+  }
+
+  .owner-appointments-page__grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .owner-appointments-page__filters {
+    padding: 16px;
+  }
+
+  .owner-appointments-page__filter-group {
+    width: 100%;
+  }
+}

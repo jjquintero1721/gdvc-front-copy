@@ -133,13 +133,18 @@ const appointmentService = {
    * @returns {Promise} Cita creada
    */
   createAppointment: async (appointmentData) => {
-    try {
-      const response = await apiClient.post('/appointments/', appointmentData)
-      return response.data
-    } catch (error) {
-      throw handleAppointmentError(error)
-    }
-  },
+      try {
+        console.log('📝 Creando nueva cita:', appointmentData)
+
+        const response = await apiClient.post('/appointments/', appointmentData)
+
+        console.log('✅ Cita creada:', response.data)
+        return response.data
+      } catch (error) {
+        console.error('❌ Error al crear cita:', error)
+        throw handleAppointmentError(error)
+      }
+    },
 
   /**
    * Actualizar una cita existente
@@ -161,14 +166,23 @@ const appointmentService = {
    * @param {string} appointmentId - ID de la cita
    * @returns {Promise} Confirmación de cancelación
    */
-  cancelAppointment: async (appointmentId) => {
-    try {
-      const response = await apiClient.delete(`/appointments/${appointmentId}`)
-      return response.data
-    } catch (error) {
-      throw handleAppointmentError(error)
-    }
-  },
+  cancelAppointment: async (appointmentId, motivo_cancelacion) => {
+      try {
+        console.log(`❌ Cancelando cita ${appointmentId}`)
+
+        const response = await apiClient.delete(`/appointments/${appointmentId}`, {
+          params: {
+            motivo_cancelacion: motivo_cancelacion
+          }
+        })
+
+        console.log('✅ Cita cancelada:', response.data)
+        return response.data
+      } catch (error) {
+        console.error(`❌ Error al cancelar cita ${appointmentId}:`, error)
+        throw handleAppointmentError(error)
+      }
+    },
 
   /**
    * Reprogramar una cita
@@ -193,13 +207,47 @@ const appointmentService = {
    * @returns {Promise} Cita confirmada
    */
   confirmAppointment: async (appointmentId) => {
-    try {
-      const response = await apiClient.post(`/appointments/${appointmentId}/confirm`)
-      return response.data
-    } catch (error) {
-      throw handleAppointmentError(error)
+      try {
+        console.log(`✅ Confirmando cita ${appointmentId}`)
+
+        const response = await apiClient.post(`/appointments/${appointmentId}/confirm`)
+
+        console.log('✅ Cita confirmada:', response.data)
+        return response.data
+      } catch (error) {
+        console.error(`❌ Error al confirmar cita ${appointmentId}:`, error)
+        throw handleAppointmentError(error)
+      }
+    },
+
+      /**
+     * Obtener disponibilidad de un veterinario
+     * Endpoint: GET /appointments/availability/{veterinario_id}
+     * @param {string} veterinarioId - ID del veterinario
+     * @param {Object} params - Parámetros adicionales
+     * @param {string} params.fecha_desde - Fecha desde (opcional)
+     * @param {string} params.fecha_hasta - Fecha hasta (opcional)
+     * @returns {Promise} Disponibilidad del veterinario
+     */
+    getVeterinarianAvailability: async (veterinarioId, params = {}) => {
+      try {
+        console.log(`📅 Obteniendo disponibilidad del veterinario ${veterinarioId}`)
+
+        const queryParams = new URLSearchParams()
+
+        if (params.fecha_desde) queryParams.append('fecha_desde', params.fecha_desde)
+        if (params.fecha_hasta) queryParams.append('fecha_hasta', params.fecha_hasta)
+
+        const response = await apiClient.get(`/appointments/availability/${veterinarioId}?${queryParams}`)
+
+        console.log('✅ Disponibilidad obtenida:', response.data)
+        return response.data
+      } catch (error) {
+        console.error(`❌ Error al obtener disponibilidad del veterinario ${veterinarioId}:`, error)
+        throw handleAppointmentError(error)
+      }
     }
-  }
+
 }
 
 /**

@@ -53,8 +53,8 @@ const navigationByRole = {
   ],
   propietario: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
-    { name: 'Mis Mascotas', path: '/mis-mascotas', icon: 'paw' },
-    { name: 'Mis Citas', path: '/mis-citas', icon: 'calendar' }
+    { name: 'Mis Mascotas', path: '/mascotas', icon: 'paw' },
+    { name: 'Citas', path: '/citas', icon: 'calendar' }
   ]
 }
 

@@ -1,0 +1,258 @@
+/* ============================================
+   OWNER AVAILABILITY PANEL - ESTILOS
+   Panel de disponibilidad simplificado para propietarios
+   ============================================ */
+
+.owner-availability-panel {
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ============================================
+   SELECTOR DE FECHA
+   ============================================ */
+
+.owner-availability-panel__date-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.owner-availability-panel__date-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.owner-availability-panel__date-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #3b82f6;
+}
+
+.owner-availability-panel__date-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.owner-availability-panel__date-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+.owner-availability-panel__date-display {
+  flex: 1;
+  text-align: center;
+}
+
+.owner-availability-panel__date-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  text-transform: capitalize;
+}
+
+/* ============================================
+   GRID DE HORARIOS
+   ============================================ */
+
+.owner-availability-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  min-height: 300px;
+}
+
+.owner-availability-panel__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 2px solid;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* Slot disponible */
+.owner-availability-panel__slot--available {
+  border-color: #10b981;
+  background: #ecfdf5;
+}
+
+.owner-availability-panel__slot--available:hover {
+  background: #d1fae5;
+  border-color: #059669;
+  transform: scale(1.05);
+}
+
+.owner-availability-panel__slot--available .owner-availability-panel__slot-icon,
+.owner-availability-panel__slot--available .owner-availability-panel__slot-time {
+  color: #10b981;
+}
+
+/* Slot ocupado */
+.owner-availability-panel__slot--occupied {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.owner-availability-panel__slot--occupied .owner-availability-panel__slot-icon,
+.owner-availability-panel__slot--occupied .owner-availability-panel__slot-time {
+  color: #9ca3af;
+}
+
+/* Slot seleccionado */
+.owner-availability-panel__slot--selected {
+  border-color: #3b82f6 !important;
+  background: #dbeafe !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.owner-availability-panel__slot--selected .owner-availability-panel__slot-icon,
+.owner-availability-panel__slot--selected .owner-availability-panel__slot-time {
+  color: #3b82f6 !important;
+  font-weight: 600;
+}
+
+.owner-availability-panel__slot-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.owner-availability-panel__slot-time {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.owner-availability-panel__slot-check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  color: #3b82f6;
+}
+
+/* ============================================
+   LOADING
+   ============================================ */
+
+.owner-availability-panel__loading {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+}
+
+.owner-availability-panel__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.owner-availability-panel__loading p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ============================================
+   LEYENDA
+   ============================================ */
+
+.owner-availability-panel__legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.owner-availability-panel__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.owner-availability-panel__legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.owner-availability-panel__legend-dot--available {
+  background: #10b981;
+}
+
+.owner-availability-panel__legend-dot--occupied {
+  background: #9ca3af;
+}
+
+.owner-availability-panel__legend-dot--selected {
+  background: #3b82f6;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .owner-availability-panel {
+    padding: 16px;
+  }
+
+  .owner-availability-panel__grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .owner-availability-panel__slot {
+    padding: 10px;
+  }
+
+  .owner-availability-panel__legend {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .owner-availability-panel__date-text {
+    font-size: 0.875rem;
+  }
+}
