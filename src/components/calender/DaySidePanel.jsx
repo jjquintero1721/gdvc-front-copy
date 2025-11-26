@@ -337,7 +337,7 @@ const AppointmentItem = ({ appointment, isCurrentUser, onClick }) => {
     <div className={itemClass} onClick={onClick}>
       <div className="appointment-item__header">
         <span className="appointment-item__pet-name">
-          {appointment.mascota_nombre || 'Mascota'}
+          {appointment.mascota?.nombre || 'Mascota'}
         </span>
         <span className={`appointment-item__status appointment-item__status--${appointment.estado}`}>
           {appointment.estado}
@@ -348,7 +348,7 @@ const AppointmentItem = ({ appointment, isCurrentUser, onClick }) => {
       )}
       <div className="appointment-item__footer">
         <span className="appointment-item__vet">
-          Dr(a). {appointment.veterinario_nombre || 'Sin asignar'}
+           {appointment.veterinario?.nombre || 'Sin asignar'}
         </span>
       </div>
     </div>
