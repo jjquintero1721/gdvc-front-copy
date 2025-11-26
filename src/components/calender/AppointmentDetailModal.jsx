@@ -2,7 +2,13 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import './AppointmentDetailModal.css';
 
+/**
+ * AppointmentDetailModal - Modal para mostrar detalles de una cita
+ *
+ * ✅ CORRECCIÓN: Usa CSS dedicado con z-index: 10000 para aparecer sobre DaySidePanel
+ */
 const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
   if (!appointment) return null;
 
@@ -15,36 +21,36 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay */}
+          {/* Overlay - ✅ z-index: 10000 en CSS */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
+            className="appointment-modal__overlay"
             onClick={onClose}
           >
-            {/* Modal */}
+            {/* Modal Container */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+              className="appointment-modal__container"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
-                <div className="flex items-start justify-between">
+              <div className="appointment-modal__header">
+                <div className="appointment-modal__header-content">
                   <div>
-                    <h2 className="text-2xl font-bold mb-1">Detalle de Cita</h2>
-                    <p className="text-blue-100">{fechaFormateada}</p>
+                    <h2 className="appointment-modal__title">Detalle de Cita</h2>
+                    <p className="appointment-modal__date">{fechaFormateada}</p>
                   </div>
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-blue-800 rounded-lg transition-colors"
+                    className="appointment-modal__close-btn"
                     aria-label="Cerrar modal"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="appointment-modal__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -52,76 +58,83 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
               </div>
 
               {/* Contenido */}
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-                {/* Información principal */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="appointment-modal__content">
+                {/* Grid de información principal */}
+                <div className="appointment-modal__grid">
                   {/* Mascota */}
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Mascota</h3>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="appointment-modal__section">
+                    <h3 className="appointment-modal__section-title">Mascota</h3>
+                    <div className="appointment-modal__section-content">
+                      <div className="appointment-modal__info-row">
+                        <svg className="appointment-modal__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
-                        <span className="font-semibold text-gray-900">
+                        <span className="appointment-modal__info-text">
                           {appointment.mascota?.nombre || 'No especificado'}
                         </span>
                       </div>
-                      {appointment.mascota?.tipo && (
-                        <p className="text-sm text-gray-600 ml-7">
-                          Tipo: {appointment.mascota.tipo}
-                        </p>
-                      )}
-                      {appointment.mascota?.raza && (
-                        <p className="text-sm text-gray-600 ml-7">
-                          Raza: {appointment.mascota.raza}
+                      {appointment.mascota?.especie && (
+                        <p className="appointment-modal__info-subtext">
+                          {appointment.mascota.especie} - {appointment.mascota.raza || 'Raza no especificada'}
                         </p>
                       )}
                     </div>
                   </div>
 
-                  {/* Veterinario */}
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Veterinario</h3>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Propietario */}
+                  <div className="appointment-modal__section">
+                    <h3 className="appointment-modal__section-title">Propietario</h3>
+                    <div className="appointment-modal__section-content">
+                      <div className="appointment-modal__info-row">
+                        <svg className="appointment-modal__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <span className="font-semibold text-gray-900">
-                          Dr. {appointment.veterinario?.nombre} {appointment.veterinario?.apellido}
+                        <span className="appointment-modal__info-text">
+                          {appointment.propietario?.nombre || 'No especificado'}
                         </span>
                       </div>
-                      {appointment.veterinario?.especialidad && (
-                        <p className="text-sm text-gray-600 ml-7">
-                          {appointment.veterinario.especialidad}
-                        </p>
+                      {appointment.propietario?.telefono && (
+                        <p className="appointment-modal__info-subtext">{appointment.propietario.telefono}</p>
                       )}
                     </div>
                   </div>
                 </div>
 
+                {/* Veterinario */}
+                {appointment.veterinario && (
+                  <div className="appointment-modal__section appointment-modal__section--full">
+                    <h3 className="appointment-modal__section-title">Veterinario Asignado</h3>
+                    <div className="appointment-modal__info-row">
+                      <svg className="appointment-modal__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      <span className="appointment-modal__info-text">
+                         {appointment.veterinario.nombre} {appointment.veterinario.apellido}
+                      </span>
+                    </div>
+                    {appointment.veterinario.especialidad && (
+                      <p className="appointment-modal__info-subtext">
+                        {appointment.veterinario.especialidad}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Horario y Estado */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-blue-50 rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Horario</h3>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="appointment-modal__grid">
+                  <div className="appointment-modal__section appointment-modal__section--blue">
+                    <h3 className="appointment-modal__section-title">Horario</h3>
+                    <div className="appointment-modal__info-row">
+                      <svg className="appointment-modal__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="text-lg font-semibold text-gray-900">{horaFormateada}</span>
+                      <span className="appointment-modal__info-text">{horaFormateada}</span>
                     </div>
                   </div>
 
-                  <div className="bg-green-50 rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Estado</h3>
-                    <span className={`
-                      inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                      ${appointment.estado === 'confirmada' ? 'bg-green-200 text-green-800' : ''}
-                      ${appointment.estado === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
-                      ${appointment.estado === 'cancelada' ? 'bg-red-200 text-red-800' : ''}
-                      ${appointment.estado === 'completada' ? 'bg-blue-200 text-blue-800' : ''}
-                    `}>
+                  <div className="appointment-modal__section appointment-modal__section--green">
+                    <h3 className="appointment-modal__section-title">Estado</h3>
+                    <span className={`appointment-modal__badge appointment-modal__badge--${appointment.estado}`}>
                       {appointment.estado?.charAt(0).toUpperCase() + appointment.estado?.slice(1)}
                     </span>
                   </div>
@@ -129,75 +142,80 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
 
                 {/* Servicio */}
                 {appointment.servicio && (
-                  <div className="bg-purple-50 rounded-xl p-4 mb-6">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Servicio</h3>
-                    <p className="text-gray-900 font-medium">{appointment.servicio.nombre || 'No especificado'}</p>
+                  <div className="appointment-modal__section appointment-modal__section--purple appointment-modal__section--full">
+                    <h3 className="appointment-modal__section-title">Servicio</h3>
+                    <p className="appointment-modal__info-text">{appointment.servicio.nombre || 'No especificado'}</p>
                     {appointment.servicio.descripcion && (
-                      <p className="text-sm text-gray-600 mt-1">{appointment.servicio.descripcion}</p>
+                      <p className="appointment-modal__description">{appointment.servicio.descripcion}</p>
                     )}
                   </div>
                 )}
 
                 {/* Motivo */}
                 {appointment.motivo && (
-                  <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Motivo de la consulta</h3>
-                    <p className="text-gray-900">{appointment.motivo}</p>
+                  <div className="appointment-modal__section appointment-modal__section--full">
+                    <h3 className="appointment-modal__section-title">Motivo de la consulta</h3>
+                    <p className="appointment-modal__description">{appointment.motivo}</p>
                   </div>
                 )}
 
                 {/* Notas */}
                 {appointment.notas && appointment.notas.trim() !== '' && (
-                  <div className="bg-amber-50 rounded-xl p-4 mb-6 border-l-4 border-amber-400">
-                    <div className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="appointment-modal__section appointment-modal__section--amber appointment-modal__section--full">
+                    <div className="appointment-modal__alert">
+                      <svg className="appointment-modal__icon" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                       </svg>
-                      <div>
-                        <h3 className="text-sm font-semibold text-amber-900 uppercase mb-1">Notas adicionales</h3>
-                        <p className="text-gray-700">{appointment.notas}</p>
+                      <div className="appointment-modal__alert-content">
+                        <h3 className="appointment-modal__section-title">Notas adicionales</h3>
+                        <p className="appointment-modal__description">{appointment.notas}</p>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Información adicional */}
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                <div className="appointment-modal__data-grid">
                   <div>
-                    <span className="font-medium">Fecha de creación:</span>
-                    <p>{format(parseISO(appointment.fecha_creacion), "d 'de' MMMM 'de' yyyy", { locale: es })}</p>
+                    <p className="appointment-modal__data-label">Fecha de creación:</p>
+                    <p className="appointment-modal__data-value">
+                      {format(parseISO(appointment.fecha_creacion), "d 'de' MMMM 'de' yyyy", { locale: es })}
+                    </p>
                   </div>
                   {appointment.fecha_actualizacion && (
                     <div>
-                      <span className="font-medium">Última actualización:</span>
-                      <p>{format(parseISO(appointment.fecha_actualizacion), "d 'de' MMMM 'de' yyyy", { locale: es })}</p>
+                      <p className="appointment-modal__data-label">Última actualización:</p>
+                      <p className="appointment-modal__data-value">
+                        {format(parseISO(appointment.fecha_actualizacion), "d 'de' MMMM 'de' yyyy", { locale: es })}
+                      </p>
                     </div>
                   )}
                 </div>
 
                 {/* Advertencia de cancelación tardía */}
                 {appointment.cancelacion_tardia && (
-                  <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3 flex items-start gap-2">
-                    <svg className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    <div>
-                      <p className="font-semibold text-orange-900">Cancelación tardía</p>
-                      <p className="text-sm text-orange-700">Esta cita fue cancelada con poco tiempo de anticipación.</p>
+                  <div className="appointment-modal__section appointment-modal__section--orange appointment-modal__section--full">
+                    <div className="appointment-modal__alert">
+                      <svg className="appointment-modal__alert-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <div className="appointment-modal__alert-content">
+                        <p className="appointment-modal__alert-title">Cancelación tardía</p>
+                        <p className="appointment-modal__alert-text">Esta cita fue cancelada con poco tiempo de anticipación.</p>
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Footer con botones de acción */}
-              <div className="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200">
+              {/* Footer */}
+              <div className="appointment-modal__footer">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  className="appointment-modal__btn appointment-modal__btn--close"
                 >
                   Cerrar
                 </button>
-                {/* Aquí podrías agregar botones para editar o cancelar la cita si fuera necesario */}
               </div>
             </motion.div>
           </motion.div>
