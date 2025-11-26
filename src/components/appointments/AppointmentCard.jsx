@@ -8,6 +8,11 @@ import './AppointmentCard.css'
 /**
  * AppointmentCard - Tarjeta de cita para propietarios
  *
+ * ✅ CORRECCIÓN APLICADA:
+ * - Normalización de estados (uppercase)
+ * - Debugging mejorado
+ * - Validación explícita de props
+ *
  * Muestra la información de una cita con diseño similar a PetCard
  * Incluye botones de acción según el estado de la cita
  *
@@ -27,6 +32,16 @@ function AppointmentCard({
   userRole
 }) {
   const [isLoading, setIsLoading] = useState(false)
+
+  // ✅ DEBUGGING: Verificar props recibidas
+  console.group(`🎴 AppointmentCard #${appointment.id}`)
+  console.log('📋 Appointment:', appointment)
+  console.log('👤 User Role:', userRole)
+  console.log('🔖 Estado Original:', appointment.estado)
+
+  // ✅ CORRECCIÓN: Normalizar estado a UPPERCASE para evitar problemas de comparación
+  const normalizedEstado = appointment.estado?.toString().toUpperCase() || 'DESCONOCIDO'
+  console.log('🔖 Estado Normalizado:', normalizedEstado)
 
   // Formatear fecha
   const formatAppointmentDate = (dateString) => {
@@ -50,7 +65,8 @@ function AppointmentCard({
       CONFIRMADA: 'green',
       ATENDIDA: 'blue',
       CANCELADA: 'red',
-      PENDIENTE: 'yellow'
+      PENDIENTE: 'yellow',
+      EN_PROCESO: 'purple'
     }
     return statusColors[estado] || 'gray'
   }
@@ -67,19 +83,32 @@ function AppointmentCard({
     return labels[estado] || estado
   }
 
+  // ✅ CORRECCIÓN: Usar estado normalizado para las comparaciones
   // Determinar si puede confirmar/cancelar/reprogramar
   const canConfirm = ['superadmin', 'propietario'].includes(userRole) &&
-                     ['AGENDADA', 'PENDIENTE'].includes(appointment.estado)
+                     ['AGENDADA', 'PENDIENTE'].includes(normalizedEstado)
 
   const canCancel = ['superadmin', 'propietario'].includes(userRole) &&
-                    !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(appointment.estado)
+                    !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(normalizedEstado)
 
   const canReschedule = ['superadmin', 'propietario'].includes(userRole) &&
-                        !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(appointment.estado)
+                        !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(normalizedEstado)
+
+  // ✅ DEBUGGING: Mostrar evaluación de permisos
+  console.log('✅ Permisos evaluados:')
+  console.log('  - canConfirm:', canConfirm, {
+    hasRole: ['superadmin', 'propietario'].includes(userRole),
+    hasCorrectStatus: ['AGENDADA', 'PENDIENTE'].includes(normalizedEstado),
+    currentStatus: normalizedEstado
+  })
+  console.log('  - canCancel:', canCancel)
+  console.log('  - canReschedule:', canReschedule)
+  console.groupEnd()
 
   return (
     <motion.div
       className="appointment-card"
+      data-status={normalizedEstado}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -92,8 +121,8 @@ function AppointmentCard({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <span className={`appointment-card__status appointment-card__status--${getStatusColor(appointment.estado)}`}>
-          {getStatusLabel(appointment.estado)}
+        <span className={`appointment-card__status appointment-card__status--${getStatusColor(normalizedEstado)}`}>
+          {getStatusLabel(normalizedEstado)}
         </span>
       </div>
 
@@ -164,10 +193,13 @@ function AppointmentCard({
           <span>Ver Detalles</span>
         </button>
 
-        {/* Botón de Confirmar (solo para AGENDADA/PENDIENTE) */}
+        {/* ⭐ Botón de Confirmar (solo para AGENDADA/PENDIENTE) */}
         {canConfirm && (
           <button
-            onClick={() => onConfirm(appointment)}
+            onClick={() => {
+              console.log('🎯 Confirmando cita:', appointment.id)
+              onConfirm(appointment)
+            }}
             className="appointment-card__button appointment-card__button--success"
             disabled={isLoading}
             title="Confirmar cita"
@@ -175,6 +207,19 @@ function AppointmentCard({
             <CheckCircle size={18} />
             <span>Confirmar Cita</span>
           </button>
+        )}
+
+        {/* ℹ️ Mensaje de debugging si el botón no aparece */}
+        {!canConfirm && normalizedEstado === 'AGENDADA' && (
+          <div style={{
+            padding: '8px',
+            background: '#fef3c7',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            color: '#92400e'
+          }}>
+            ⚠️ Debug: Estado=AGENDADA pero botón oculto. Role={userRole}
+          </div>
         )}
 
         {/* Botones de acción secundarios */}

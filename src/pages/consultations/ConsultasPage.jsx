@@ -76,8 +76,8 @@ function ConsultasPage() {
 
     try {
       // Obtener todas las citas
-      const response = await appointmentService.listAppointments()
-      const allAppointments = response.citas || response.data || []
+      const response = await appointmentService.getAllAppointments()
+      const allAppointments = response.appointment || response.data || []
 
       // Filtrar solo CONFIRMADAS y EN_PROCESO
       const confirmedAppointments = allAppointments.filter(
@@ -102,8 +102,8 @@ function ConsultasPage() {
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase()
       filtered = filtered.filter(apt =>
-        apt.mascota?.nombre?.toLowerCase().includes(search) ||
-        apt.mascota?.propietario?.nombre?.toLowerCase().includes(search)
+        apt.pets?.nombre?.toLowerCase().includes(search) ||
+        apt.pets?.propietario?.nombre?.toLowerCase().includes(search)
       )
     }
 
