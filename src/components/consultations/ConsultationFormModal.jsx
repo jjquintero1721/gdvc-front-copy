@@ -106,24 +106,37 @@ function ConsultationFormModal({
   }
 
   // Validar formulario
-  const validateForm = () => {
-    const errors = []
+  // ✅ DESPUÉS (ConsultationFormModal_CORRECTED.jsx)
+const validateForm = () => {
+  const errors = []
 
-    if (!formData.motivo.trim()) {
-      errors.push('El motivo es obligatorio')
-    }
-    if (!formData.anamnesis.trim()) {
-      errors.push('La anamnesis es obligatoria')
-    }
-    if (!formData.signos_vitales.trim()) {
-      errors.push('Los signos vitales son obligatorios')
-    }
-    if (!formData.diagnostico.trim()) {
-      errors.push('El diagnóstico es obligatorio')
-    }
-
-    return errors
+  // 1. Motivo: min_length=5, max_length=300
+  if (!formData.motivo.trim()) {
+    errors.push('El motivo es obligatorio')
+  } else if (formData.motivo.trim().length < 5) {
+    errors.push('El motivo debe tener al menos 5 caracteres')
+  } else if (formData.motivo.trim().length > 300) {
+    errors.push('El motivo no puede exceder 300 caracteres')
   }
+
+  // 2. Diagnóstico: min_length=10
+  if (!formData.diagnostico.trim()) {
+    errors.push('El diagnóstico es obligatorio')
+  } else if (formData.diagnostico.trim().length < 10) {
+    errors.push('El diagnóstico debe tener al menos 10 caracteres')
+  }
+
+  // 3. Tratamiento: min_length=5
+  if (!formData.tratamiento.trim()) {
+    errors.push('El tratamiento es obligatorio')
+  } else if (formData.tratamiento.trim().length < 5) {
+    errors.push('El tratamiento debe tener al menos 5 caracteres')
+  }
+
+  // ✅ NOTA: anamnesis, signos_vitales, vacunas y observaciones son OPCIONALES
+
+  return errors
+}
 
   // Guardar consulta (crear o actualizar)
   const handleSave = async () => {
@@ -362,7 +375,7 @@ function ConsultationFormModal({
                 {/* Anamnesis */}
                 <div className="consultation-form-modal__field">
                   <label className="consultation-form-modal__label">
-                    Anamnesis (Historia clínica) *
+                    Anamnesis (Historia clínica)
                   </label>
                   <textarea
                     name="anamnesis"
@@ -378,7 +391,7 @@ function ConsultationFormModal({
                 {/* Signos Vitales */}
                 <div className="consultation-form-modal__field">
                   <label className="consultation-form-modal__label">
-                    Signos Vitales *
+                    Signos Vitales
                   </label>
                   <textarea
                     name="signos_vitales"
@@ -410,7 +423,7 @@ function ConsultationFormModal({
                 {/* Tratamiento */}
                 <div className="consultation-form-modal__field">
                   <label className="consultation-form-modal__label">
-                    Tratamiento
+                    Tratamiento *
                   </label>
                   <textarea
                     name="tratamiento"
