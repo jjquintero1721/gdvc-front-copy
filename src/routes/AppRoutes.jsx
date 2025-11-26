@@ -24,6 +24,7 @@ import PetsPage from '@/pages/pets/PetsPage'
 import CreatePetPage from '@/pages/pets/CreatePetPage'
 import VeterinariosListPage from "@pages/veterinarios/VeterinariosListPage.jsx";
 import CalendarPage from "@pages/appointments/CalendarPage.jsx";
+import ServicesPage from "@pages/services/ServicesPage.jsx";
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -195,6 +196,17 @@ function AppRoutes() {
           <ProtectedRoute>
             <DashboardLayout>
               <CalendarPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/servicios"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <ServicesPage />
             </DashboardLayout>
           </ProtectedRoute>
         }

@@ -1,0 +1,155 @@
+/* ===================================
+   Services Page Styles
+   Página de gestión de servicios
+   =================================== */
+
+.services-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+.services-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  gap: 20px;
+}
+
+.services-page__header-content {
+  flex: 1;
+}
+
+.services-page__title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0 0 8px 0;
+}
+
+.services-page__subtitle {
+  font-size: 16px;
+  color: #64748B;
+  margin: 0;
+}
+
+/* ===== FILTROS ===== */
+.services-page__filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.services-page__search {
+  flex: 1;
+  min-width: 280px;
+}
+
+.services-page__filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.services-page__filter-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1E293B;
+  white-space: nowrap;
+}
+
+.services-page__select {
+  padding: 10px 16px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1E293B;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.services-page__select:hover {
+  border-color: #CBD5E1;
+}
+
+.services-page__select:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ===== MENSAJES ===== */
+.services-page > .alert {
+  margin-bottom: 20px;
+}
+
+/* ===== RESPONSIVE ===== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .services-page {
+    padding: 20px;
+  }
+
+  .services-page__title {
+    font-size: 28px;
+  }
+}
+
+/* Móviles grandes */
+@media (max-width: 768px) {
+  .services-page {
+    padding: 16px;
+  }
+
+  .services-page__header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 24px;
+  }
+
+  .services-page__title {
+    font-size: 24px;
+  }
+
+  .services-page__subtitle {
+    font-size: 14px;
+  }
+
+  .services-page__filters {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .services-page__search {
+    min-width: 100%;
+  }
+
+  .services-page__filter-group {
+    width: 100%;
+  }
+
+  .services-page__select {
+    flex: 1;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .services-page {
+    padding: 12px;
+  }
+
+  .services-page__title {
+    font-size: 20px;
+  }
+
+  .services-page__subtitle {
+    font-size: 13px;
+  }
+}
