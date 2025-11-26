@@ -7,26 +7,13 @@ import appointmentService from '@/services/appointmentService'
 import petService from '@/services/petService'
 import serviceService from '@/services/serviceService'
 import userService from '@/services/userService'
+import ownerService from '@/services/ownerService' // ✅ AGREGAR ESTA IMPORTACIÓN
 import OwnerAvailabilityPanel from './OwnerAvailabilityPanel'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Alert from '@/components/ui/Alert'
 import './CreateAppointmentModal.css'
 
-/**
- * CreateAppointmentModal - Modal para agendar nueva cita
- *
- * Permite al propietario:
- * - Seleccionar mascota (solo sus mascotas)
- * - Seleccionar servicio
- * - Seleccionar veterinario
- * - Ver disponibilidad y seleccionar horario
- * - Ingresar motivo de la cita
- *
- * @param {Boolean} isOpen - Estado del modal
- * @param {Function} onClose - Callback para cerrar modal
- * @param {Function} onSuccess - Callback cuando se crea la cita
- */
 function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
   const { user: currentUser } = useAuthStore()
 
@@ -43,6 +30,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
   const [pets, setPets] = useState([])
   const [services, setServices] = useState([])
   const [veterinarians, setVeterinarians] = useState([])
+  const [currentOwner, setCurrentOwner] = useState(null) // ✅ AGREGAR ESTE ESTADO
 
   // Estados de disponibilidad
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -52,10 +40,10 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false)
   const [loadingData, setLoadingData] = useState(true)
   const [error, setError] = useState(null)
-  const [step, setStep] = useState(1) // 1: Datos básicos, 2: Disponibilidad
+  const [step, setStep] = useState(1)
 
   /**
-   * Cargar datos iniciales
+   * ✅ FUNCIÓN CORREGIDA - Cargar datos iniciales
    */
   useEffect(() => {
     if (isOpen) {
@@ -68,25 +56,62 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
       setLoadingData(true)
       setError(null)
 
-      // Cargar mascotas del propietario
-      const petsResponse = await petService.getPetsByOwner(currentUser.id)
-      setPets(petsResponse.data?.mascotas || [])
+      console.log('🔄 Iniciando carga de datos para el formulario...')
 
-      // Cargar servicios disponibles
+      // ✅ PASO 1: Obtener el registro de propietario del usuario autenticado
+      console.log('📌 Paso 1: Obteniendo registro de propietario...')
+      const owner = await ownerService.getMyOwnerProfile()
+
+      if (!owner) {
+        setError('No se encontró tu registro de propietario. Por favor, contacta al administrador.')
+        setLoadingData(false)
+        return
+      }
+
+      console.log(`✅ Propietario encontrado: ${owner.id}`)
+      setCurrentOwner(owner)
+
+      // ✅ PASO 2: Cargar mascotas usando el propietario_id correcto
+      console.log('📌 Paso 2: Cargando mascotas del propietario...')
+      const petsResponse = await petService.getPetsByOwner(owner.id) // ✅ USAR owner.id NO currentUser.id
+      const petsData = petsResponse.data?.pets || []
+
+      console.log(`✅ ${petsData.length} mascotas cargadas`)
+      setPets(petsData)
+
+      if (petsData.length === 0) {
+        setError('No tienes mascotas registradas. Por favor, registra una mascota antes de agendar una cita.')
+        setLoadingData(false)
+        return
+      }
+
+      // ✅ PASO 3: Cargar servicios disponibles
+      console.log('📌 Paso 3: Cargando servicios disponibles...')
       const servicesResponse = await serviceService.getAllServices()
-      setServices(servicesResponse.data?.servicios || [])
+      const servicesData = servicesResponse.data?.servicios || []
 
-      // Cargar veterinarios
+      console.log(`✅ ${servicesData.length} servicios cargados`)
+      setServices(servicesData)
+
+      // ✅ PASO 4: Cargar veterinarios
+      console.log('📌 Paso 4: Cargando veterinarios...')
       const veterinariansResponse = await userService.getUsersByRole('veterinario')
-      setVeterinarians(veterinariansResponse.data?.usuarios || [])
+      const veterinariansData = veterinariansResponse.data?.usuarios || []
+
+      console.log(`✅ ${veterinariansData.length} veterinarios cargados`)
+      setVeterinarians(veterinariansData)
+
+      console.log('✅ Carga de datos completada exitosamente')
 
     } catch (err) {
-      console.error('Error al cargar datos:', err)
+      console.error('❌ Error al cargar datos:', err)
       setError(err.message || 'Error al cargar los datos necesarios')
     } finally {
       setLoadingData(false)
     }
   }
+
+  // ... resto del código sin cambios ...
 
   /**
    * Manejar cambio en inputs del formulario
@@ -182,6 +207,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
       })
       setStep(1)
       setSelectedTimeSlot(null)
+      setCurrentOwner(null) // ✅ LIMPIAR TAMBIÉN EL OWNER
 
       onSuccess()
     } catch (err) {
@@ -206,6 +232,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
       })
       setStep(1)
       setSelectedTimeSlot(null)
+      setCurrentOwner(null) // ✅ LIMPIAR TAMBIÉN EL OWNER
       setError(null)
       onClose()
     }
@@ -254,8 +281,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
           {/* Contenido del modal */}
           <div className="create-appointment-modal__content">
             {loadingData ? (
-              <div className="create-appointment-modal__loading">
-                <div className="create-appointment-modal__spinner"></div>
+              <div style={{ textAlign: 'center', padding: '40px' }}>
                 <p>Cargando datos...</p>
               </div>
             ) : (
@@ -263,7 +289,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                 {/* PASO 1: Datos básicos */}
                 {step === 1 && (
                   <div className="create-appointment-modal__step">
-                    {/* Seleccionar mascota */}
+                    {/* Mascota */}
                     <div className="create-appointment-modal__field">
                       <label className="create-appointment-modal__label">
                         Mascota *
@@ -278,13 +304,13 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                         <option value="">Selecciona una mascota</option>
                         {pets.map(pet => (
                           <option key={pet.id} value={pet.id}>
-                            {pet.nombre} ({pet.especie})
+                            {pet.nombre} ({pet.especie} - {pet.raza || 'Sin raza'})
                           </option>
                         ))}
                       </select>
                     </div>
 
-                    {/* Seleccionar servicio */}
+                    {/* Servicio */}
                     <div className="create-appointment-modal__field">
                       <label className="create-appointment-modal__label">
                         Servicio *
@@ -299,13 +325,13 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                         <option value="">Selecciona un servicio</option>
                         {services.map(service => (
                           <option key={service.id} value={service.id}>
-                            {service.nombre} - ${service.precio} ({service.duracion_minutos} min)
+                            {service.nombre}
                           </option>
                         ))}
                       </select>
                     </div>
 
-                    {/* Seleccionar veterinario */}
+                    {/* Veterinario */}
                     <div className="create-appointment-modal__field">
                       <label className="create-appointment-modal__label">
                         Veterinario *
@@ -373,7 +399,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                     <>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
                         onClick={handleClose}
                         disabled={loading}
                       >
@@ -381,6 +407,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                       </Button>
                       <Button
                         type="button"
+                        variant="primary"
                         onClick={handleNextStep}
                         disabled={loading}
                       >
@@ -391,14 +418,15 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                     <>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
                         onClick={handlePreviousStep}
                         disabled={loading}
                       >
-                        Atrás
+                        Anterior
                       </Button>
                       <Button
                         type="submit"
+                        variant="primary"
                         disabled={loading || !selectedTimeSlot}
                       >
                         {loading ? 'Agendando...' : 'Agendar Cita'}
