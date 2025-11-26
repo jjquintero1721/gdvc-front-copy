@@ -2,17 +2,22 @@ import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { motion } from 'framer-motion'
-import { Play, Eye } from 'lucide-react'
+import { Play, Eye, ArrowRight } from 'lucide-react'
 import './ConsultationCard.css'
 
 /**
- * ConsultationCard - Tarjeta de cita confirmada lista para consulta
+ * ConsultationCard - Tarjeta de cita confirmada o en proceso
  *
- * Similar a AppointmentCard pero enfocado en iniciar consultas
- * Solo muestra citas en estado CONFIRMADA
+ * ✅ CORRECCIONES APLICADAS:
+ * 1. Detecta estado real de la cita (CONFIRMADA vs EN_PROCESO)
+ * 2. Muestra badge con el estado correcto
+ * 3. Cambia el texto del botón según el estado:
+ *    - CONFIRMADA: "Iniciar Consulta"
+ *    - EN_PROCESO: "Continuar Consulta"
+ * 4. Aplica colores diferentes según el estado
  *
- * @param {Object} appointment - Cita confirmada
- * @param {Function} onStartConsultation - Callback para iniciar consulta
+ * @param {Object} appointment - Cita confirmada o en proceso
+ * @param {Function} onStartConsultation - Callback para iniciar/continuar consulta
  * @param {Function} onViewDetails - Callback para ver detalles
  * @param {boolean} isLoading - Estado de carga
  */
@@ -22,6 +27,19 @@ function ConsultationCard({
   onViewDetails,
   isLoading = false
 }) {
+  // ✅ NUEVO: Normalizar estado a UPPERCASE para comparaciones
+  const estadoNormalizado = appointment.estado?.toString().toUpperCase() || 'DESCONOCIDO'
+
+  // ✅ NUEVO: Determinar si la cita está en proceso
+  const isInProgress = estadoNormalizado === 'EN_PROCESO'
+
+  console.log('🎴 ConsultationCard:', {
+    id: appointment.id,
+    estadoOriginal: appointment.estado,
+    estadoNormalizado,
+    isInProgress
+  })
+
   // Formatear fecha
   const formatAppointmentDate = (dateString) => {
     try {
@@ -38,6 +56,39 @@ function ConsultationCard({
 
   const { date, time, dayOfWeek } = formatAppointmentDate(appointment.fecha_hora)
 
+  // ✅ NUEVO: Configuración del badge según estado
+  const getBadgeConfig = () => {
+    if (isInProgress) {
+      return {
+        text: 'En Proceso',
+        className: 'consultation-card__status--in-progress'
+      }
+    }
+    return {
+      text: 'Confirmada',
+      className: 'consultation-card__status--confirmed'
+    }
+  }
+
+  // ✅ NUEVO: Configuración del botón según estado
+  const getButtonConfig = () => {
+    if (isInProgress) {
+      return {
+        text: 'Continuar Consulta',
+        icon: <ArrowRight size={18} />,
+        className: 'consultation-card__button--continue'
+      }
+    }
+    return {
+      text: 'Iniciar Consulta',
+      icon: <Play size={18} />,
+      className: 'consultation-card__button--primary'
+    }
+  }
+
+  const badgeConfig = getBadgeConfig()
+  const buttonConfig = getButtonConfig()
+
   return (
     <motion.div
       className="consultation-card"
@@ -53,8 +104,9 @@ function ConsultationCard({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
         </div>
-        <span className="consultation-card__status">
-          Confirmada
+        {/* ✅ NUEVO: Badge dinámico según estado */}
+        <span className={`consultation-card__status ${badgeConfig.className}`}>
+          {badgeConfig.text}
         </span>
       </div>
 
@@ -108,13 +160,15 @@ function ConsultationCard({
 
       {/* Footer con acciones */}
       <div className="consultation-card__footer">
+        {/* ✅ NUEVO: Botón dinámico según estado */}
         <button
           onClick={() => onStartConsultation(appointment)}
-          className="consultation-card__button consultation-card__button--primary"
+          className={`consultation-card__button ${buttonConfig.className}`}
           disabled={isLoading}
+          title={isInProgress ? 'Continuar con la consulta en proceso' : 'Iniciar una nueva consulta'}
         >
-          <Play size={18} />
-          <span>Iniciar Consulta</span>
+          {buttonConfig.icon}
+          <span>{buttonConfig.text}</span>
         </button>
 
         <button

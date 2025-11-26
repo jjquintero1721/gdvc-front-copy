@@ -2,6 +2,9 @@
  * Servicio de Seguimiento de Pacientes - RF-11
  * Permite crear citas de control/seguimiento asociadas a consultas
  *
+ * ✅ CORRECCIÓN APLICADA:
+ * Ahora usa apiClient (con /api/v1/ incluido) en lugar de axios directo
+ *
  * Funcionalidades:
  * - Crear seguimiento (nueva cita vinculada a consulta)
  * - Listar seguimientos de una consulta
@@ -10,122 +13,114 @@
  * - Obtener estadísticas
  */
 
-import axios from 'axios'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+import apiClient from './apiClient'
 
 class FollowUpService {
   /**
    * Crea un seguimiento para una consulta
-   * POST /follow-up/consultas/{consulta_id}/seguimiento
+   * POST /api/v1/follow-up/consultas/{consulta_id}/seguimiento
    *
    * Crea una nueva cita vinculada a la consulta original
    * Usado para controles post-operatorios, revisiones, etc.
    */
   async createFollowUp(consultaId, followUpData) {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.post(
-        `${API_URL}/follow-up/consultas/${consultaId}/seguimiento`,
-        followUpData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+      console.log(`📅 Creando seguimiento para consulta ${consultaId}:`, followUpData)
+
+      // ✅ CORREGIDO: Usa apiClient que ya incluye /api/v1/
+      const response = await apiClient.post(
+        `/follow-up/consultas/${consultaId}/seguimiento`,
+        followUpData
       )
+
+      console.log('✅ Seguimiento creado:', response.data)
       return response.data
     } catch (error) {
+      console.error(`❌ Error al crear seguimiento:`, error)
       throw this.handleError(error)
     }
   }
 
   /**
    * Obtiene todos los seguimientos de una consulta
-   * GET /follow-up/consultas/{consulta_id}/seguimientos
+   * GET /api/v1/follow-up/consultas/{consulta_id}/seguimientos
    */
   async getConsultationFollowUps(consultaId) {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.get(
-        `${API_URL}/follow-up/consultas/${consultaId}/seguimientos`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+      console.log(`🔍 Obteniendo seguimientos de consulta ${consultaId}`)
+
+      const response = await apiClient.get(
+        `/follow-up/consultas/${consultaId}/seguimientos`
       )
+
+      console.log('✅ Seguimientos obtenidos:', response.data)
       return response.data
     } catch (error) {
+      console.error(`❌ Error al obtener seguimientos:`, error)
       throw this.handleError(error)
     }
   }
 
   /**
    * Completa un seguimiento (registra la consulta de control)
-   * POST /follow-up/completar
+   * POST /api/v1/follow-up/completar
    *
    * Este endpoint crea la consulta de seguimiento y la vincula
    * automáticamente al historial clínico
    */
   async completeFollowUp(completionData) {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.post(
-        `${API_URL}/follow-up/completar`,
-        completionData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+      console.log('📝 Completando seguimiento:', completionData)
+
+      const response = await apiClient.post(
+        '/follow-up/completar',
+        completionData
       )
+
+      console.log('✅ Seguimiento completado:', response.data)
       return response.data
     } catch (error) {
+      console.error('❌ Error al completar seguimiento:', error)
       throw this.handleError(error)
     }
   }
 
   /**
    * Cancela un seguimiento
-   * DELETE /follow-up/cancelar/{cita_seguimiento_id}
+   * DELETE /api/v1/follow-up/cancelar/{cita_seguimiento_id}
    */
   async cancelFollowUp(citaSeguimientoId) {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.delete(
-        `${API_URL}/follow-up/cancelar/${citaSeguimientoId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+      console.log(`❌ Cancelando seguimiento ${citaSeguimientoId}`)
+
+      const response = await apiClient.delete(
+        `/follow-up/cancelar/${citaSeguimientoId}`
       )
+
+      console.log('✅ Seguimiento cancelado:', response.data)
       return response.data
     } catch (error) {
+      console.error('❌ Error al cancelar seguimiento:', error)
       throw this.handleError(error)
     }
   }
 
   /**
    * Obtiene estadísticas de seguimientos
-   * GET /follow-up/estadisticas
+   * GET /api/v1/follow-up/estadisticas
    */
-  async getFollowUpStatistics() {
+  async getFollowUpStatistics(params = {}) {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.get(
-        `${API_URL}/follow-up/estadisticas`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      )
+      console.log('📊 Obteniendo estadísticas de seguimientos')
+
+      const response = await apiClient.get('/follow-up/estadisticas', {
+        params
+      })
+
+      console.log('✅ Estadísticas obtenidas:', response.data)
       return response.data
     } catch (error) {
+      console.error('❌ Error al obtener estadísticas:', error)
       throw this.handleError(error)
     }
   }
@@ -135,13 +130,16 @@ class FollowUpService {
    */
   handleError(error) {
     if (error.response) {
+      // Error de respuesta del servidor
       const message = error.response.data?.detail ||
                      error.response.data?.message ||
                      'Error al procesar la solicitud'
       return new Error(message)
     } else if (error.request) {
+      // Error de red
       return new Error('No se pudo conectar con el servidor')
     } else {
+      // Error desconocido
       return new Error(error.message || 'Error desconocido')
     }
   }

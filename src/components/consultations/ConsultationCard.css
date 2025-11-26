@@ -262,3 +262,120 @@
 .consultation-card__icon {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* ============================================
+   ESTILOS ADICIONALES PARA ConsultationCard
+   Agregar estos estilos al archivo ConsultationCard.css existente
+   ============================================ */
+
+/* ✅ Badge para estado "En Proceso" */
+.consultation-card__status--in-progress {
+  background-color: #fef3c7; /* Amarillo suave */
+  color: #92400e; /* Marrón oscuro */
+  border: 1px solid #fbbf24;
+}
+
+/* ✅ Badge para estado "Confirmada" */
+.consultation-card__status--confirmed {
+  background-color: #d1fae5; /* Verde suave */
+  color: #065f46; /* Verde oscuro */
+  border: 1px solid #10b981;
+}
+
+/* ✅ Botón "Continuar Consulta" (EN_PROCESO) */
+.consultation-card__button--continue {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.consultation-card__button--continue:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  transform: translateY(-2px);
+}
+
+.consultation-card__button--continue:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.consultation-card__button--continue:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ============================================
+   ANIMACIÓN OPCIONAL: Pulso para citas EN_PROCESO
+   ============================================ */
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+}
+
+.consultation-card__status--in-progress {
+  animation: pulse-subtle 2s infinite;
+}
+
+/* ============================================
+   TOOLTIP PARA ESTADOS
+   ============================================ */
+
+.consultation-card__button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-bottom: 8px;
+  z-index: 1000;
+  opacity: 0;
+  animation: fadeInTooltip 0.2s ease-in forwards;
+}
+
+@keyframes fadeInTooltip {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   RESPONSIVIDAD
+   ============================================ */
+
+@media (max-width: 768px) {
+  .consultation-card__button--continue,
+  .consultation-card__button--primary {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .consultation-card__status--in-progress,
+  .consultation-card__status--confirmed {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+}
