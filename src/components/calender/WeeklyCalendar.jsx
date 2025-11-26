@@ -3,11 +3,19 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { getAllAppointments } from '@services/appointmentsService.js';
+
+// ✅ CORRECCIÓN: Usar el servicio correcto que tiene apiClient configurado
+import appointmentService from '@/services/appointmentService';
+
 import './WeeklyCalendar.css';
 
 /**
- * Componente WeeklyCalendar - Vista de calendario semanal con estilos mejorados
+ * Componente WeeklyCalendar - Vista de calendario semanal
+ *
+ * ✅ CORRECCIÓN APLICADA:
+ * - Cambiado de appointmentsService.js (viejo) a appointmentService.js (correcto)
+ * - El nuevo servicio usa apiClient que incluye el interceptor JWT
+ * - Ahora envía correctamente Authorization: Bearer <token>
  *
  * Features:
  * - Estilos profesionales y animaciones sutiles
@@ -32,48 +40,69 @@ const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUser
   }, [refreshTrigger]);
 
   /**
-   * Cargar citas desde el backend y transformarlas a eventos del calendario
+   * ✅ FUNCIÓN CORREGIDA: Cargar citas desde el backend usando el servicio correcto
    */
   const loadAppointments = async () => {
     setLoading(true);
     try {
-      const data = await getAllAppointments();
+      console.log('📅 Cargando citas desde el backend...');
+
+      // ✅ CORRECCIÓN: Usar appointmentService (con apiClient y JWT)
+      const response = await appointmentService.getAllAppointments({
+        limit: 1000  // Cargar todas las citas visibles
+      });
+
+      console.log('✅ Respuesta del backend:', response);
+
+      // ✅ CORRECCIÓN: El backend envuelve todo en { success, message, data }
+      // La estructura real es: { data: { total: X, citas: [...] } }
+      const appointments = response.data?.citas || [];
+
+      console.log(`✅ ${appointments.length} citas cargadas`);
 
       // Transformar citas a formato de eventos de FullCalendar
-      const calendarEvents = data.map(appointment => {
-        // Determinar el color basado en el estado y usuario
-        const isCurrentUser = appointment.veterinario_id === currentUserId;
-        let backgroundColor, borderColor, className;
+      const calendarEvents = appointments.map((appointment) => {
+        // Determinar color según estado
+        let backgroundColor = '#3b82f6'; // Azul por defecto
+        let borderColor = '#2563eb';
 
-        if (appointment.estado === 'cancelada') {
-          backgroundColor = '#ef4444';
+        if (appointment.estado === 'CANCELADA') {
+          backgroundColor = '#ef4444'; // Rojo
           borderColor = '#dc2626';
-          className = 'event-cancelled';
-        } else if (appointment.estado === 'pendiente') {
-          backgroundColor = '#f59e0b';
-          borderColor = '#d97706';
-          className = 'event-pending';
-        } else if (isCurrentUser) {
-          backgroundColor = '#3b82f6';
-          borderColor = '#2563eb';
-          className = 'event-current-user';
-        } else {
-          backgroundColor = '#10b981';
+        } else if (appointment.estado === 'COMPLETADA') {
+          backgroundColor = '#10b981'; // Verde
           borderColor = '#059669';
-          className = 'event-other-user';
+        } else if (appointment.estado === 'PENDIENTE' || appointment.estado === 'AGENDADA') {
+          backgroundColor = '#f59e0b'; // Naranja
+          borderColor = '#d97706';
+        } else if (appointment.estado === 'CONFIRMADA') {
+          backgroundColor = '#3b82f6'; // Azul
+          borderColor = '#2563eb';
+        }
+
+        // Si es mi cita (del veterinario actual), usar azul más intenso
+        if (appointment.veterinario_id === currentUserId) {
+          backgroundColor = '#3b82f6';
+          borderColor = '#1d4ed8';
         }
 
         return {
           id: appointment.id,
-          title: `${appointment.mascota?.nombre || 'Mascota'} - Dr. ${appointment.veterinario?.apellido || 'Veterinario'}`,
+          title: `${appointment.mascota?.nombre || 'Mascota'} - ${appointment.propietario?.nombre || 'Cliente'}`,
           start: appointment.fecha_hora,
+          end: appointment.fecha_fin || appointment.fecha_hora, // Si no hay fecha_fin, usar la misma
           backgroundColor,
           borderColor,
-          className,
+          textColor: '#ffffff',
+          classNames: [
+            'fc-event-custom',
+            appointment.veterinario_id === currentUserId ? 'fc-event-mine' : 'fc-event-other'
+          ],
           extendedProps: {
             appointment: appointment,
-            isCurrentUser: isCurrentUser,
-            estado: appointment.estado
+            estado: appointment.estado,
+            veterinario: appointment.veterinario?.nombre || 'Sin asignar',
+            motivo: appointment.motivo || 'Sin motivo especificado'
           }
         };
       });
@@ -81,7 +110,15 @@ const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUser
       setEvents(calendarEvents);
     } catch (error) {
       console.error('❌ Error al cargar citas:', error);
-      // Aquí podrías mostrar un toast o notificación de error
+
+      // ✅ Manejo mejorado de errores
+      if (error.response?.status === 403) {
+        console.error('🔒 Error 403: Sin permisos para ver citas. Verifica tu rol y autenticación.');
+      } else if (error.response?.status === 401) {
+        console.error('🔐 Error 401: Token inválido o expirado. Recarga la página o inicia sesión nuevamente.');
+      } else {
+        console.error('⚠️ Error inesperado:', error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -103,7 +140,6 @@ const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUser
     const appointment = info.event.extendedProps.appointment;
     console.log('📅 Evento clickeado:', appointment);
     // Aquí podrías abrir un modal de detalle directamente
-    // Por ejemplo: openAppointmentDetailModal(appointment);
   };
 
   /**
@@ -160,64 +196,58 @@ const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUser
           right: 'timeGridWeek,timeGridDay'
         }}
 
-        // Configuración de botones en español
+        // Configuración de idioma y formato
+        locale="es"
         buttonText={{
           today: 'Hoy',
           week: 'Semana',
-          day: 'Día',
-          prev: '◀',
-          next: '▶'
+          day: 'Día'
         }}
 
-        // Idioma español
-        locale="es"
-
-        // Horario de trabajo: 8:00 AM - 6:00 PM
+        // Configuración de tiempo
         slotMinTime="08:00:00"
         slotMaxTime="18:00:00"
-
-        // Configuración de slots
-        allDaySlot={false}
         slotDuration="00:30:00"
         slotLabelInterval="01:00"
-
-        // Altura automática
-        expandRows={true}
-        height="auto"
-
-        // Datos de eventos
-        events={events}
-
-        // Handlers
-        dateClick={handleDateClick}
-        eventClick={handleEventClick}
-
-        // Formatos personalizados
         slotLabelFormat={slotLabelFormat}
         eventTimeFormat={eventTimeFormat}
         dayHeaderFormat={dayHeaderFormat}
 
-        // Indicador de tiempo actual
+        // Configuración de altura
+        height="auto"
+        contentHeight="auto"
+        aspectRatio={1.8}
+
+        // Configuración de días
+        weekends={true}
+        allDaySlot={false}
         nowIndicator={true}
 
-        // Navegación por scroll
-        scrollTime="08:00:00"
-        scrollTimeReset={false}
+        // Eventos
+        events={events}
+        dateClick={handleDateClick}
+        eventClick={handleEventClick}
 
-        // Opciones de selección
-        selectable={true}
-        selectMirror={true}
-
-        // Mejoras de UX
-        eventDisplay="block"
-        dayMaxEvents={true}
-
-        // Clases CSS personalizadas
+        // Clases personalizadas para días
         dayCellClassNames={(arg) => {
-          const classes = [];
-          if (arg.isToday) classes.push('fc-day-today');
-          if (arg.date.getDay() === 0 || arg.date.getDay() === 6) {
-            classes.push(arg.date.getDay() === 0 ? 'fc-day-sun' : 'fc-day-sat');
+          const classes = ['fc-day-custom'];
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const cellDate = new Date(arg.date);
+          cellDate.setHours(0, 0, 0, 0);
+
+          if (cellDate.getTime() === today.getTime()) {
+            classes.push('fc-day-today-custom');
+          }
+
+          if (arg.isOther) {
+            classes.push('fc-day-other');
+          }
+
+          // Agregar clase para fines de semana
+          const dayOfWeek = arg.date.getDay();
+          if (dayOfWeek === 0 || dayOfWeek === 6) {
+            classes.push(dayOfWeek === 0 ? 'fc-day-sun' : 'fc-day-sat');
           }
           return classes;
         }}
