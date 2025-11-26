@@ -46,6 +46,7 @@ const navigationByRole = {
     { name: 'Propietarios', path: '/propietarios', icon: 'user' },
     { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
     { name: 'Veterinarios', path: '/veterinarios', icon: 'medical' },
+    { name: 'Horarios', path: '/horarios', icon: 'clock' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
@@ -53,7 +54,8 @@ const navigationByRole = {
   propietario: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
     { name: 'Mis Mascotas', path: '/mis-mascotas', icon: 'paw' },
-    { name: 'Mis Citas', path: '/mis-citas', icon: 'calendar' }
+    { name: 'Mis Citas', path: '/mis-citas', icon: 'calendar' },
+    { name: 'Horarios', path: '/horarios', icon: 'clock' },
   ]
 }
 

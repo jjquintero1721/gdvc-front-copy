@@ -160,6 +160,22 @@ const DaySidePanel = ({
     setTimeout(() => setSelectedAppointment(null), 300);
   };
 
+  const handleAvailableSlotClick = (time) => {
+  if (currentUserRole === 'propietario' || currentUserRole === 'superadmin') {
+    console.log('📅 Click en slot disponible:', {
+      fecha: selectedDate,
+      hora: time,
+      mensaje: 'Aquí iría la redirección a la página de agendamiento'
+    });
+
+    // TODO: Implementar cuando exista la página de citas
+    // navigate(`/citas/nueva?fecha=${format(selectedDate, 'yyyy-MM-dd')}&hora=${time}`);
+
+    // Por ahora, mostrar un mensaje
+    alert(`Funcionalidad en desarrollo.\n\nSeleccionaste:\nFecha: ${format(selectedDate, 'dd/MM/yyyy', { locale: es })}\nHora: ${time}`);
+  }
+};
+
   const groupedAppointments = groupAppointmentsByHour();
 
   return (
@@ -275,16 +291,33 @@ const DaySidePanel = ({
                             {hasAppointments ? (
                               appointmentsInSlot.map((appointment) => (
                                 <AppointmentItem
-                                  key={appointment.id}
-                                  appointment={appointment}
-                                  isCurrentUser={appointment.veterinario_id === currentUserId}
-                                  onClick={() => handleAppointmentClick(appointment)}
-                                />
+                                    key={appointment.id}
+                                    appointment={appointment}
+                                    isCurrentUser={appointment.veterinario_id === currentUserId}
+                                    currentUserRole={currentUserRole}
+                                    onClick={handleAppointmentClick}
+                                  />
                               ))
                             ) : (
-                              <p className="day-side-panel__slot-empty">
-                                No hay citas programadas en este horario
-                              </p>
+                              <div
+                                className={`day-side-panel__slot-empty ${
+                                  (currentUserRole === 'propietario' || currentUserRole === 'superadmin') 
+                                    ? 'day-side-panel__slot-empty--clickable' 
+                                    : ''
+                                }`}
+                                onClick={() => handleAvailableSlotClick(slot)}
+                                style={{
+                                  cursor: (currentUserRole === 'propietario' || currentUserRole === 'superadmin')
+                                    ? 'pointer'
+                                    : 'default'
+                                }}
+                              >
+                                <p className="day-side-panel__slot-empty-text">
+                                  {(currentUserRole === 'propietario' || currentUserRole === 'superadmin')
+                                    ? '✨ Horario disponible - Haz click para agendar'
+                                    : 'No hay citas programadas en este horario'}
+                                </p>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -327,19 +360,46 @@ const DaySidePanel = ({
 /**
  * AppointmentItem - Componente de item de cita
  */
-const AppointmentItem = ({ appointment, isCurrentUser, onClick }) => {
+const AppointmentItem = ({ appointment, isCurrentUser, onClick, currentUserRole }) => {
+
+  const esAnonima = appointment.es_mi_cita === false && appointment.titulo_anonimo;
+  const esPropietario = currentUserRole === 'propietario';
+
   // Determinar clase según tipo de usuario
   const itemClass = `appointment-item ${
-    isCurrentUser ? 'appointment-item--mine' : ''
+    esAnonima ? 'appointment-item--anonymous' : ''
+  } ${
+    appointment.es_mi_cita ? 'appointment-item--mine' : ''
   }`;
 
+  if (esAnonima) {
+    return (
+      <div className={itemClass}>
+        <div className="appointment-item__header">
+          <span className="appointment-item__pet-name">
+            {appointment.titulo_anonimo}
+          </span>
+          <span className="appointment-item__status appointment-item__status--occupied">
+            AGENDADA
+          </span>
+        </div>
+        <p className="appointment-item__reason">Horario ocupado</p>
+      </div>
+    );
+  }
+
+  // Cita con información completa
   return (
-    <div className={itemClass} onClick={onClick}>
+    <div
+      className={itemClass}
+      onClick={() => !esPropietario && onClick(appointment)}
+      style={{ cursor: esPropietario ? 'default' : 'pointer' }}
+    >
       <div className="appointment-item__header">
         <span className="appointment-item__pet-name">
-          {appointment.mascota?.nombre || 'Mascota'}
+          {appointment.mascota_nombre || appointment.mascota?.nombre || 'Mascota'}
         </span>
-        <span className={`appointment-item__status appointment-item__status--${appointment.estado}`}>
+        <span className={`appointment-item__status appointment-item__status--${appointment.estado?.toLowerCase()}`}>
           {appointment.estado}
         </span>
       </div>
@@ -348,7 +408,7 @@ const AppointmentItem = ({ appointment, isCurrentUser, onClick }) => {
       )}
       <div className="appointment-item__footer">
         <span className="appointment-item__vet">
-           {appointment.veterinario?.nombre || 'Sin asignar'}
+          {appointment.veterinario_nombre || appointment.veterinario?.nombre || 'Sin asignar'}
         </span>
       </div>
     </div>
