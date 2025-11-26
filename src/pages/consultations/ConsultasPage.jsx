@@ -30,6 +30,11 @@ import './ConsultasPage.css'
  * - Revertir cambios
  * - Programar seguimientos
  * - Completar consulta (marca cita como COMPLETADA)
+ *
+ * FIXES APLICADOS:
+ * 1. Filtro de estados en minúsculas (confirmada, en_proceso)
+ * 2. Extracción correcta del array: response.data.citas
+ * 3. Filtro de mascota corregido: apt.mascota (no apt.pets)
  */
 function ConsultasPage() {
   const { user: currentUser } = useAuthStore()
@@ -69,23 +74,48 @@ function ConsultasPage() {
 
   /**
    * Carga todas las citas en estado CONFIRMADA o EN_PROCESO
+   *
+   * FIXES:
+   * - Estados en minúsculas: 'confirmada', 'en_proceso'
+   * - Extracción correcta: response.data.citas
    */
   const loadConfirmedAppointments = async () => {
     setLoading(true)
     setError(null)
 
     try {
+      console.log('📞 Llamando a appointmentService.getAllAppointments()')
+
       // Obtener todas las citas
       const response = await appointmentService.getAllAppointments()
-      const allAppointments = response.appointment || response.data || []
 
-      // Filtrar solo CONFIRMADAS y EN_PROCESO
+      console.log('📦 Respuesta completa:', response)
+      console.log('📊 response.data:', response.data)
+
+      // ✅ FIX: Extracción correcta del array de citas
+      // Backend devuelve: { success, message, data: { total, citas: [...] } }
+      const allAppointments = response.data?.citas || []
+
+      console.log('📋 Total de citas recibidas:', allAppointments.length)
+      console.log('🔍 Tipo de allAppointments:', Array.isArray(allAppointments) ? 'Array' : typeof allAppointments)
+
+      if (!Array.isArray(allAppointments)) {
+        console.error('❌ allAppointments NO es un array:', allAppointments)
+        throw new Error('La respuesta del servidor no contiene un array de citas válido')
+      }
+
+      // ✅ FIX: Filtrar usando estados en MINÚSCULAS
+      // El backend devuelve: "confirmada", "en_proceso", "agendada", etc.
       const confirmedAppointments = allAppointments.filter(
-        apt => apt.estado === 'CONFIRMADA' || apt.estado === 'EN_PROCESO'
+        apt => apt.estado === 'confirmada' || apt.estado === 'en_proceso'
       )
+
+      console.log('✅ Citas confirmadas/en proceso:', confirmedAppointments.length)
+      console.log('🔍 Estados encontrados:', [...new Set(allAppointments.map(a => a.estado))])
 
       setAppointments(confirmedAppointments)
     } catch (err) {
+      console.error('❌ Error al cargar citas:', err)
       setError(err.message || 'Error al cargar las citas confirmadas')
     } finally {
       setLoading(false)
@@ -94,6 +124,8 @@ function ConsultasPage() {
 
   /**
    * Aplica filtros de búsqueda y fecha
+   *
+   * FIX: Corregido apt.pets a apt.mascota
    */
   const applyFilters = () => {
     let filtered = [...appointments]
@@ -102,8 +134,9 @@ function ConsultasPage() {
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase()
       filtered = filtered.filter(apt =>
-        apt.pets?.nombre?.toLowerCase().includes(search) ||
-        apt.pets?.propietario?.nombre?.toLowerCase().includes(search)
+        // ✅ FIX: apt.mascota (no apt.pets)
+        apt.mascota?.nombre?.toLowerCase().includes(search) ||
+        apt.mascota?.propietario?.nombre?.toLowerCase().includes(search)
       )
     }
 
@@ -294,40 +327,26 @@ function ConsultasPage() {
             <p>Cargando citas confirmadas...</p>
           </div>
         ) : filteredAppointments.length === 0 ? (
-          <motion.div
-            className="consultas-page__empty"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <AlertCircle size={64} className="consultas-page__empty-icon" />
-            <h3 className="consultas-page__empty-title">
-              No hay citas confirmadas
-            </h3>
-            <p className="consultas-page__empty-text">
-              Cuando haya citas confirmadas, aparecerán aquí para que puedas iniciar las consultas.
+          <div className="consultas-page__empty">
+            <AlertCircle size={48} />
+            <h3>No hay citas confirmadas</h3>
+            <p>
+              {searchTerm || filterDate
+                ? 'No se encontraron citas con los filtros aplicados'
+                : 'No hay citas en estado confirmada o en proceso'}
             </p>
-          </motion.div>
+          </div>
         ) : (
           <div className="consultas-page__grid">
-            <AnimatePresence>
-              {filteredAppointments.map((appointment, index) => (
-                <motion.div
-                  key={appointment.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                >
-                  <ConsultationCard
-                    appointment={appointment}
-                    onStartConsultation={handleStartConsultation}
-                    onViewDetails={handleViewDetails}
-                    isLoading={loading}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {filteredAppointments.map((appointment) => (
+              <ConsultationCard
+                key={appointment.id}
+                appointment={appointment}
+                onStartConsultation={handleStartConsultation}
+                onViewDetails={handleViewDetails}
+                isLoading={loading}
+              />
+            ))}
           </div>
         )}
       </motion.div>
@@ -342,7 +361,7 @@ function ConsultasPage() {
         }}
         appointment={selectedAppointment}
         existingConsultation={existingConsultation}
-        onSave={handleConsultationSaved}
+        onSaved={handleConsultationSaved}
       />
 
       <AppointmentDetailModal
@@ -352,7 +371,6 @@ function ConsultasPage() {
           setSelectedAppointment(null)
         }}
         appointment={selectedAppointment}
-        canEdit={false}
       />
     </div>
   )
