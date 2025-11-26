@@ -26,19 +26,32 @@ const WORK_HOURS = [
  * ✅ Badges de estado
  * ✅ Iconos SVG profesionales
  * ✅ Responsive design
+ * ✅ CORRECCIÓN: Manejo correcto de timezones UTC
+ * ✅ NUEVO: Soporte para refreshTrigger
  */
-const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUserRole }) => {
+const DaySidePanel = ({
+  isOpen,
+  onClose,
+  selectedDate,
+  currentUserId,
+  currentUserRole,
+  refreshTrigger // ✅ NUEVO: Recibir refreshTrigger
+}) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Cargar citas cuando cambia la fecha seleccionada
+  // ✅ CORRECCIÓN: Agregar refreshTrigger a las dependencias
+  // Ahora se recargará cuando:
+  // 1. Se abre el panel
+  // 2. Cambia la fecha
+  // 3. Se presiona el botón "Refrescar" (cambia refreshTrigger)
   useEffect(() => {
     if (selectedDate && isOpen) {
       loadDayAppointments();
     }
-  }, [selectedDate, isOpen]);
+  }, [selectedDate, isOpen, refreshTrigger]); // ✅ refreshTrigger agregado
 
   /**
    * Cargar citas del día seleccionado
@@ -51,7 +64,7 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
       // Formatear fecha a YYYY-MM-DD
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
 
-      console.log('📅 Cargando citas del día:', formattedDate);
+      console.log('📅 [DaySidePanel] Cargando citas del día:', formattedDate);
 
       // ✅ Usar el servicio correcto
       const response = await appointmentService.getAppointmentsByDate(formattedDate);
@@ -59,12 +72,12 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
       // ✅ El backend devuelve: { success: true, data: { total: X, citas: [...] } }
       const dayAppointments = response.data?.citas || [];
 
-      console.log(`✅ ${dayAppointments.length} citas encontradas para el día`);
-      console.log('📋 Citas:', dayAppointments);
+      console.log(`✅ [DaySidePanel] ${dayAppointments.length} citas encontradas`);
+      console.log('📋 [DaySidePanel] Citas:', dayAppointments);
 
       setAppointments(dayAppointments);
     } catch (error) {
-      console.error('❌ Error al cargar citas del día:', error);
+      console.error('❌ [DaySidePanel] Error al cargar citas del día:', error);
       setAppointments([]);
     } finally {
       setLoading(false);
@@ -72,31 +85,62 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
   };
 
   /**
-   * ✅ CORREGIDO: Agrupar citas por hora
+   * ✅ Extraer hora UTC sin conversión a hora local
+   *
+   * Evita problemas de timezone extrayendo directamente del string ISO
+   */
+  const extractUTCTime = (isoString) => {
+    try {
+      // Regex para extraer HH:mm de un string ISO
+      // Ejemplo: "2025-11-26T08:00:00Z" → "08:00"
+      const timeMatch = isoString.match(/T(\d{2}:\d{2})/);
+
+      if (timeMatch && timeMatch[1]) {
+        return timeMatch[1];
+      }
+
+      // Fallback usando Date.getUTCHours()
+      const date = new Date(isoString);
+      const hours = date.getUTCHours().toString().padStart(2, '0');
+      const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } catch (error) {
+      console.error('Error al extraer hora UTC:', error);
+      return null;
+    }
+  };
+
+  /**
+   * ✅ Agrupar citas por hora usando extracción directa
    */
   const groupAppointmentsByHour = () => {
     const grouped = {};
 
     appointments.forEach(appointment => {
       try {
-        // Parsear la fecha del backend (puede venir en formato ISO)
-        const appointmentDate = parseISO(appointment.fecha_hora);
+        // Extraer hora directamente del string ISO (evita conversión a hora local)
+        const appointmentTime = extractUTCTime(appointment.fecha_hora);
 
-        // Formatear a HH:mm (ej: "08:00", "14:30")
-        const appointmentTime = format(appointmentDate, 'HH:mm');
+        if (!appointmentTime) {
+          console.warn('⚠️ No se pudo extraer hora de:', appointment.fecha_hora);
+          return;
+        }
 
-        console.log(`⏰ Cita en horario: ${appointmentTime}`, appointment);
+        console.log(`⏰ Cita en horario UTC: ${appointmentTime}`, {
+          original: appointment.fecha_hora,
+          extracted: appointmentTime
+        });
 
         if (!grouped[appointmentTime]) {
           grouped[appointmentTime] = [];
         }
         grouped[appointmentTime].push(appointment);
       } catch (error) {
-        console.error('❌ Error al parsear fecha de cita:', appointment.fecha_hora, error);
+        console.error('❌ Error al procesar cita:', appointment.fecha_hora, error);
       }
     });
 
-    console.log('📊 Citas agrupadas por hora:', grouped);
+    console.log('📊 Citas agrupadas por hora (UTC):', grouped);
     return grouped;
   };
 
@@ -148,7 +192,7 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
                     {selectedDate && format(selectedDate, "EEEE, d 'de' MMMM", { locale: es })}
                   </h2>
                   <p className="day-side-panel__subtitle">
-                    Horarios laborales: 8:00 AM - 5:30 PM
+                    Horarios laborales: 8:00 AM - 5:30 PM (UTC)
                   </p>
                 </div>
 
@@ -286,65 +330,26 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
 const AppointmentItem = ({ appointment, isCurrentUser, onClick }) => {
   // Determinar clase según tipo de usuario
   const itemClass = `appointment-item ${
-    isCurrentUser ? 'appointment-item--current-user' : 'appointment-item--other-user'
+    isCurrentUser ? 'appointment-item--mine' : ''
   }`;
-
-  // Determinar estado
-  const getStatusClass = (estado) => {
-    const estadoUpper = estado?.toUpperCase() || '';
-
-    switch (estadoUpper) {
-      case 'CONFIRMADA':
-        return 'appointment-item__status--confirmed';
-      case 'AGENDADA':
-      case 'PENDIENTE':
-        return 'appointment-item__status--pending';
-      case 'CANCELADA':
-        return 'appointment-item__status--cancelled';
-      case 'COMPLETADA':
-      case 'ATENDIDA':
-        return 'appointment-item__status--completed';
-      default:
-        return 'appointment-item__status--pending';
-    }
-  };
-
-  const getStatusText = (estado) => {
-    const estadoUpper = estado?.toUpperCase() || '';
-
-    switch (estadoUpper) {
-      case 'CONFIRMADA':
-        return 'Confirmada';
-      case 'AGENDADA':
-        return 'Agendada';
-      case 'PENDIENTE':
-        return 'Pendiente';
-      case 'CANCELADA':
-        return 'Cancelada';
-      case 'COMPLETADA':
-        return 'Completada';
-      case 'ATENDIDA':
-        return 'Atendida';
-      default:
-        return estado || 'Pendiente';
-    }
-  };
 
   return (
     <div className={itemClass} onClick={onClick}>
-      <div className="appointment-item__icon">
-        🐾
+      <div className="appointment-item__header">
+        <span className="appointment-item__pet-name">
+          {appointment.mascota_nombre || 'Mascota'}
+        </span>
+        <span className={`appointment-item__status appointment-item__status--${appointment.estado}`}>
+          {appointment.estado}
+        </span>
       </div>
-      <div className="appointment-item__content">
-        <p className="appointment-item__name">
-          {appointment.mascota?.nombre || 'Mascota'} - Dr. {appointment.veterinario?.apellido || appointment.veterinario?.nombre || 'Veterinario'}
-        </p>
-        <div className="appointment-item__details">
-          <span>{appointment.propietario?.nombre || 'Propietario'}</span>
-          <span className={`appointment-item__status ${getStatusClass(appointment.estado)}`}>
-            {getStatusText(appointment.estado)}
-          </span>
-        </div>
+      {appointment.motivo && (
+        <p className="appointment-item__reason">{appointment.motivo}</p>
+      )}
+      <div className="appointment-item__footer">
+        <span className="appointment-item__vet">
+          Dr(a). {appointment.veterinario_nombre || 'Sin asignar'}
+        </span>
       </div>
     </div>
   );
