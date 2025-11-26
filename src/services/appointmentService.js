@@ -15,6 +15,7 @@ import apiClient from './apiClient'
  *
  * Endpoints disponibles:
  * - GET /appointments/ - Listar todas las citas con filtros
+ * - GET /appointments/date/{fecha} - Obtener citas de una fecha específica
  * - GET /appointments/{appointment_id} - Obtener cita específica
  * - POST /appointments/ - Crear nueva cita
  * - PUT /appointments/{appointment_id} - Actualizar cita
@@ -52,6 +53,28 @@ const appointmentService = {
       // response.data contiene: { success: true, message: "...", data: { total, citas: [...] } }
       return response.data
     } catch (error) {
+      throw handleAppointmentError(error)
+    }
+  },
+
+  /**
+   * ✅ NUEVO: Obtener citas de una fecha específica
+   * Endpoint: GET /appointments/date/{fecha}
+   * @param {string} fecha - Fecha en formato YYYY-MM-DD
+   * @returns {Promise} Citas de la fecha especificada
+   */
+  getAppointmentsByDate: async (fecha) => {
+    try {
+      console.log(`📅 Solicitando citas para la fecha: ${fecha}`)
+
+      const response = await apiClient.get(`/appointments/date/${fecha}`)
+
+      console.log('✅ Respuesta del backend:', response.data)
+
+      // response.data contiene: { success: true, message: "...", data: { total, citas: [...] } }
+      return response.data
+    } catch (error) {
+      console.error(`❌ Error al obtener citas de la fecha ${fecha}:`, error)
       throw handleAppointmentError(error)
     }
   },
@@ -105,7 +128,7 @@ const appointmentService = {
   },
 
   /**
-   * Crear nueva cita
+   * Crear una nueva cita
    * @param {Object} appointmentData - Datos de la cita
    * @returns {Promise} Cita creada
    */
@@ -119,7 +142,7 @@ const appointmentService = {
   },
 
   /**
-   * Actualizar cita existente
+   * Actualizar una cita existente
    * @param {string} appointmentId - ID de la cita
    * @param {Object} appointmentData - Datos actualizados
    * @returns {Promise} Cita actualizada
@@ -134,7 +157,7 @@ const appointmentService = {
   },
 
   /**
-   * Cancelar cita
+   * Cancelar una cita
    * @param {string} appointmentId - ID de la cita
    * @returns {Promise} Confirmación de cancelación
    */
@@ -145,42 +168,74 @@ const appointmentService = {
     } catch (error) {
       throw handleAppointmentError(error)
     }
+  },
+
+  /**
+   * Reprogramar una cita
+   * @param {string} appointmentId - ID de la cita
+   * @param {string} nuevaFecha - Nueva fecha en formato ISO
+   * @returns {Promise} Cita reprogramada
+   */
+  rescheduleAppointment: async (appointmentId, nuevaFecha) => {
+    try {
+      const response = await apiClient.put(`/appointments/${appointmentId}/reschedule`, {
+        fecha_hora: nuevaFecha
+      })
+      return response.data
+    } catch (error) {
+      throw handleAppointmentError(error)
+    }
+  },
+
+  /**
+   * Confirmar una cita
+   * @param {string} appointmentId - ID de la cita
+   * @returns {Promise} Cita confirmada
+   */
+  confirmAppointment: async (appointmentId) => {
+    try {
+      const response = await apiClient.post(`/appointments/${appointmentId}/confirm`)
+      return response.data
+    } catch (error) {
+      throw handleAppointmentError(error)
+    }
   }
 }
 
 /**
- * Manejo de errores del servicio de citas
+ * Manejo centralizado de errores de citas
  * @param {Error} error - Error capturado
- * @returns {Error} Error procesado con mensaje amigable
+ * @returns {Error} Error formateado
  */
-function handleAppointmentError(error) {
+const handleAppointmentError = (error) => {
   if (error.response) {
+    // Error del servidor
     const status = error.response.status
-    const data = error.response.data
+    const message = error.response.data?.detail || error.response.data?.message || 'Error en la operación'
 
     switch (status) {
       case 400:
-        return new Error(data.detail || 'Datos inválidos. Verifica la información de la cita.')
+        return new Error(`Datos inválidos: ${message}`)
       case 401:
-        return new Error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.')
+        return new Error('No autorizado. Por favor, inicia sesión nuevamente.')
       case 403:
         return new Error('No tienes permisos para realizar esta acción.')
       case 404:
         return new Error('Cita no encontrada.')
-      case 409:
-        return new Error('Conflicto de horario. El horario seleccionado no está disponible.')
+      case 422:
+        return new Error(`Error de validación: ${message}`)
       case 500:
         return new Error('Error del servidor. Por favor, intenta más tarde.')
       default:
-        return new Error(data.detail || 'Error al procesar la solicitud.')
+        return new Error(message)
     }
+  } else if (error.request) {
+    // Error de red
+    return new Error('Error de conexión. Verifica tu internet.')
+  } else {
+    // Otro error
+    return new Error(error.message || 'Error desconocido')
   }
-
-  if (error.request) {
-    return new Error('Error de conexión. Por favor, verifica tu internet.')
-  }
-
-  return new Error(error.message || 'Error desconocido')
 }
 
 export default appointmentService

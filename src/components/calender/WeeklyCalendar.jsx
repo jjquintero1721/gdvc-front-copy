@@ -48,8 +48,10 @@ const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUser
       console.log('📅 Cargando citas desde el backend...');
 
       // ✅ CORRECCIÓN: Usar appointmentService (con apiClient y JWT)
+      // Nota: El backend tiene un límite máximo de 100 por request
       const response = await appointmentService.getAllAppointments({
-        limit: 1000  // Cargar todas las citas visibles
+        skip: 0,
+        limit: 100  // Máximo permitido por el backend
       });
 
       console.log('✅ Respuesta del backend:', response);
