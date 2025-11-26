@@ -1,4 +1,5 @@
 import apiClient from './apiClient'
+import {API_URL} from "@utils/constants.js";
 
 /**
  * Servicio de Citas
@@ -220,6 +221,24 @@ const appointmentService = {
       }
     },
 
+  /**
+     * Inicia una cita (cambia estado a EN_PROCESO)
+     * POST /appointments/{appointment_id}/start
+     */
+    startAppointment: async (appointmentId) => {
+        try {
+          console.log(`▶️ Iniciando cita ${appointmentId}`)
+
+          const response = await apiClient.post(`/appointments/${appointmentId}/start`)
+
+          console.log('✅ Cita iniciada:', response.data)
+          return response.data
+        } catch (error) {
+          console.error(`❌ Error al iniciar cita ${appointmentId}:`, error)
+          throw handleAppointmentError(error)
+        }
+      },
+
       /**
      * Obtener disponibilidad de un veterinario
      * Endpoint: GET /appointments/availability/{veterinario_id}
@@ -249,48 +268,22 @@ const appointmentService = {
     },
 
     /**
-     * Inicia una cita (cambia estado a EN_PROCESO)
-     * POST /appointments/{appointment_id}/start
-     */
-    async startAppointment(appointmentId) {
-      try {
-        const token = localStorage.getItem('token')
-        const response = await axios.post(
-          `${API_URL}/appointments/${appointmentId}/start`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        )
-        return response.data
-      } catch (error) {
-        throw this.handleError(error)
-      }
-    },
-
-    /**
      * Completa una cita (cambia estado a COMPLETADA)
      * POST /appointments/{appointment_id}/complete
      */
-    async completeAppointment(appointmentId) {
-      try {
-        const token = localStorage.getItem('token')
-        const response = await axios.post(
-          `${API_URL}/appointments/${appointmentId}/complete`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        )
-        return response.data
-      } catch (error) {
-        throw this.handleError(error)
+    completeAppointment: async (appointmentId) => {
+        try {
+          console.log(`✅ Completando cita ${appointmentId}`)
+
+          const response = await apiClient.post(`/appointments/${appointmentId}/complete`)
+
+          console.log('✅ Cita completada:', response.data)
+          return response.data
+        } catch (error) {
+          console.error(`❌ Error al completar cita ${appointmentId}:`, error)
+          throw handleAppointmentError(error)
+        }
       }
-    }
 
 
 }
