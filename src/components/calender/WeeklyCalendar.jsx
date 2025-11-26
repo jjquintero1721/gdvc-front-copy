@@ -4,9 +4,23 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { getAllAppointments } from '@services/appointmentsService.js';
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
+import './WeeklyCalendar.css';
 
+/**
+ * Componente WeeklyCalendar - Vista de calendario semanal con estilos mejorados
+ *
+ * Features:
+ * - Estilos profesionales y animaciones sutiles
+ * - Vista semanal y diaria de citas
+ * - Indicador de tiempo actual
+ * - Colores diferenciados por tipo de cita
+ * - Interacciones suaves y responsivas
+ *
+ * @param {Function} onDayClick - Callback cuando se hace click en un día
+ * @param {Number} refreshTrigger - Trigger para recargar datos
+ * @param {String} currentUserId - ID del usuario actual
+ * @param {String} currentUserRole - Rol del usuario actual
+ */
 const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUserRole }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,111 +31,245 @@ const WeeklyCalendar = ({ onDayClick, refreshTrigger, currentUserId, currentUser
     loadAppointments();
   }, [refreshTrigger]);
 
+  /**
+   * Cargar citas desde el backend y transformarlas a eventos del calendario
+   */
   const loadAppointments = async () => {
     setLoading(true);
     try {
       const data = await getAllAppointments();
 
       // Transformar citas a formato de eventos de FullCalendar
-      const calendarEvents = data.map(appointment => ({
-        id: appointment.id,
-        title: `${appointment.mascota?.nombre || 'Mascota'} - Dr. ${appointment.veterinario?.apellido || 'Veterinario'}`,
-        start: appointment.fecha_hora,
-        backgroundColor: appointment.veterinario_id === currentUserId ? '#3b82f6' : '#10b981',
-        borderColor: appointment.veterinario_id === currentUserId ? '#2563eb' : '#059669',
-        extendedProps: {
-          appointment: appointment,
-          isCurrentUser: appointment.veterinario_id === currentUserId
+      const calendarEvents = data.map(appointment => {
+        // Determinar el color basado en el estado y usuario
+        const isCurrentUser = appointment.veterinario_id === currentUserId;
+        let backgroundColor, borderColor, className;
+
+        if (appointment.estado === 'cancelada') {
+          backgroundColor = '#ef4444';
+          borderColor = '#dc2626';
+          className = 'event-cancelled';
+        } else if (appointment.estado === 'pendiente') {
+          backgroundColor = '#f59e0b';
+          borderColor = '#d97706';
+          className = 'event-pending';
+        } else if (isCurrentUser) {
+          backgroundColor = '#3b82f6';
+          borderColor = '#2563eb';
+          className = 'event-current-user';
+        } else {
+          backgroundColor = '#10b981';
+          borderColor = '#059669';
+          className = 'event-other-user';
         }
-      }));
+
+        return {
+          id: appointment.id,
+          title: `${appointment.mascota?.nombre || 'Mascota'} - Dr. ${appointment.veterinario?.apellido || 'Veterinario'}`,
+          start: appointment.fecha_hora,
+          backgroundColor,
+          borderColor,
+          className,
+          extendedProps: {
+            appointment: appointment,
+            isCurrentUser: isCurrentUser,
+            estado: appointment.estado
+          }
+        };
+      });
 
       setEvents(calendarEvents);
     } catch (error) {
-      console.error('Error al cargar citas:', error);
+      console.error('❌ Error al cargar citas:', error);
       // Aquí podrías mostrar un toast o notificación de error
     } finally {
       setLoading(false);
     }
   };
 
-  // Handler cuando se hace click en un día
+  /**
+   * Handler cuando se hace click en un día del calendario
+   */
   const handleDateClick = (info) => {
-    onDayClick(info.date);
+    if (onDayClick) {
+      onDayClick(info.date);
+    }
   };
 
-  // Handler cuando se hace click en un evento (opcional, para vista previa rápida)
+  /**
+   * Handler cuando se hace click en un evento (cita)
+   */
   const handleEventClick = (info) => {
-    // Aquí podrías abrir el modal de detalle directamente
-    console.log('Evento clickeado:', info.event.extendedProps.appointment);
+    const appointment = info.event.extendedProps.appointment;
+    console.log('📅 Evento clickeado:', appointment);
+    // Aquí podrías abrir un modal de detalle directamente
+    // Por ejemplo: openAppointmentDetailModal(appointment);
+  };
+
+  /**
+   * Formateo personalizado para los slots de tiempo
+   */
+  const slotLabelFormat = {
+    hour: 'numeric',
+    minute: '2-digit',
+    meridiem: 'short',
+    hour12: true
+  };
+
+  /**
+   * Formateo personalizado para los eventos
+   */
+  const eventTimeFormat = {
+    hour: 'numeric',
+    minute: '2-digit',
+    meridiem: 'short',
+    hour12: true
+  };
+
+  /**
+   * Formateo personalizado para los encabezados de día
+   */
+  const dayHeaderFormat = {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short'
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
+    <div className="weekly-calendar">
+      {/* Overlay de carga */}
       {loading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-2xl">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-gray-600 font-medium">Cargando citas...</span>
+        <div className="weekly-calendar-loading">
+          <div className="weekly-calendar-loading-content">
+            <div className="weekly-calendar-spinner"></div>
+            <span className="weekly-calendar-loading-text">Cargando citas...</span>
           </div>
         </div>
       )}
 
+      {/* Calendario FullCalendar */}
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
+
+        // Configuración del toolbar
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
           right: 'timeGridWeek,timeGridDay'
         }}
+
+        // Configuración de botones en español
+        buttonText={{
+          today: 'Hoy',
+          week: 'Semana',
+          day: 'Día',
+          prev: '◀',
+          next: '▶'
+        }}
+
+        // Idioma español
         locale="es"
+
+        // Horario de trabajo: 8:00 AM - 6:00 PM
         slotMinTime="08:00:00"
         slotMaxTime="18:00:00"
+
+        // Configuración de slots
         allDaySlot={false}
         slotDuration="00:30:00"
         slotLabelInterval="01:00"
+
+        // Altura automática
         expandRows={true}
         height="auto"
+
+        // Datos de eventos
         events={events}
+
+        // Handlers
         dateClick={handleDateClick}
         eventClick={handleEventClick}
-        slotLabelFormat={{
-          hour: 'numeric',
-          minute: '2-digit',
-          meridiem: 'short'
+
+        // Formatos personalizados
+        slotLabelFormat={slotLabelFormat}
+        eventTimeFormat={eventTimeFormat}
+        dayHeaderFormat={dayHeaderFormat}
+
+        // Indicador de tiempo actual
+        nowIndicator={true}
+
+        // Navegación por scroll
+        scrollTime="08:00:00"
+        scrollTimeReset={false}
+
+        // Opciones de selección
+        selectable={true}
+        selectMirror={true}
+
+        // Mejoras de UX
+        eventDisplay="block"
+        dayMaxEvents={true}
+
+        // Clases CSS personalizadas
+        dayCellClassNames={(arg) => {
+          const classes = [];
+          if (arg.isToday) classes.push('fc-day-today');
+          if (arg.date.getDay() === 0 || arg.date.getDay() === 6) {
+            classes.push(arg.date.getDay() === 0 ? 'fc-day-sun' : 'fc-day-sat');
+          }
+          return classes;
         }}
-        eventTimeFormat={{
-          hour: 'numeric',
-          minute: '2-digit',
-          meridiem: 'short'
+
+        // Clases para eventos
+        eventClassNames={(arg) => {
+          return arg.event.classNames || [];
         }}
-        dayHeaderFormat={{
-          weekday: 'short',
-          day: 'numeric',
-          month: 'short'
-        }}
-        // Estilos personalizados
-        dayCellClassNames="hover:bg-blue-50 cursor-pointer transition-colors"
-        eventClassNames="cursor-pointer hover:opacity-80 transition-opacity"
       />
 
-      {/* Leyenda */}
-      <div className="mt-6 flex items-center gap-6 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-blue-500"></div>
-          <span className="text-gray-600">Mis citas</span>
+      {/* Leyenda de colores */}
+      <div className="calendar-legend">
+        <div className="calendar-legend-item">
+          <div
+            className="calendar-legend-color"
+            style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
+          />
+          <span>Mis citas</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-green-500"></div>
-          <span className="text-gray-600">Otras citas</span>
+
+        <div className="calendar-legend-item">
+          <div
+            className="calendar-legend-color"
+            style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+          />
+          <span>Otras citas</span>
+        </div>
+
+        <div className="calendar-legend-item">
+          <div
+            className="calendar-legend-color"
+            style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}
+          />
+          <span>Pendientes</span>
+        </div>
+
+        <div className="calendar-legend-item">
+          <div
+            className="calendar-legend-color"
+            style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}
+          />
+          <span>Canceladas</span>
         </div>
       </div>
 
-      {/* Nota sobre horarios */}
-      <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <p className="text-sm text-blue-800">
-          <span className="font-semibold">💡 Tip:</span> Haz click en cualquier día para ver los horarios disponibles y las citas programadas.
+      {/* Tip útil */}
+      <div className="calendar-tip">
+        <p className="calendar-tip-text">
+          <span className="calendar-tip-icon">💡</span>
+          <span>
+            <strong>Tip:</strong> Haz click en cualquier día para ver los horarios disponibles y las citas programadas.
+          </span>
         </p>
       </div>
     </div>

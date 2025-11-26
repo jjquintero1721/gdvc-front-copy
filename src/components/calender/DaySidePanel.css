@@ -1,0 +1,506 @@
+/* ============================================
+   DAY SIDE PANEL - ESTILOS MEJORADOS
+   Panel lateral con horarios del día seleccionado
+   ============================================ */
+
+/* Overlay oscuro */
+.day-side-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+  cursor: pointer;
+}
+
+/* Panel deslizante */
+.day-side-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  max-width: 640px;
+  background: white;
+  box-shadow:
+    -10px 0 40px rgba(0, 0, 0, 0.2),
+    -5px 0 20px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   HEADER DEL PANEL
+   ============================================ */
+
+.day-side-panel__header {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+.day-side-panel__header-content {
+  flex: 1;
+}
+
+.day-side-panel__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.day-side-panel__subtitle {
+  font-size: 0.938rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 400;
+}
+
+.day-side-panel__close-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.day-side-panel__close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+.day-side-panel__close-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* ============================================
+   CONTENIDO DEL PANEL
+   ============================================ */
+
+.day-side-panel__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: #f9fafb;
+}
+
+/* Scroll personalizado */
+.day-side-panel__content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.day-side-panel__content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.day-side-panel__content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.day-side-panel__content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ============================================
+   ESTADO DE CARGA
+   ============================================ */
+
+.day-side-panel__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+}
+
+.day-side-panel__spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(59, 130, 246, 0.2);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.day-side-panel__loading-text {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* ============================================
+   SLOTS DE HORARIOS
+   ============================================ */
+
+.day-side-panel__slots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day-side-panel__slot {
+  background: white;
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  animation: slideInRight 0.4s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.day-side-panel__slot:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+/* Header del slot */
+.day-side-panel__slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.day-side-panel__slot-time-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.day-side-panel__slot-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.day-side-panel__slot-time {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.day-side-panel__slot-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.day-side-panel__slot-badge--available {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+
+/* Contenido del slot */
+.day-side-panel__slot-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-side-panel__slot-empty {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ============================================
+   ITEMS DE CITAS
+   ============================================ */
+
+.appointment-item {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.appointment-item:hover {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #93c5fd;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.appointment-item--current-user {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #3b82f6;
+}
+
+.appointment-item--other-user {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: #10b981;
+}
+
+.appointment-item__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  font-size: 1.25rem;
+}
+
+.appointment-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.appointment-item__name {
+  font-size: 0.938rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appointment-item__details {
+  font-size: 0.813rem;
+  color: #6b7280;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.appointment-item__status {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.688rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.appointment-item__status--confirmed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.appointment-item__status--pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.appointment-item__status--cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ============================================
+   FOOTER DEL PANEL
+   ============================================ */
+
+.day-side-panel__footer {
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.day-side-panel__footer-stat {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.day-side-panel__footer-value {
+  font-weight: 600;
+  color: #111827;
+}
+
+.day-side-panel__footer-value--success {
+  color: #10b981;
+}
+
+/* ============================================
+   ESTADO VACÍO
+   ============================================ */
+
+.day-side-panel__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.day-side-panel__empty-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.day-side-panel__empty-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.day-side-panel__empty-text {
+  font-size: 0.938rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .day-side-panel {
+    max-width: 100%;
+  }
+
+  .day-side-panel__header {
+    padding: 20px 24px;
+  }
+
+  .day-side-panel__title {
+    font-size: 1.25rem;
+  }
+
+  .day-side-panel__content {
+    padding: 16px;
+  }
+
+  .day-side-panel__slot {
+    padding: 12px 16px;
+  }
+
+  .day-side-panel__slot-time {
+    font-size: 1rem;
+  }
+
+  .appointment-item {
+    padding: 10px 12px;
+  }
+
+  .appointment-item__icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+}
+
+/* ============================================
+   ANIMACIONES ADICIONALES
+   ============================================ */
+
+.day-side-panel--entering {
+  animation: slideInFromRight 0.4s ease-out;
+}
+
+.day-side-panel--exiting {
+  animation: slideOutToRight 0.3s ease-in;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================
+   MEJORAS DE ACCESIBILIDAD
+   ============================================ */
+
+.day-side-panel__close-btn:focus,
+.appointment-item:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Reducir animaciones si el usuario prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .day-side-panel,
+  .day-side-panel__slot,
+  .appointment-item,
+  .day-side-panel__spinner,
+  .day-side-panel__close-btn {
+    animation: none;
+    transition: none;
+  }
+}

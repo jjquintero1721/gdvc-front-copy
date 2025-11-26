@@ -1,0 +1,494 @@
+/* ============================================
+   CALENDAR PAGE - ESTILOS MEJORADOS
+   Página completa del calendario de horarios
+   ============================================ */
+
+/* Contenedor principal */
+.calendar-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+  padding: 32px 24px;
+  animation: gradientShift 15s ease infinite;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animación de fondo sutil */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Patrón de fondo decorativo */
+.calendar-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.05) 100%);
+  clip-path: ellipse(80% 50% at 50% 0%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Contenedor con ancho máximo */
+.calendar-page__container {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   HEADER DE LA PÁGINA
+   ============================================ */
+
+.calendar-page__header {
+  background: white;
+  border-radius: 20px;
+  padding: 32px 40px;
+  margin-bottom: 32px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(59, 130, 246, 0.1);
+  animation: slideDown 0.6s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decoración del header */
+.calendar-page__header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 200% 100%;
+  animation: gradientFlow 3s linear infinite;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calendar-page__header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+/* Sección de título */
+.calendar-page__title-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.calendar-page__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.calendar-page__title-icon {
+  font-size: 2.5rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.calendar-page__subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Sección de acciones */
+.calendar-page__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   BOTÓN DE REFRESCAR
+   ============================================ */
+
+.calendar-page__refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.938rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 4px 12px rgba(59, 130, 246, 0.3),
+    0 0 0 0 rgba(59, 130, 246, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-page__refresh-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.calendar-page__refresh-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.calendar-page__refresh-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 20px rgba(59, 130, 246, 0.4),
+    0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.calendar-page__refresh-btn:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 8px rgba(59, 130, 246, 0.3),
+    0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.calendar-page__refresh-btn-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.6s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.calendar-page__refresh-btn:hover .calendar-page__refresh-btn-icon {
+  transform: rotate(360deg);
+}
+
+.calendar-page__refresh-btn-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   ÁREA DEL CALENDARIO
+   ============================================ */
+
+.calendar-page__calendar-wrapper {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   INDICADORES Y BADGES
+   ============================================ */
+
+.calendar-page__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.calendar-page__badge--live {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.calendar-page__badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* ============================================
+   CARDS INFORMATIVOS
+   ============================================ */
+
+.calendar-page__info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+  animation: fadeIn 1s ease-out;
+}
+
+.calendar-page__info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.calendar-page__info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.calendar-page__info-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+
+.calendar-page__info-card--blue .calendar-page__info-card-icon {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.calendar-page__info-card--green .calendar-page__info-card-icon {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.calendar-page__info-card--purple .calendar-page__info-card-icon {
+  background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+}
+
+.calendar-page__info-card-title {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 4px 0;
+  font-weight: 500;
+}
+
+.calendar-page__info-card-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 0;
+}
+
+/* ============================================
+   ESTADOS VACÍOS
+   ============================================ */
+
+.calendar-page__empty-state {
+  background: white;
+  border-radius: 20px;
+  padding: 80px 40px;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-page__empty-icon {
+  font-size: 5rem;
+  margin-bottom: 24px;
+  opacity: 0.5;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.calendar-page__empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 12px 0;
+}
+
+.calendar-page__empty-description {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .calendar-page {
+    padding: 24px 16px;
+  }
+
+  .calendar-page__header {
+    padding: 24px 28px;
+  }
+
+  .calendar-page__title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-page__header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .calendar-page__title-section {
+    min-width: 100%;
+  }
+
+  .calendar-page__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .calendar-page__refresh-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .calendar-page__info-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   MODO OSCURO (OPCIONAL)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .calendar-page {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+
+  .calendar-page__header {
+    background: #1e293b;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .calendar-page__title {
+    color: #e0f2fe;
+  }
+
+  .calendar-page__subtitle {
+    color: #94a3b8;
+  }
+
+  .calendar-page__info-card {
+    background: #1e293b;
+    color: #e0f2fe;
+  }
+
+  .calendar-page__info-card-value {
+    color: #93c5fd;
+  }
+}
+
+/* ============================================
+   ANIMACIONES DE CARGA
+   ============================================ */
+
+.calendar-page__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+}
+
+.calendar-page__loading-spinner {
+  width: 64px;
+  height: 64px;
+  border: 6px solid rgba(59, 130, 246, 0.2);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.calendar-page__loading-text {
+  font-size: 1.125rem;
+  color: #6b7280;
+  font-weight: 500;
+}

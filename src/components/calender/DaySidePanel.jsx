@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getAppointmentsByDate } from '@services/appointmentsService.js';
-import AppointmentItem from './AppointmentItem';
 import AppointmentDetailModal from './AppointmentDetailModal';
+import './DaySidePanel.css';
 
 // Horarios fijos: 8:00 AM - 5:30 PM con intervalos de 30 minutos
 const WORK_HOURS = [
@@ -13,6 +13,17 @@ const WORK_HOURS = [
   '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
 ];
 
+/**
+ * DaySidePanel - Panel lateral con horarios del día
+ *
+ * Features:
+ * ✅ Diseño profesional con CSS personalizado
+ * ✅ Animaciones suaves de entrada/salida
+ * ✅ Lista de horarios con citas
+ * ✅ Badges de estado
+ * ✅ Iconos SVG profesionales
+ * ✅ Responsive design
+ */
 const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUserRole }) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,22 +37,27 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
     }
   }, [selectedDate, isOpen]);
 
+  /**
+   * Cargar citas del día seleccionado
+   */
   const loadDayAppointments = async () => {
     if (!selectedDate) return;
 
     setLoading(true);
     try {
       const data = await getAppointmentsByDate(selectedDate);
-      setAppointments(data);
+      setAppointments(data || []);
     } catch (error) {
-      console.error('Error al cargar citas del día:', error);
+      console.error('❌ Error al cargar citas del día:', error);
       setAppointments([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Agrupar citas por hora
+  /**
+   * Agrupar citas por hora
+   */
   const groupAppointmentsByHour = () => {
     const grouped = {};
 
@@ -56,13 +72,17 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
     return grouped;
   };
 
-  // Handler para abrir modal de detalle
+  /**
+   * Handler para abrir modal de detalle
+   */
   const handleAppointmentClick = (appointment) => {
     setSelectedAppointment(appointment);
     setIsModalOpen(true);
   };
 
-  // Handler para cerrar modal
+  /**
+   * Handler para cerrar modal
+   */
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setTimeout(() => setSelectedAppointment(null), 300);
@@ -81,7 +101,7 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              className="day-side-panel-overlay"
               onClick={onClose}
             />
 
@@ -91,26 +111,26 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50 overflow-hidden flex flex-col"
+              className="day-side-panel"
             >
               {/* Header del panel */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold">
+              <div className="day-side-panel__header">
+                <div className="day-side-panel__header-content">
+                  <h2 className="day-side-panel__title">
                     {selectedDate && format(selectedDate, "EEEE, d 'de' MMMM", { locale: es })}
                   </h2>
-                  <p className="text-blue-100 mt-1">
+                  <p className="day-side-panel__subtitle">
                     Horarios laborales: 8:00 AM - 5:30 PM
                   </p>
                 </div>
 
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-blue-800 rounded-lg transition-colors"
+                  className="day-side-panel__close-btn"
                   aria-label="Cerrar panel"
                 >
                   <svg
-                    className="w-6 h-6"
+                    className="day-side-panel__close-icon"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -126,28 +146,33 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
               </div>
 
               {/* Contenido del panel */}
-              <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+              <div className="day-side-panel__content">
                 {loading ? (
-                  <div className="flex flex-col items-center justify-center h-64 gap-3">
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-gray-600">Cargando horarios...</span>
+                  <div className="day-side-panel__loading">
+                    <div className="day-side-panel__spinner"></div>
+                    <span className="day-side-panel__loading-text">Cargando horarios...</span>
+                  </div>
+                ) : appointments.length === 0 ? (
+                  <div className="day-side-panel__empty">
+                    <div className="day-side-panel__empty-icon">📅</div>
+                    <h3 className="day-side-panel__empty-title">No hay citas programadas</h3>
+                    <p className="day-side-panel__empty-text">
+                      Este día no tiene citas agendadas aún.
+                    </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="day-side-panel__slots">
                     {WORK_HOURS.map((hour) => {
                       const appointmentsInSlot = groupedAppointments[hour] || [];
                       const hasAppointments = appointmentsInSlot.length > 0;
 
                       return (
-                        <div
-                          key={hour}
-                          className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
-                        >
-                          {/* Hora del slot */}
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
+                        <div key={hour} className="day-side-panel__slot">
+                          {/* Header del slot */}
+                          <div className="day-side-panel__slot-header">
+                            <div className="day-side-panel__slot-time-wrapper">
                               <svg
-                                className="w-5 h-5 text-gray-400"
+                                className="day-side-panel__slot-icon"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -159,35 +184,35 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
                                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                 />
                               </svg>
-                              <span className="font-semibold text-gray-900 text-lg">
+                              <span className="day-side-panel__slot-time">
                                 {format(new Date(`2000-01-01T${hour}`), 'h:mm a')}
                               </span>
                             </div>
 
                             {!hasAppointments && (
-                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <span className="day-side-panel__slot-badge day-side-panel__slot-badge--available">
                                 Disponible
                               </span>
                             )}
                           </div>
 
-                          {/* Lista de citas en este horario */}
-                          {hasAppointments ? (
-                            <div className="space-y-2">
-                              {appointmentsInSlot.map((appointment) => (
+                          {/* Contenido del slot */}
+                          <div className="day-side-panel__slot-content">
+                            {hasAppointments ? (
+                              appointmentsInSlot.map((appointment) => (
                                 <AppointmentItem
                                   key={appointment.id}
                                   appointment={appointment}
                                   isCurrentUser={appointment.veterinario_id === currentUserId}
                                   onClick={() => handleAppointmentClick(appointment)}
                                 />
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-gray-500 italic">
-                              No hay citas programadas en este horario
-                            </p>
-                          )}
+                              ))
+                            ) : (
+                              <p className="day-side-panel__slot-empty">
+                                No hay citas programadas en este horario
+                              </p>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -196,18 +221,20 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
               </div>
 
               {/* Footer con estadísticas */}
-              <div className="bg-white border-t border-gray-200 p-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">
-                    Total de citas: <span className="font-semibold text-gray-900">{appointments.length}</span>
+              {!loading && appointments.length > 0 && (
+                <div className="day-side-panel__footer">
+                  <span className="day-side-panel__footer-stat">
+                    Total de citas:{' '}
+                    <span className="day-side-panel__footer-value">{appointments.length}</span>
                   </span>
-                  <span className="text-gray-600">
-                    Slots disponibles: <span className="font-semibold text-green-600">
+                  <span className="day-side-panel__footer-stat">
+                    Slots disponibles:{' '}
+                    <span className="day-side-panel__footer-value day-side-panel__footer-value--success">
                       {WORK_HOURS.length - Object.keys(groupedAppointments).length}
                     </span>
                   </span>
                 </div>
-              </div>
+              )}
             </motion.div>
           </>
         )}
@@ -220,6 +247,49 @@ const DaySidePanel = ({ isOpen, onClose, selectedDate, currentUserId, currentUse
         appointment={selectedAppointment}
       />
     </>
+  );
+};
+
+/**
+ * AppointmentItem - Componente de item de cita
+ */
+const AppointmentItem = ({ appointment, isCurrentUser, onClick }) => {
+  // Determinar clase según tipo de usuario
+  const itemClass = `appointment-item ${
+    isCurrentUser ? 'appointment-item--current-user' : 'appointment-item--other-user'
+  }`;
+
+  // Determinar estado
+  const getStatusClass = (estado) => {
+    switch (estado) {
+      case 'confirmada':
+        return 'appointment-item__status--confirmed';
+      case 'pendiente':
+        return 'appointment-item__status--pending';
+      case 'cancelada':
+        return 'appointment-item__status--cancelled';
+      default:
+        return 'appointment-item__status--pending';
+    }
+  };
+
+  return (
+    <div className={itemClass} onClick={onClick}>
+      <div className="appointment-item__icon">
+        🐾
+      </div>
+      <div className="appointment-item__content">
+        <p className="appointment-item__name">
+          {appointment.mascota?.nombre || 'Mascota'} - Dr. {appointment.veterinario?.apellido || 'Veterinario'}
+        </p>
+        <div className="appointment-item__details">
+          <span>{appointment.propietario?.nombre || 'Propietario'}</span>
+          <span className={`appointment-item__status ${getStatusClass(appointment.estado)}`}>
+            {appointment.estado || 'Pendiente'}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };
 
