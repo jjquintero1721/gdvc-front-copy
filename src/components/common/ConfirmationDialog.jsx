@@ -1,26 +1,34 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, AlertCircle, CheckCircle, RotateCcw, Info } from 'lucide-react'
+import {
+  X,
+  AlertCircle,
+  CheckCircle,
+  RotateCcw,
+  Info,
+  AlertTriangle,
+  Clock
+} from 'lucide-react'
 import Button from '@/components/ui/Button'
 import './ConfirmationDialog.css'
 
 /**
- * ConfirmationDialog - Modal de confirmación mejorado
+ * ConfirmationDialog - Modal de confirmación profesional
  *
- * Componente reutilizable para confirmaciones críticas con mejor UX
- * Incluye variantes para diferentes tipos de acciones
+ * Reemplaza window.confirm() con una interfaz moderna y accesible
+ * Incluye animaciones, variantes de color y mejor UX
  *
  * @param {boolean} isOpen - Si el modal está abierto
- * @param {function} onClose - Callback para cerrar el modal
- * @param {function} onConfirm - Callback para confirmar la acción
- * @param {string} variant - Tipo: 'danger', 'warning', 'success', 'info'
+ * @param {function} onClose - Callback para cerrar
+ * @param {function} onConfirm - Callback para confirmar
+ * @param {string} variant - Tipo: 'danger' | 'warning' | 'success' | 'info' | 'restore'
  * @param {string} title - Título del modal
  * @param {string} message - Mensaje principal
  * @param {string} details - Detalles adicionales (opcional)
  * @param {string} confirmText - Texto del botón confirmar
  * @param {string} cancelText - Texto del botón cancelar
  * @param {boolean} isLoading - Estado de carga
- * @param {React.ReactNode} children - Contenido adicional (opcional)
+ * @param {React.ReactNode} children - Contenido adicional
  */
 const ConfirmationDialog = ({
   isOpen,
@@ -35,6 +43,29 @@ const ConfirmationDialog = ({
   isLoading = false,
   children
 }) => {
+  // Prevenir scroll del body cuando está abierto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
+  // Manejar tecla ESC
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape' && isOpen && !isLoading) {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [isOpen, isLoading, onClose])
+
   // Prevenir cierre si está cargando
   const handleClose = () => {
     if (!isLoading) {
@@ -42,31 +73,42 @@ const ConfirmationDialog = ({
     }
   }
 
-  // Prevenir cierre al hacer clic en el contenido
+  // Prevenir propagación al hacer clic en el contenido
   const handleContentClick = (e) => {
     e.stopPropagation()
   }
 
   // Iconos según variante
   const getIcon = () => {
+    const iconProps = { size: 48, strokeWidth: 2 }
+
     switch (variant) {
       case 'danger':
-        return <AlertCircle size={48} />
+        return <AlertCircle {...iconProps} />
       case 'success':
-        return <CheckCircle size={48} />
+        return <CheckCircle {...iconProps} />
       case 'info':
-        return <Info size={48} />
+        return <Info {...iconProps} />
       case 'restore':
-        return <RotateCcw size={48} />
+        return <RotateCcw {...iconProps} />
       case 'warning':
       default:
-        return <AlertCircle size={48} />
+        return <AlertTriangle {...iconProps} />
     }
   }
 
-  // Colores según variante
-  const getVariantClass = () => {
-    return `confirmation-dialog--${variant}`
+  // Variante para botón de confirmar
+  const getConfirmButtonVariant = () => {
+    switch (variant) {
+      case 'danger':
+        return 'danger'
+      case 'success':
+        return 'primary'
+      case 'restore':
+        return 'primary'
+      default:
+        return 'primary'
+    }
   }
 
   return (
@@ -77,14 +119,19 @@ const ConfirmationDialog = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           onClick={handleClose}
         >
           <motion.div
-            className={`confirmation-dialog-content ${getVariantClass()}`}
+            className={`confirmation-dialog-content confirmation-dialog--${variant}`}
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{
+              type: 'spring',
+              damping: 25,
+              stiffness: 300
+            }}
             onClick={handleContentClick}
           >
             {/* Botón cerrar */}
@@ -93,6 +140,7 @@ const ConfirmationDialog = ({
               onClick={handleClose}
               disabled={isLoading}
               aria-label="Cerrar"
+              type="button"
             >
               <X size={20} />
             </button>
@@ -107,7 +155,7 @@ const ConfirmationDialog = ({
               {title}
             </h3>
 
-            {/* Mensaje principal */}
+            {/* Mensaje */}
             <p className="confirmation-dialog-message">
               {message}
             </p>
@@ -115,11 +163,12 @@ const ConfirmationDialog = ({
             {/* Detalles adicionales */}
             {details && (
               <div className="confirmation-dialog-details">
-                {details}
+                <Clock size={16} />
+                <span>{details}</span>
               </div>
             )}
 
-            {/* Contenido personalizado (opcional) */}
+            {/* Contenido adicional */}
             {children && (
               <div className="confirmation-dialog-body">
                 {children}
@@ -132,16 +181,16 @@ const ConfirmationDialog = ({
                 variant="secondary"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="confirmation-dialog-btn-cancel"
+                type="button"
               >
                 {cancelText}
               </Button>
               <Button
-                variant={variant === 'danger' ? 'danger' : 'primary'}
+                variant={getConfirmButtonVariant()}
                 onClick={onConfirm}
                 loading={isLoading}
                 disabled={isLoading}
-                className="confirmation-dialog-btn-confirm"
+                type="button"
               >
                 {confirmText}
               </Button>

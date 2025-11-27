@@ -28,18 +28,20 @@ const navigationByRole = {
     { name: 'Servicios', path: '/servicios', icon: 'briefcase' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
-    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
+    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
+    { name: 'Inventario', path: '/inventario', icon:'briefcase'}
   ],
   veterinario: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
     { name: 'Propietarios', path: '/propietarios', icon: 'user' },
     { name: 'Mascotas', path: '/mascotas', icon: 'paw' },
     { name: 'Veterinarios', path: '/veterinarios', icon: 'medical' },
+    { name: 'Horarios', path: '/horarios', icon: 'clock' },
+    { name: 'Servicios', path: '/servicios', icon: 'briefcase' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
-    { name: 'Servicios', path: '/servicios', icon: 'briefcase' },
-    { name: 'Horarios', path: '/horarios', icon: 'clock' }
+    { name: 'Inventario', path: '/inventario', icon:'briefcase'}
   ],
   auxiliar: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
@@ -49,12 +51,15 @@ const navigationByRole = {
     { name: 'Horarios', path: '/horarios', icon: 'clock' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
-    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
+    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
+    { name: 'Inventario', path: '/inventario', icon:'briefcase'}
   ],
   propietario: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
     { name: 'Mis Mascotas', path: '/mascotas', icon: 'paw' },
-    { name: 'Citas', path: '/citas', icon: 'calendar' }
+    { name: 'Citas', path: '/citas', icon: 'calendar' },
+    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
+
   ]
 }
 

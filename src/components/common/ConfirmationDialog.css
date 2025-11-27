@@ -1,29 +1,28 @@
 /* ============================================
    CONFIRMATION DIALOG - ESTILOS MEJORADOS
-   Modal de confirmación profesional y accesible
+   Modal de confirmación profesional
    ============================================ */
 
-/* Overlay del modal */
+/* Overlay */
 .confirmation-dialog-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  animation: fadeIn 0.2s ease-out;
 }
 
 /* Contenedor principal */
 .confirmation-dialog-content {
   background: white;
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
   max-width: 28rem;
   width: 100%;
   padding: 2rem;
@@ -38,7 +37,7 @@
   right: 1rem;
   background: transparent;
   border: none;
-  color: #6b7280;
+  color: #9ca3af;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -46,15 +45,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
 .confirmation-dialog-close:hover {
   background: #f3f4f6;
-  color: #374151;
+  color: #4b5563;
 }
 
 .confirmation-dialog-close:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -63,39 +63,53 @@
    ============================================ */
 
 .confirmation-dialog-icon {
-  width: 4rem;
-  height: 4rem;
+  width: 5rem;
+  height: 5rem;
   margin: 0 auto 1.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: scaleIn 0.3s ease-out;
+  animation: iconPulse 0.5s ease-out;
 }
 
-/* Variantes de color del icono */
+@keyframes iconPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Variantes de color */
 .confirmation-dialog-icon--warning {
-  background: #fef3c7;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   color: #f59e0b;
 }
 
 .confirmation-dialog-icon--danger {
-  background: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: #ef4444;
 }
 
 .confirmation-dialog-icon--success {
-  background: #d1fae5;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
   color: #10b981;
 }
 
 .confirmation-dialog-icon--info {
-  background: #dbeafe;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   color: #3b82f6;
 }
 
 .confirmation-dialog-icon--restore {
-  background: #e0e7ff;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
   color: #6366f1;
 }
 
@@ -104,30 +118,39 @@
    ============================================ */
 
 .confirmation-dialog-title {
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 700;
   color: #111827;
   margin: 0 0 0.75rem 0;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .confirmation-dialog-message {
   font-size: 0.938rem;
   color: #6b7280;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0;
   line-height: 1.6;
 }
 
 .confirmation-dialog-details {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   padding: 1rem;
   margin: 1rem 0;
   font-size: 0.875rem;
   color: #374151;
   text-align: left;
   line-height: 1.6;
+  display: flex;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.confirmation-dialog-details svg {
+  flex-shrink: 0;
+  color: #6b7280;
+  margin-top: 0.125rem;
 }
 
 .confirmation-dialog-body {
@@ -142,59 +165,27 @@
 .confirmation-dialog-actions {
   display: flex;
   gap: 0.75rem;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
 }
 
-.confirmation-dialog-btn-cancel,
-.confirmation-dialog-btn-confirm {
+.confirmation-dialog-actions button {
   flex: 1;
-  min-height: 2.75rem;
-  font-weight: 600;
-}
-
-/* Variantes de borde del contenedor según tipo */
-.confirmation-dialog--danger {
-  border-top: 4px solid #ef4444;
-}
-
-.confirmation-dialog--warning {
-  border-top: 4px solid #f59e0b;
-}
-
-.confirmation-dialog--success {
-  border-top: 4px solid #10b981;
-}
-
-.confirmation-dialog--info {
-  border-top: 4px solid #3b82f6;
-}
-
-.confirmation-dialog--restore {
-  border-top: 4px solid #6366f1;
 }
 
 /* ============================================
-   ANIMACIONES
+   VARIANTES DE DIÁLOGO
    ============================================ */
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.confirmation-dialog--danger .confirmation-dialog-title {
+  color: #dc2626;
 }
 
-@keyframes scaleIn {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.confirmation-dialog--success .confirmation-dialog-title {
+  color: #059669;
+}
+
+.confirmation-dialog--restore .confirmation-dialog-title {
+  color: #4f46e5;
 }
 
 /* ============================================
@@ -203,12 +194,22 @@
 
 @media (max-width: 640px) {
   .confirmation-dialog-content {
-    max-width: calc(100vw - 2rem);
     padding: 1.5rem;
+    max-width: calc(100% - 2rem);
+  }
+
+  .confirmation-dialog-icon {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .confirmation-dialog-icon svg {
+    width: 2.5rem;
+    height: 2.5rem;
   }
 
   .confirmation-dialog-title {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
   }
 
   .confirmation-dialog-message {
@@ -216,11 +217,10 @@
   }
 
   .confirmation-dialog-actions {
-    flex-direction: column;
+    flex-direction: column-reverse;
   }
 
-  .confirmation-dialog-btn-cancel,
-  .confirmation-dialog-btn-confirm {
+  .confirmation-dialog-actions button {
     width: 100%;
   }
 }
