@@ -4,7 +4,8 @@ import UpdateMedicationModal from './UpdateMedicationModal';
 import RegisterEntryModal from './RegisterEntryModal';
 import RegisterExitModal from './RegisterExitModal';
 import MedicationHistoryModal from './MedicationHistoryModal';
-import DeactivateMedicationModal from './DesactivateMedicationModal.jsx';
+import DeactivateMedicationModal from './DesactivateMedicationModal';
+import './MedicationCard.css';
 
 const MedicationCard = ({ medication, onUpdate }) => {
   const [showActions, setShowActions] = useState(false);
@@ -47,142 +48,158 @@ const MedicationCard = ({ medication, onUpdate }) => {
     }).format(value);
   };
 
-  const getStockColor = () => {
-    if (isExpired()) return 'text-red-600 bg-red-50';
-    if (isLowStock) return 'text-orange-600 bg-orange-50';
-    return 'text-green-600 bg-green-50';
+  const getStockClass = () => {
+    if (isExpired()) return 'medication-card__stock--expired';
+    if (isLowStock) return 'medication-card__stock--low';
+    return 'medication-card__stock--ok';
   };
 
-  const getStockBadge = () => {
-    if (isExpired()) return { text: 'Vencido', color: 'bg-red-500' };
-    if (isLowStock) return { text: 'Stock Bajo', color: 'bg-orange-500' };
-    return { text: 'Stock OK', color: 'bg-green-500' };
+  const getBadgeClass = () => {
+    if (isExpired()) return 'medication-card__badge--expired';
+    if (isLowStock) return 'medication-card__badge--low';
+    return 'medication-card__badge--ok';
   };
 
-  const badge = getStockBadge();
+  const getBadgeText = () => {
+    if (isExpired()) return 'Vencido';
+    if (isLowStock) return 'Stock Bajo';
+    return 'Stock OK';
+  };
+
+  const getDateClass = () => {
+    if (isExpired()) return 'medication-card__info-value--expired';
+    if (isExpiringSoon()) return 'medication-card__info-value--expiring';
+    return '';
+  };
 
   const handleModalSuccess = () => {
-    onUpdate(); // Recargar la lista de medicamentos
+    onUpdate();
   };
 
   return (
     <>
       <div
-        className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100"
+        className="medication-card"
         onMouseEnter={() => setShowActions(true)}
         onMouseLeave={() => setShowActions(false)}
       >
         {/* Header with Badge */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b border-gray-100">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="bg-white p-3 rounded-xl shadow-sm">
-                <Pill size={24} className="text-blue-600" />
+        <div className="medication-card__header">
+          <div className="medication-card__header-top">
+            <div className="medication-card__title-wrapper">
+              <div className="medication-card__icon-bg">
+                <Pill size={24} className="medication-card__icon" />
               </div>
-              <div>
-                <h3 className="font-bold text-gray-800 text-lg leading-tight">
+              <div className="medication-card__title-content">
+                <h3 className="medication-card__name">
                   {medication.nombre}
                 </h3>
-                <p className="text-sm text-gray-600 capitalize">{medication.tipo}</p>
+                <p className="medication-card__type">{medication.tipo}</p>
               </div>
             </div>
-            <span className={`${badge.color} text-white text-xs font-semibold px-3 py-1 rounded-full`}>
-              {badge.text}
+            <span className={`medication-card__badge ${getBadgeClass()}`}>
+              {getBadgeText()}
             </span>
           </div>
         </div>
 
         {/* Body */}
-        <div className="p-4 space-y-3">
+        <div className="medication-card__body">
           {/* Stock Info */}
-          <div className={`flex items-center justify-between p-3 rounded-lg ${getStockColor()}`}>
-            <div className="flex items-center gap-2">
-              <Package size={18} className="flex-shrink-0" />
-              <div>
-                <p className="text-xs font-medium mb-0.5">Stock Actual</p>
-                <p className="text-2xl font-bold">{medication.stock_actual}</p>
+          <div className={`medication-card__stock ${getStockClass()}`}>
+            <div className="medication-card__stock-left">
+              <Package size={18} className="medication-card__stock-icon" />
+              <div className="medication-card__stock-info">
+                <p className="medication-card__stock-label">Stock Actual</p>
+                <p className="medication-card__stock-value">{medication.stock_actual}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs mb-0.5">Unidad</p>
-              <p className="text-sm font-semibold capitalize">{medication.unidad_medida}</p>
+            <div className="medication-card__stock-right">
+              <p className="medication-card__stock-unit-label">Unidad</p>
+              <p className="medication-card__stock-unit">{medication.unidad_medida}</p>
             </div>
           </div>
 
           {/* Stock Limits */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-gray-50 p-2 rounded-lg">
-              <p className="text-xs text-gray-600 mb-1">Mínimo</p>
-              <p className="text-sm font-semibold text-gray-800">{medication.stock_minimo}</p>
+          <div className="medication-card__limits">
+            <div className="medication-card__limit">
+              <p className="medication-card__limit-label">Mínimo</p>
+              <p className="medication-card__limit-value">{medication.stock_minimo}</p>
             </div>
-            <div className="bg-gray-50 p-2 rounded-lg">
-              <p className="text-xs text-gray-600 mb-1">Máximo</p>
-              <p className="text-sm font-semibold text-gray-800">{medication.stock_maximo}</p>
+            <div className="medication-card__limit">
+              <p className="medication-card__limit-label">Máximo</p>
+              <p className="medication-card__limit-value">{medication.stock_maximo}</p>
             </div>
           </div>
 
           {/* Price Info */}
-          <div className="flex items-center justify-between bg-green-50 p-3 rounded-lg">
-            <div className="flex items-center gap-2">
-              <DollarSign size={16} className="text-green-600" />
-              <div>
-                <p className="text-xs text-gray-600">Precio Venta</p>
-                <p className="text-sm font-bold text-green-700">{formatCurrency(medication.precio_venta)}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Info */}
-          <div className="space-y-2 text-sm">
-            <div className="flex items-start gap-2 bg-blue-50 p-3 rounded-lg">
-              <Calendar size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-xs text-gray-600 mb-1">Vencimiento</p>
-                <p className={`text-sm font-medium ${isExpired() ? 'text-red-600' : isExpiringSoon() ? 'text-yellow-600' : 'text-gray-800'}`}>
-                  {formatDate(medication.fecha_vencimiento)}
+          <div className="medication-card__price">
+            <div className="medication-card__price-left">
+              <DollarSign size={16} className="medication-card__price-icon" />
+              <div className="medication-card__price-info">
+                <p className="medication-card__price-label">Precio Venta</p>
+                <p className="medication-card__price-value">
+                  {formatCurrency(medication.precio_venta)}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-start gap-2 bg-gray-50 p-3 rounded-lg">
-            <MapPin size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-xs text-gray-600 mb-1">Ubicación</p>
-              <p className="text-sm font-medium text-gray-800">{medication.ubicacion || 'No especificada'}</p>
+          {/* Expiry Date */}
+          <div className="medication-card__info-item medication-card__info-item--date">
+            <Calendar size={16} className="medication-card__info-icon medication-card__info-icon--date" />
+            <div className="medication-card__info-content">
+              <p className="medication-card__info-label">Vencimiento</p>
+              <p className={`medication-card__info-value ${getDateClass()}`}>
+                {formatDate(medication.fecha_vencimiento)}
+              </p>
             </div>
           </div>
 
+          {/* Location */}
+          <div className="medication-card__info-item medication-card__info-item--location">
+            <MapPin size={16} className="medication-card__info-icon medication-card__info-icon--location" />
+            <div className="medication-card__info-content">
+              <p className="medication-card__info-label">Ubicación</p>
+              <p className="medication-card__info-value">
+                {medication.ubicacion || 'No especificada'}
+              </p>
+            </div>
+          </div>
+
+          {/* Laboratory */}
           {medication.laboratorio && (
-            <div className="text-sm">
-              <p className="text-xs text-gray-600">Laboratorio</p>
-              <p className="font-medium text-gray-800">{medication.laboratorio}</p>
+            <div className="medication-card__lab">
+              <p className="medication-card__lab-label">Laboratorio</p>
+              <p className="medication-card__lab-value">{medication.laboratorio}</p>
             </div>
           )}
 
           {/* Special Badges */}
-          <div className="flex flex-wrap gap-2">
-            {medication.requiere_refrigeracion && (
-              <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                <Snowflake size={12} />
-                <span>Refrigeración</span>
-              </div>
-            )}
-            {medication.controlado && (
-              <div className="flex items-center gap-1 bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
-                <AlertCircle size={12} />
-                <span>Controlado</span>
-              </div>
-            )}
-          </div>
+          {(medication.requiere_refrigeracion || medication.controlado) && (
+            <div className="medication-card__special-badges">
+              {medication.requiere_refrigeracion && (
+                <div className="medication-card__special-badge medication-card__special-badge--refrigeration">
+                  <Snowflake size={12} />
+                  <span>Refrigeración</span>
+                </div>
+              )}
+              {medication.controlado && (
+                <div className="medication-card__special-badge medication-card__special-badge--controlled">
+                  <AlertCircle size={12} />
+                  <span>Controlado</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Actions */}
-        <div className="border-t border-gray-200 p-4 bg-gray-50">
-          <div className="grid grid-cols-2 gap-2">
+        {/* Footer - Actions */}
+        <div className="medication-card__footer">
+          <div className="medication-card__actions">
             <button
               onClick={() => setIsUpdateModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-blue-50 text-blue-700 py-2.5 rounded-lg hover:bg-blue-100 transition-colors font-medium text-sm"
+              className="medication-card__action-button medication-card__action-button--update"
             >
               <Edit size={16} />
               Actualizar
@@ -190,7 +207,7 @@ const MedicationCard = ({ medication, onUpdate }) => {
 
             <button
               onClick={() => setIsHistoryModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-purple-50 text-purple-700 py-2.5 rounded-lg hover:bg-purple-100 transition-colors font-medium text-sm"
+              className="medication-card__action-button medication-card__action-button--history"
             >
               <Clock size={16} />
               Historial
@@ -198,7 +215,7 @@ const MedicationCard = ({ medication, onUpdate }) => {
 
             <button
               onClick={() => setIsEntryModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-green-50 text-green-700 py-2.5 rounded-lg hover:bg-green-100 transition-colors font-medium text-sm"
+              className="medication-card__action-button medication-card__action-button--entry"
             >
               <ArrowUpCircle size={16} />
               Entrada
@@ -206,7 +223,7 @@ const MedicationCard = ({ medication, onUpdate }) => {
 
             <button
               onClick={() => setIsExitModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-orange-50 text-orange-700 py-2.5 rounded-lg hover:bg-orange-100 transition-colors font-medium text-sm"
+              className="medication-card__action-button medication-card__action-button--exit"
             >
               <ArrowDownCircle size={16} />
               Salida
@@ -215,7 +232,7 @@ const MedicationCard = ({ medication, onUpdate }) => {
 
           <button
             onClick={() => setIsDeactivateModalOpen(true)}
-            className="w-full mt-2 flex items-center justify-center gap-2 bg-red-50 text-red-700 py-2.5 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm"
+            className="medication-card__action-button medication-card__action-button--deactivate"
           >
             <Trash2 size={16} />
             Desactivar

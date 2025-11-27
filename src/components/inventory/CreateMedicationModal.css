@@ -1,0 +1,419 @@
+/* ============================================
+   CREATE MEDICATION MODAL - ESTILOS
+   Modal para crear nuevos medicamentos
+   ============================================ */
+
+/* Overlay del modal */
+.medication-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Contenedor del modal */
+.medication-modal__container {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  max-width: 64rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+/* ============================================
+   HEADER DEL MODAL
+   ============================================ */
+
+.medication-modal__header {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.medication-modal__header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.medication-modal__title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.medication-modal__icon-bg {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medication-modal__icon {
+  color: white;
+}
+
+.medication-modal__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.medication-modal__close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medication-modal__close-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.medication-modal__close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   BODY DEL MODAL
+   ============================================ */
+
+.medication-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* Scrollbar personalizado */
+.medication-modal__body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.medication-modal__body::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.medication-modal__body::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.medication-modal__body::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Mensaje de error */
+.medication-modal__error {
+  background: #fef2f2;
+  border-left: 4px solid #dc2626;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  animation: slideIn 0.3s ease;
+}
+
+.medication-modal__error-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.medication-modal__error-icon {
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.medication-modal__error-text {
+  color: #991b1b;
+  font-size: 0.875rem;
+  flex: 1;
+}
+
+/* ============================================
+   FORMULARIO
+   ============================================ */
+
+.medication-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Sección del formulario */
+.medication-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.medication-form__section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Grid del formulario */
+.medication-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.medication-form__grid--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Campo del formulario */
+.medication-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.medication-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.medication-form__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  display: block;
+}
+
+.medication-form__required {
+  color: #dc2626;
+}
+
+/* Inputs */
+.medication-form__input,
+.medication-form__select,
+.medication-form__textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+  color: #1f2937;
+}
+
+.medication-form__input:focus,
+.medication-form__select:focus,
+.medication-form__textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.medication-form__input::placeholder,
+.medication-form__textarea::placeholder {
+  color: #9ca3af;
+}
+
+.medication-form__textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* Checkboxes */
+.medication-form__checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.medication-form__checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.medication-form__checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.medication-form__checkbox:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.medication-form__checkbox-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ============================================
+   FOOTER DEL MODAL
+   ============================================ */
+
+.medication-modal__footer {
+  background: #f9fafb;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.medication-modal__button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+}
+
+.medication-modal__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.medication-modal__button--cancel {
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.medication-modal__button--cancel:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.medication-modal__button--submit {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+.medication-modal__button--submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Spinner de carga */
+.medication-modal__spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .medication-modal__container {
+    max-width: 100%;
+    max-height: 95vh;
+  }
+
+  .medication-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .medication-form__grid--three {
+    grid-template-columns: 1fr;
+  }
+
+  .medication-modal__footer {
+    flex-direction: column-reverse;
+  }
+
+  .medication-modal__button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

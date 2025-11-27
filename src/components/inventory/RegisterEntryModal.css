@@ -1,0 +1,190 @@
+/* ============================================
+   REGISTER ENTRY MODAL - ESTILOS
+   Modal para registrar entradas de medicamentos al inventario
+   ============================================ */
+
+/* Nota: Hereda la estructura base de CreateMedicationModal */
+
+/* Header personalizado para Entry */
+.entry-modal__header {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 1.5rem;
+}
+
+.entry-modal__icon-bg {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+}
+
+.entry-modal__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.entry-modal__subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0 0;
+}
+
+/* Información actual del medicamento */
+.entry-modal__current-info {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 1px solid #6ee7b7;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.entry-modal__current-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #047857;
+  margin: 0 0 0.75rem 0;
+}
+
+.entry-modal__current-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.entry-modal__current-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.entry-modal__current-label {
+  font-size: 0.75rem;
+  color: #059669;
+  margin: 0 0 0.25rem 0;
+}
+
+.entry-modal__current-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #065f46;
+  margin: 0;
+}
+
+.entry-modal__current-unit {
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+/* Campo de cantidad destacado */
+.entry-modal__quantity-field {
+  background: linear-gradient(135deg, #f0fdf4 0%, white 100%);
+  border: 2px solid #10b981;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.entry-modal__quantity-input {
+  padding: 1rem;
+  border: 2px solid #6ee7b7;
+  border-radius: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.entry-modal__quantity-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Indicador de nuevo stock */
+.entry-modal__new-stock {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #6ee7b7;
+  text-align: center;
+}
+
+.entry-modal__new-stock-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+}
+
+.entry-modal__new-stock-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #059669;
+  margin: 0;
+}
+
+/* Campo de costo */
+.entry-modal__cost-field {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.entry-modal__cost-total {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 0.5rem;
+  text-align: center;
+  border: 1px solid #86efac;
+}
+
+.entry-modal__cost-total-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.entry-modal__cost-total-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #047857;
+  margin: 0;
+}
+
+/* Botón de registrar entrada */
+.entry-modal__button--submit {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+.entry-modal__button--submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 6px 8px -1px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Select de motivo */
+.entry-modal__reason-select {
+  padding: 0.75rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.entry-modal__reason-select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+  .entry-modal__current-grid {
+    grid-template-columns: 1fr;
+  }
+}

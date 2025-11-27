@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import inventoryService from '../../services/inventoryService';
 import { X, Save, AlertCircle } from 'lucide-react';
+import './CreateMedicationModal.css';
 
 const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -68,38 +69,48 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="medication-modal__overlay">
+      <div className="medication-modal__container">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">Nuevo Medicamento</h2>
-          <button
-            onClick={onClose}
-            className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
-          >
-            <X size={24} />
-          </button>
+        <div className="medication-modal__header">
+          <div className="medication-modal__header-content">
+            <div className="medication-modal__title-wrapper">
+              <div className="medication-modal__icon-bg">
+                <Save size={24} className="medication-modal__icon" />
+              </div>
+              <h2 className="medication-modal__title">Nuevo Medicamento</h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="medication-modal__close-btn"
+              disabled={loading}
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+        <div className="medication-modal__body">
           {error && (
-            <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg flex items-start gap-3">
-              <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
-              <p className="text-red-800 text-sm">{error}</p>
+            <div className="medication-modal__error">
+              <div className="medication-modal__error-content">
+                <AlertCircle className="medication-modal__error-icon" size={20} />
+                <p className="medication-modal__error-text">{error}</p>
+              </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="medication-form">
             {/* Información Básica */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">
                 Información Básica
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nombre del Medicamento <span className="text-red-500">*</span>
+              <div className="medication-form__grid">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Nombre del Medicamento <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="text"
@@ -107,21 +118,21 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     value={formData.nombre}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                     placeholder="Ej: Vacuna Antirrábica Canina"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tipo <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Tipo <span className="medication-form__required">*</span>
                   </label>
                   <select
                     name="tipo"
                     value={formData.tipo}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__select"
                   >
                     <option value="medicamento">Medicamento</option>
                     <option value="vacuna">Vacuna</option>
@@ -133,8 +144,8 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                   </select>
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="medication-form__field medication-form__field--full">
+                  <label className="medication-form__label">
                     Descripción
                   </label>
                   <textarea
@@ -142,13 +153,13 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     value={formData.descripcion}
                     onChange={handleChange}
                     rows="3"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__textarea"
                     placeholder="Descripción del medicamento..."
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
                     Laboratorio
                   </label>
                   <input
@@ -156,20 +167,20 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     name="laboratorio"
                     value={formData.laboratorio}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                     placeholder="Ej: Zoetis"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
                     Unidad de Medida
                   </label>
                   <select
                     name="unidad_medida"
                     value={formData.unidad_medida}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__select"
                   >
                     <option value="unidades">Unidades</option>
                     <option value="ml">Mililitros (ml)</option>
@@ -184,14 +195,14 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             {/* Stock */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">
                 Control de Stock
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Actual <span className="text-red-500">*</span>
+              <div className="medication-form__grid medication-form__grid--three">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Stock Actual <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -200,13 +211,13 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     onChange={handleChange}
                     required
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Mínimo <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Stock Mínimo <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -215,13 +226,13 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     onChange={handleChange}
                     required
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Máximo <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Stock Máximo <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -230,21 +241,21 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     onChange={handleChange}
                     required
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
               </div>
             </div>
 
             {/* Precios */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">
                 Información Comercial
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Precio de Compra (COP) <span className="text-red-500">*</span>
+              <div className="medication-form__grid">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Precio de Compra (COP) <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -254,13 +265,13 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Precio de Venta (COP) <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Precio de Venta (COP) <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -270,12 +281,12 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
                     Lote
                   </label>
                   <input
@@ -283,13 +294,13 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     name="lote"
                     value={formData.lote}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                     placeholder="Ej: VAC-2025-001"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
                     Fecha de Vencimiento
                   </label>
                   <input
@@ -297,12 +308,12 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     name="fecha_vencimiento"
                     value={formData.fecha_vencimiento}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="medication-form__field medication-form__field--full">
+                  <label className="medication-form__label">
                     Ubicación en Almacén
                   </label>
                   <input
@@ -310,7 +321,7 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     name="ubicacion"
                     value={formData.ubicacion}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                     placeholder="Ej: Refrigerador A - Estante 2"
                   />
                 </div>
@@ -318,65 +329,67 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             {/* Características Especiales */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">
                 Características Especiales
               </h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
+              <div className="medication-form__checkboxes">
+                <div className="medication-form__checkbox-wrapper">
                   <input
                     type="checkbox"
                     name="requiere_refrigeracion"
                     checked={formData.requiere_refrigeracion}
                     onChange={handleChange}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="medication-form__checkbox"
+                    id="requiere_refrigeracion"
                   />
-                  <label className="text-sm font-medium text-gray-700">
+                  <label htmlFor="requiere_refrigeracion" className="medication-form__checkbox-label">
                     Requiere Refrigeración
                   </label>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="medication-form__checkbox-wrapper">
                   <input
                     type="checkbox"
                     name="controlado"
                     checked={formData.controlado}
                     onChange={handleChange}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="medication-form__checkbox"
+                    id="controlado"
                   />
-                  <label className="text-sm font-medium text-gray-700">
+                  <label htmlFor="controlado" className="medication-form__checkbox-label">
                     Medicamento Controlado
                   </label>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Enfermedad que Trata
-                    </label>
-                    <input
-                      type="text"
-                      name="enfermedad"
-                      value={formData.enfermedad}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Ej: Rabia"
-                    />
-                  </div>
+              <div className="medication-form__grid">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Enfermedad que Trata
+                  </label>
+                  <input
+                    type="text"
+                    name="enfermedad"
+                    value={formData.enfermedad}
+                    onChange={handleChange}
+                    className="medication-form__input"
+                    placeholder="Ej: Rabia"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Dosis Recomendada
-                    </label>
-                    <input
-                      type="text"
-                      name="dosis_recomendada"
-                      value={formData.dosis_recomendada}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Ej: 1 dosis anual"
-                    />
-                  </div>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Dosis Recomendada
+                  </label>
+                  <input
+                    type="text"
+                    name="dosis_recomendada"
+                    value={formData.dosis_recomendada}
+                    onChange={handleChange}
+                    className="medication-form__input"
+                    placeholder="Ej: 1 dosis anual"
+                  />
                 </div>
               </div>
             </div>
@@ -384,12 +397,12 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t">
+        <div className="medication-modal__footer">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium disabled:opacity-50"
+            className="medication-modal__button medication-modal__button--cancel"
           >
             Cancelar
           </button>
@@ -397,11 +410,11 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
             type="submit"
             onClick={handleSubmit}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="medication-modal__button medication-modal__button--submit"
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="medication-modal__spinner"></div>
                 Guardando...
               </>
             ) : (

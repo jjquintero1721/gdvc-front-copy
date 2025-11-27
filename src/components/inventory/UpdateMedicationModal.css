@@ -1,0 +1,121 @@
+/* ============================================
+   UPDATE MEDICATION MODAL - ESTILOS
+   Modal para actualizar información de un medicamento
+   ============================================ */
+
+/* Reutiliza la mayoría de estilos de CreateMedicationModal */
+
+/* Header personalizado para Update */
+.update-medication-modal__header {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.update-medication-modal__icon-bg {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sección de información actual */
+.update-medication-modal__current-info {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #86efac;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.update-medication-modal__current-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #065f46;
+  margin: 0 0 0.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.update-medication-modal__current-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.update-medication-modal__current-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #bbf7d0;
+}
+
+.update-medication-modal__current-label {
+  font-size: 0.75rem;
+  color: #047857;
+  font-weight: 500;
+}
+
+.update-medication-modal__current-value {
+  font-size: 0.875rem;
+  color: #065f46;
+  font-weight: 600;
+}
+
+/* Campos modificados destacados */
+.medication-form__field--modified .medication-form__input,
+.medication-form__field--modified .medication-form__select {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.medication-form__field--modified .medication-form__label {
+  color: #065f46;
+}
+
+/* Botón de actualizar */
+.medication-modal__button--update {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+.medication-modal__button--update:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 6px 8px -1px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Indicador de cambios */
+.update-medication-modal__changes-indicator {
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.update-medication-modal__changes-text {
+  color: #92400e;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .update-medication-modal__current-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -13,6 +13,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import './InventoryReports.css'
 
 const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
   const [lowStockAlerts, setLowStockAlerts] = useState([]);
@@ -87,48 +88,48 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="inventory-reports__loading">
+        <div className="inventory-reports__spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="inventory-reports">
       {/* Dashboard Summary */}
       {dashboard && dashboard.resumen && (
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="inventory-reports__summary">
           <button
             onClick={() => toggleSection('dashboard')}
-            className="w-full flex items-center justify-between mb-4"
+            className="inventory-reports__section-toggle"
           >
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-              <Package className="text-blue-600" size={28} />
+            <h2 className="inventory-reports__summary-title">
+              <Package size={28} />
               Resumen del Inventario
             </h2>
             {expandedSections.dashboard ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
           </button>
 
           {expandedSections.dashboard && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
-                <p className="text-sm text-blue-700 font-medium mb-1">Total Medicamentos</p>
-                <p className="text-3xl font-bold text-blue-900">{dashboard.resumen.total_medicamentos}</p>
+            <div className="inventory-reports__summary-grid">
+              <div className="inventory-reports__summary-stat">
+                <p className="inventory-reports__summary-stat-label">Total Medicamentos</p>
+                <p className="inventory-reports__summary-stat-value">{dashboard.resumen.total_medicamentos}</p>
               </div>
 
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
-                <p className="text-sm text-green-700 font-medium mb-1">Activos</p>
-                <p className="text-3xl font-bold text-green-900">{dashboard.resumen.medicamentos_activos}</p>
+              <div className="inventory-reports__summary-stat">
+                <p className="inventory-reports__summary-stat-label">Activos</p>
+                <p className="inventory-reports__summary-stat-value">{dashboard.resumen.medicamentos_activos}</p>
               </div>
 
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200">
-                <p className="text-sm text-orange-700 font-medium mb-1">Stock Bajo</p>
-                <p className="text-3xl font-bold text-orange-900">{dashboard.resumen.alertas_stock_bajo}</p>
+              <div className="inventory-reports__summary-stat">
+                <p className="inventory-reports__summary-stat-label">Stock Bajo</p>
+                <p className="inventory-reports__summary-stat-value">{dashboard.resumen.alertas_stock_bajo}</p>
               </div>
 
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
-                <p className="text-sm text-purple-700 font-medium mb-1">Valor Total</p>
-                <p className="text-2xl font-bold text-purple-900">
+              <div className="inventory-reports__summary-stat">
+                <p className="inventory-reports__summary-stat-label">Valor Total</p>
+                <p className="inventory-reports__summary-stat-value">
                   {formatCurrency(dashboard.resumen.valor_total_inventario)}
                 </p>
               </div>
@@ -139,16 +140,16 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
 
       {/* Low Stock Alerts */}
       {lowStockAlerts.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-200">
-          <div className="flex items-center justify-between mb-4">
+        <div className="inventory-reports__section">
+          <div className="inventory-reports__section-header">
             <button
               onClick={() => toggleSection('lowStock')}
-              className="flex items-center gap-3 flex-1"
+              className="inventory-reports__section-toggle"
             >
-              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                <AlertTriangle className="text-orange-600" size={28} />
+              <h2 className="inventory-reports__section-title">
+                <AlertTriangle size={28} />
                 Alertas de Stock Bajo
-                <span className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                <span className="inventory-reports__badge">
                   {lowStockAlerts.length}
                 </span>
               </h2>
@@ -158,7 +159,7 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
             {lowStockAlerts.length > 0 && (
               <button
                 onClick={handleGeneratePurchaseOrder}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md"
+                className="inventory-reports__generate-order-btn"
               >
                 <ShoppingCart size={18} />
                 Generar Orden de Compra
@@ -167,54 +168,66 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
           </div>
 
           {expandedSections.lowStock && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="inventory-reports__list">
               {lowStockAlerts.map((alert) => (
                 <div
                   key={alert.medicamento_id}
-                  className={`border-l-4 p-4 rounded-lg ${
-                    alert.requiere_accion_inmediata
-                      ? 'bg-red-50 border-red-500'
-                      : 'bg-orange-50 border-orange-500'
+                  className={`inventory-reports__item inventory-reports__item--low-stock ${
+                    alert.requiere_accion_inmediata ? 'inventory-reports__item--urgent' : ''
                   }`}
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-gray-800">{alert.nombre}</h3>
+                  <div className="inventory-reports__item-header">
+                    <div className="inventory-reports__item-left">
+                      <div className="inventory-reports__item-icon-bg inventory-reports__item-icon-bg--low-stock">
+                        <AlertTriangle className="inventory-reports__item-icon" size={20} />
+                      </div>
+                      <div className="inventory-reports__item-info">
+                        <h3 className="inventory-reports__item-name">{alert.nombre}</h3>
+                        <p className="inventory-reports__item-type">{alert.tipo}</p>
+                      </div>
+                    </div>
                     {alert.requiere_accion_inmediata && (
-                      <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      <span className="inventory-reports__item-badge inventory-reports__item-badge--urgent">
                         ¡URGENTE!
                       </span>
                     )}
                   </div>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Stock actual:</span>
-                      <span className="font-semibold text-gray-800">{alert.stock_actual}</span>
+
+                  <div className="inventory-reports__item-grid">
+                    <div className="inventory-reports__item-stat">
+                      <p className="inventory-reports__item-stat-label">Stock Actual</p>
+                      <p className="inventory-reports__item-stat-value inventory-reports__item-stat-value--danger">
+                        {alert.stock_actual} <span className="inventory-reports__item-stat-unit">{alert.unidad_medida}</span>
+                      </p>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Stock mínimo:</span>
-                      <span className="font-semibold text-gray-800">{alert.stock_minimo}</span>
+
+                    <div className="inventory-reports__item-stat">
+                      <p className="inventory-reports__item-stat-label">Stock Mínimo</p>
+                      <p className="inventory-reports__item-stat-value">
+                        {alert.stock_minimo} <span className="inventory-reports__item-stat-unit">{alert.unidad_medida}</span>
+                      </p>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Diferencia:</span>
-                      <span className="font-semibold text-red-600">-{alert.diferencia}</span>
+
+                    <div className="inventory-reports__item-stat">
+                      <p className="inventory-reports__item-stat-label">Faltante</p>
+                      <p className="inventory-reports__item-stat-value inventory-reports__item-stat-value--warning">
+                        {alert.cantidad_faltante} <span className="inventory-reports__item-stat-unit">{alert.unidad_medida}</span>
+                      </p>
                     </div>
-                    <div className="mt-2 pt-2 border-t border-gray-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Nivel de stock:</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${
-                                alert.porcentaje_stock < 25 ? 'bg-red-500' : 'bg-orange-500'
-                              }`}
-                              style={{ width: `${Math.min(alert.porcentaje_stock, 100)}%` }}
-                            />
-                          </div>
-                          <span className="font-semibold text-gray-800">
-                            {alert.porcentaje_stock.toFixed(0)}%
-                          </span>
-                        </div>
+
+                    <div className="inventory-reports__item-stat">
+                      <p className="inventory-reports__item-stat-label">Nivel de Stock</p>
+                      <div className="inventory-reports__progress-bar">
+                        <div
+                          className={`inventory-reports__progress-fill ${
+                            alert.porcentaje_stock < 30 ? 'inventory-reports__progress-fill--danger' : 'inventory-reports__progress-fill--warning'
+                          }`}
+                          style={{ width: `${Math.min(alert.porcentaje_stock, 100)}%` }}
+                        />
                       </div>
+                      <span className="inventory-reports__progress-label">
+                        {alert.porcentaje_stock.toFixed(0)}%
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -226,15 +239,15 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
 
       {/* Expired Medications */}
       {expiredMedications.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-red-200">
+        <div className="inventory-reports__section">
           <button
             onClick={() => toggleSection('expired')}
-            className="w-full flex items-center justify-between mb-4"
+            className="inventory-reports__section-toggle"
           >
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-              <XCircle className="text-red-600" size={28} />
+            <h2 className="inventory-reports__section-title">
+              <XCircle size={28} />
               Medicamentos Vencidos
-              <span className="bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+              <span className="inventory-reports__badge inventory-reports__badge--danger">
                 {expiredMedications.length}
               </span>
             </h2>
@@ -242,38 +255,56 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
           </button>
 
           {expandedSections.expired && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="inventory-reports__list">
               {expiredMedications.map((medication) => (
                 <div
                   key={medication.id}
-                  className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg"
+                  className="inventory-reports__item inventory-reports__item--expired"
                 >
-                  <h3 className="font-bold text-gray-800 mb-2">{medication.nombre}</h3>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Calendar size={14} className="text-gray-600" />
-                      <span className="text-gray-600">Venció:</span>
-                      <span className="font-semibold text-red-700">
+                  <div className="inventory-reports__item-header">
+                    <div className="inventory-reports__item-left">
+                      <div className="inventory-reports__item-icon-bg inventory-reports__item-icon-bg--expired">
+                        <XCircle className="inventory-reports__item-icon inventory-reports__item-icon--expired" size={20} />
+                      </div>
+                      <div className="inventory-reports__item-info">
+                        <h3 className="inventory-reports__item-name">{medication.nombre}</h3>
+                        <p className="inventory-reports__item-type">{medication.tipo}</p>
+                      </div>
+                    </div>
+                    <span className="inventory-reports__item-badge inventory-reports__item-badge--expired">
+                      VENCIDO
+                    </span>
+                  </div>
+
+                  <div className="inventory-reports__item-grid">
+                    <div className="inventory-reports__item-stat">
+                      <Calendar size={14} />
+                      <p className="inventory-reports__item-stat-label">Venció:</p>
+                      <p className="inventory-reports__item-stat-value inventory-reports__item-stat-value--danger">
                         {formatDate(medication.fecha_vencimiento)}
-                      </span>
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Package size={14} className="text-gray-600" />
-                      <span className="text-gray-600">Stock actual:</span>
-                      <span className="font-semibold text-gray-800">
+
+                    <div className="inventory-reports__item-stat">
+                      <Package size={14} />
+                      <p className="inventory-reports__item-stat-label">Stock actual:</p>
+                      <p className="inventory-reports__item-stat-value">
                         {medication.stock_actual} {medication.unidad_medida}
-                      </span>
+                      </p>
                     </div>
+
                     {medication.lote && (
-                      <div className="flex items-center gap-2">
-                        <FileText size={14} className="text-gray-600" />
-                        <span className="text-gray-600">Lote:</span>
-                        <span className="font-semibold text-gray-800">{medication.lote}</span>
+                      <div className="inventory-reports__item-stat">
+                        <FileText size={14} />
+                        <p className="inventory-reports__item-stat-label">Lote:</p>
+                        <p className="inventory-reports__item-stat-value">{medication.lote}</p>
                       </div>
                     )}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-red-200">
-                    <p className="text-xs text-red-700 font-medium">
+
+                  <div className="inventory-reports__item-message inventory-reports__item-message--expired">
+                    <AlertTriangle className="inventory-reports__item-message-icon inventory-reports__item-message-icon--expired" size={16} />
+                    <p className="inventory-reports__item-message-text inventory-reports__item-message-text--expired">
                       ⚠️ Requiere desecho según protocolo de bioseguridad
                     </p>
                   </div>
@@ -286,15 +317,15 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
 
       {/* Purchase Order */}
       {purchaseOrder.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-blue-200">
+        <div className="inventory-reports__section inventory-reports__section--purchase-order">
           <button
             onClick={() => toggleSection('purchaseOrder')}
-            className="w-full flex items-center justify-between mb-4"
+            className="inventory-reports__section-toggle"
           >
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-              <ShoppingCart className="text-blue-600" size={28} />
+            <h2 className="inventory-reports__section-title">
+              <ShoppingCart size={28} />
               Orden de Compra Generada
-              <span className="bg-blue-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+              <span className="inventory-reports__badge inventory-reports__badge--primary">
                 {purchaseOrder.length} items
               </span>
             </h2>
@@ -303,74 +334,74 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
 
           {expandedSections.purchaseOrder && (
             <>
-              <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800">
+              <div className="inventory-reports__purchase-order-info">
+                <p>
                   Esta orden de compra ha sido generada automáticamente basándose en los medicamentos con stock bajo.
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="inventory-reports__purchase-order-list">
                 {purchaseOrder.map((item, index) => (
                   <div
                     key={item.medicamento_id || index}
-                    className="bg-gray-50 border border-gray-200 p-4 rounded-lg hover:shadow-md transition-shadow"
+                    className="inventory-reports__purchase-order-item"
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h3 className="font-bold text-gray-800">{item.nombre}</h3>
-                        <p className="text-sm text-gray-600 capitalize">Tipo: {item.tipo}</p>
+                    <div className="inventory-reports__purchase-order-header">
+                      <div className="inventory-reports__purchase-order-info-section">
+                        <h3 className="inventory-reports__purchase-order-name">{item.nombre}</h3>
+                        <p className="inventory-reports__purchase-order-type">Tipo: {item.tipo}</p>
                       </div>
                       <button
                         onClick={() => onEntryFromPurchaseOrder && onEntryFromPurchaseOrder(item)}
-                        className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                        className="inventory-reports__purchase-order-entry-btn"
                       >
                         <ArrowUpCircle size={16} />
                         Registrar Entrada
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-600">Stock Actual</p>
-                        <p className="font-semibold text-gray-800">{item.stock_actual}</p>
+                    <div className="inventory-reports__purchase-order-details">
+                      <div className="inventory-reports__purchase-order-stat">
+                        <p className="inventory-reports__purchase-order-stat-label">Stock Actual</p>
+                        <p className="inventory-reports__purchase-order-stat-value">{item.stock_actual}</p>
                       </div>
-                      <div>
-                        <p className="text-gray-600">A Ordenar</p>
-                        <p className="font-semibold text-blue-700">{item.cantidad_sugerida}</p>
+                      <div className="inventory-reports__purchase-order-stat">
+                        <p className="inventory-reports__purchase-order-stat-label">A Ordenar</p>
+                        <p className="inventory-reports__purchase-order-stat-value inventory-reports__purchase-order-stat-value--primary">
+                          {item.cantidad_sugerida}
+                        </p>
                       </div>
-                      <div>
-                        <p className="text-gray-600">Costo Unit.</p>
-                        <p className="font-semibold text-gray-800">
+                      <div className="inventory-reports__purchase-order-stat">
+                        <p className="inventory-reports__purchase-order-stat-label">Costo Unit.</p>
+                        <p className="inventory-reports__purchase-order-stat-value">
                           {formatCurrency(item.precio_compra)}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-gray-600">Costo Total</p>
-                        <p className="font-semibold text-green-700">
+                      <div className="inventory-reports__purchase-order-stat">
+                        <p className="inventory-reports__purchase-order-stat-label">Costo Total</p>
+                        <p className="inventory-reports__purchase-order-stat-value inventory-reports__purchase-order-stat-value--success">
                           {formatCurrency(item.costo_total_sugerido)}
                         </p>
                       </div>
                     </div>
 
                     {item.laboratorio && (
-                      <div className="mt-2 pt-2 border-t border-gray-200">
-                        <p className="text-xs text-gray-600">
-                          Laboratorio: <span className="font-medium text-gray-800">{item.laboratorio}</span>
+                      <div className="inventory-reports__purchase-order-footer">
+                        <p>
+                          Laboratorio: <span>{item.laboratorio}</span>
                         </p>
                       </div>
                     )}
                   </div>
                 ))}
 
-                <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-semibold text-gray-800">Total Estimado:</span>
-                    <span className="text-2xl font-bold text-green-700">
-                      {formatCurrency(
-                        purchaseOrder.reduce((sum, item) => sum + (item.costo_total_sugerido || 0), 0)
-                      )}
-                    </span>
-                  </div>
+                <div className="inventory-reports__purchase-order-total">
+                  <span className="inventory-reports__purchase-order-total-label">Total Estimado:</span>
+                  <span className="inventory-reports__purchase-order-total-value">
+                    {formatCurrency(
+                      purchaseOrder.reduce((sum, item) => sum + (item.costo_total_sugerido || 0), 0)
+                    )}
+                  </span>
                 </div>
               </div>
             </>
@@ -380,12 +411,12 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
 
       {/* Empty State */}
       {lowStockAlerts.length === 0 && expiredMedications.length === 0 && (
-        <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-8 text-center">
-          <Package className="mx-auto text-green-600 mb-4" size={64} />
-          <h3 className="text-xl font-semibold text-green-800 mb-2">
+        <div className="inventory-reports__empty">
+          <Package className="inventory-reports__empty-icon" size={64} />
+          <h3 className="inventory-reports__empty-title">
             ¡Todo en orden!
           </h3>
-          <p className="text-green-700">
+          <p className="inventory-reports__empty-text">
             No hay alertas de stock bajo ni medicamentos vencidos en este momento.
           </p>
         </div>

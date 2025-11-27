@@ -1,0 +1,811 @@
+/* ============================================
+   INVENTORY REPORTS - ESTILOS
+   Sección de reportes y alertas del inventario
+   ============================================ */
+
+.inventory-reports {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ============================================
+   TABS DE NAVEGACIÓN
+   ============================================ */
+
+.inventory-reports__tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.inventory-reports__tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.inventory-reports__tab:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.inventory-reports__tab--active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.inventory-reports__tab--active:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.inventory-reports__tab-icon {
+  flex-shrink: 0;
+}
+
+.inventory-reports__tab-badge {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.inventory-reports__tab--active .inventory-reports__tab-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* ============================================
+   CONTENIDO DE LAS TABS
+   ============================================ */
+
+.inventory-reports__content {
+  animation: fadeInUp 0.3s ease;
+}
+
+/* ============================================
+   ESTADO DE CARGA
+   ============================================ */
+
+.inventory-reports__loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-reports__spinner {
+  display: inline-block;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================
+   ESTADO DE ERROR
+   ============================================ */
+
+.inventory-reports__error {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-reports__error-inner {
+  background: #fef2f2;
+  border-left: 4px solid #dc2626;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.inventory-reports__error-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.inventory-reports__error-icon {
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.inventory-reports__error-text {
+  color: #991b1b;
+  font-weight: 500;
+}
+
+/* ============================================
+   ESTADO VACÍO
+   ============================================ */
+
+.inventory-reports__empty {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-reports__empty-icon {
+  margin: 0 auto 1rem;
+  color: #9ca3af;
+}
+
+.inventory-reports__empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+}
+
+.inventory-reports__empty-text {
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ============================================
+   LISTA DE ITEMS
+   ============================================ */
+
+.inventory-reports__list {
+  display: grid;
+  gap: 1rem;
+}
+
+/* ============================================
+   TARJETA DE ITEM
+   ============================================ */
+
+.inventory-reports__item {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+}
+
+.inventory-reports__item:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Tipos de alertas */
+.inventory-reports__item--low-stock {
+  border-left-color: #f59e0b;
+  background: linear-gradient(to right, #fffbeb 0%, white 100%);
+}
+
+.inventory-reports__item--expiring {
+  border-left-color: #f59e0b;
+  background: linear-gradient(to right, #fef3c7 0%, white 100%);
+}
+
+.inventory-reports__item--expired {
+  border-left-color: #dc2626;
+  background: linear-gradient(to right, #fef2f2 0%, white 100%);
+}
+
+/* Header del item */
+.inventory-reports__item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.inventory-reports__item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.inventory-reports__item-icon-bg {
+  padding: 0.625rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.inventory-reports__item-icon-bg--low-stock {
+  background: #fef3c7;
+}
+
+.inventory-reports__item-icon-bg--expiring {
+  background: #fef3c7;
+}
+
+.inventory-reports__item-icon-bg--expired {
+  background: #fee2e2;
+}
+
+.inventory-reports__item-icon {
+  color: #f59e0b;
+}
+
+.inventory-reports__item-icon--expired {
+  color: #dc2626;
+}
+
+.inventory-reports__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.inventory-reports__item-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inventory-reports__item-type {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.inventory-reports__item-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.inventory-reports__item-badge--low {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.inventory-reports__item-badge--expiring {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+.inventory-reports__item-badge--expired {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+/* Grid de información */
+.inventory-reports__item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.inventory-reports__item-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.inventory-reports__item-stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.inventory-reports__item-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.inventory-reports__item-stat-value--danger {
+  color: #dc2626;
+}
+
+.inventory-reports__item-stat-value--warning {
+  color: #f59e0b;
+}
+
+.inventory-reports__item-stat-unit {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Mensaje de alerta */
+.inventory-reports__item-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #fef3c7;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.inventory-reports__item-message--expired {
+  background: #fee2e2;
+}
+
+.inventory-reports__item-message-icon {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.inventory-reports__item-message-icon--expired {
+  color: #dc2626;
+}
+
+.inventory-reports__item-message-text {
+  font-size: 0.875rem;
+  color: #92400e;
+  margin: 0;
+  font-weight: 500;
+}
+
+.inventory-reports__item-message-text--expired {
+  color: #991b1b;
+}
+
+/* Acciones */
+.inventory-reports__item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inventory-reports__item-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-reports__item-button--primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.inventory-reports__item-button--primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.inventory-reports__item-button--secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.inventory-reports__item-button--secondary:hover {
+  background: #e5e7eb;
+}
+
+/* ============================================
+   RESUMEN ESTADÍSTICO
+   ============================================ */
+
+.inventory-reports__summary {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.inventory-reports__summary-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+}
+
+.inventory-reports__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.inventory-reports__summary-stat {
+  background: linear-gradient(135deg, #f9fafb 0%, white 100%);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.inventory-reports__summary-stat:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.inventory-reports__summary-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.inventory-reports__summary-stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .inventory-reports__tabs {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .inventory-reports__item-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .inventory-reports__item-badge {
+    align-self: flex-start;
+  }
+
+  .inventory-reports__item-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-reports__item-actions {
+    flex-direction: column;
+  }
+
+  .inventory-reports__summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   PURCHASE ORDER - ESTILOS ADICIONALES
+   ============================================ */
+
+.inventory-reports__section--purchase-order {
+  border-color: #3b82f6;
+}
+
+.inventory-reports__purchase-order-info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #1e40af;
+}
+
+.inventory-reports__purchase-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.inventory-reports__purchase-order-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.inventory-reports__purchase-order-item:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-reports__purchase-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.inventory-reports__purchase-order-info-section {
+  flex: 1;
+}
+
+.inventory-reports__purchase-order-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.inventory-reports__purchase-order-type {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.inventory-reports__purchase-order-entry-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-reports__purchase-order-entry-btn:hover {
+  background: #059669;
+}
+
+.inventory-reports__purchase-order-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .inventory-reports__purchase-order-details {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.inventory-reports__purchase-order-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-reports__purchase-order-stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+}
+
+.inventory-reports__purchase-order-stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.inventory-reports__purchase-order-stat-value--primary {
+  color: #3b82f6;
+}
+
+.inventory-reports__purchase-order-stat-value--success {
+  color: #10b981;
+}
+
+.inventory-reports__purchase-order-footer {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.inventory-reports__purchase-order-footer span {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.inventory-reports__purchase-order-total {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #d1fae5 0%, #dbeafe 100%);
+  border: 1px solid #10b981;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inventory-reports__purchase-order-total-label {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.inventory-reports__purchase-order-total-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+/* ============================================
+   ESTILOS ADICIONALES PARA SECCIONES
+   ============================================ */
+
+.inventory-reports__section {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.inventory-reports__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.inventory-reports__section-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  color: #1f2937;
+  gap: 1rem;
+}
+
+.inventory-reports__section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.inventory-reports__badge {
+  background: #f59e0b;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.inventory-reports__badge--danger {
+  background: #dc2626;
+}
+
+.inventory-reports__badge--primary {
+  background: #3b82f6;
+}
+
+.inventory-reports__generate-order-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #3b82f6, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.inventory-reports__generate-order-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #6d28d9);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.inventory-reports__item--urgent {
+  border-left-color: #dc2626;
+  background: linear-gradient(to right, #fee2e2 0%, white 100%);
+}
+
+.inventory-reports__item-badge--urgent {
+  background: #dc2626;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.inventory-reports__progress-bar {
+  height: 0.5rem;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.inventory-reports__progress-fill {
+  height: 100%;
+  background: #f59e0b;
+  transition: width 0.3s ease;
+}
+
+.inventory-reports__progress-fill--danger {
+  background: #dc2626;
+}
+
+.inventory-reports__progress-fill--warning {
+  background: #f59e0b;
+}
+
+.inventory-reports__progress-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+}

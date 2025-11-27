@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import inventoryService from '../../services/inventoryService';
-import { X, Save, AlertCircle } from 'lucide-react';
+import { X, Save, AlertCircle, Info } from 'lucide-react';
+import './UpdateMedicationModal.css';
 
 const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +29,6 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
 
   useEffect(() => {
     if (medication) {
-      // Formatear fecha para el input tipo datetime-local
       const formatDateForInput = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
@@ -71,7 +71,6 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
     setError(null);
 
     try {
-      // Convertir la fecha a formato ISO si existe
       const dataToSend = {
         ...formData,
         fecha_vencimiento: formData.fecha_vencimiento
@@ -92,42 +91,70 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="medication-modal__overlay">
+      <div className="medication-modal__container">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
-          <h2 className="text-2xl font-bold text-white">Actualizar Medicamento</h2>
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors disabled:opacity-50"
-          >
-            <X size={24} />
-          </button>
+        <div className="update-medication-modal__header">
+          <div className="medication-modal__header-content">
+            <div className="medication-modal__title-wrapper">
+              <div className="update-medication-modal__icon-bg">
+                <Save size={24} className="medication-modal__icon" />
+              </div>
+              <h2 className="medication-modal__title">Actualizar Medicamento</h2>
+            </div>
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="medication-modal__close-btn"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mx-6 mt-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 flex-shrink-0" size={20} />
-              <p className="text-red-800 text-sm">{error}</p>
+        {/* Información actual */}
+        {medication && (
+          <div className="update-medication-modal__current-info">
+            <h3 className="update-medication-modal__current-title">
+              <Info size={16} />
+              Información Actual
+            </h3>
+            <div className="update-medication-modal__current-grid">
+              <div className="update-medication-modal__current-item">
+                <span className="update-medication-modal__current-label">Stock Actual:</span>
+                <span className="update-medication-modal__current-value">
+                  {medication.stock_actual} {medication.unidad_medida}
+                </span>
+              </div>
+              <div className="update-medication-modal__current-item">
+                <span className="update-medication-modal__current-label">Última Actualización:</span>
+                <span className="update-medication-modal__current-value">
+                  {new Date(medication.updated_at || medication.created_at).toLocaleDateString('es-CO')}
+                </span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Form */}
-        <div className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Body */}
+        <div className="medication-modal__body">
+          {error && (
+            <div className="medication-modal__error">
+              <div className="medication-modal__error-content">
+                <AlertCircle className="medication-modal__error-icon" size={20} />
+                <p className="medication-modal__error-text">{error}</p>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="medication-form">
             {/* Información Básica */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
-                Información Básica
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nombre del Medicamento <span className="text-red-500">*</span>
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">Información Básica</h3>
+              <div className="medication-form__grid">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Nombre del Medicamento <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="text"
@@ -135,20 +162,20 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
                     value={formData.nombre}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tipo <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Tipo <span className="medication-form__required">*</span>
                   </label>
                   <select
                     name="tipo"
                     value={formData.tipo}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__select"
                   >
                     <option value="medicamento">Medicamento</option>
                     <option value="vacuna">Vacuna</option>
@@ -160,47 +187,44 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
                   </select>
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descripción
-                  </label>
+                <div className="medication-form__field medication-form__field--full">
+                  <label className="medication-form__label">Descripción</label>
                   <textarea
                     name="descripcion"
                     value={formData.descripcion}
                     onChange={handleChange}
                     rows="3"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__textarea"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Laboratorio
-                  </label>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">Laboratorio</label>
                   <input
                     type="text"
                     name="laboratorio"
                     value={formData.laboratorio}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Unidad de Medida <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Unidad de Medida <span className="medication-form__required">*</span>
                   </label>
                   <select
                     name="unidad_medida"
                     value={formData.unidad_medida}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__select"
                   >
                     <option value="unidades">Unidades</option>
                     <option value="ml">Mililitros (ml)</option>
-                    <option value="mg">Miligramos (mg)</option>
-                    <option value="g">Gramos (g)</option>
+                    <option value="gr">Gramos (gr)</option>
+                    <option value="kg">Kilogramos (kg)</option>
+                    <option value="cajas">Cajas</option>
                     <option value="tabletas">Tabletas</option>
                     <option value="capsulas">Cápsulas</option>
                   </select>
@@ -209,14 +233,12 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
             </div>
 
             {/* Stock */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
-                Control de Stock
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Actual <span className="text-red-500">*</span>
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">Control de Stock</h3>
+              <div className="medication-form__grid medication-form__grid--three">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Stock Actual <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -225,13 +247,13 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
                     onChange={handleChange}
                     required
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Mínimo <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Stock Mínimo <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -240,13 +262,13 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
                     onChange={handleChange}
                     required
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Máximo <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Stock Máximo <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -255,21 +277,19 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
                     onChange={handleChange}
                     required
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
               </div>
             </div>
 
             {/* Precios */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
-                Información Comercial
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Precio de Compra <span className="text-red-500">*</span>
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">Información Comercial</h3>
+              <div className="medication-form__grid">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Precio de Compra <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -279,13 +299,13 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Precio de Venta <span className="text-red-500">*</span>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">
+                    Precio de Venta <span className="medication-form__required">*</span>
                   </label>
                   <input
                     type="number"
@@ -295,83 +315,77 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
               </div>
             </div>
 
             {/* Información de Control */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
-                Información de Control
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Lote
-                  </label>
+            <div className="medication-form__section">
+              <h3 className="medication-form__section-title">Información de Control</h3>
+              <div className="medication-form__grid">
+                <div className="medication-form__field">
+                  <label className="medication-form__label">Lote</label>
                   <input
                     type="text"
                     name="lote"
                     value={formData.lote}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Fecha de Vencimiento
-                  </label>
+                <div className="medication-form__field">
+                  <label className="medication-form__label">Fecha de Vencimiento</label>
                   <input
                     type="datetime-local"
                     name="fecha_vencimiento"
                     value={formData.fecha_vencimiento}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ubicación
-                  </label>
+                <div className="medication-form__field medication-form__field--full">
+                  <label className="medication-form__label">Ubicación</label>
                   <input
                     type="text"
                     name="ubicacion"
                     value={formData.ubicacion}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="medication-form__input"
                     placeholder="Ej: Refrigerador A - Estante 2"
                   />
                 </div>
+              </div>
 
-                <div className="flex items-center gap-6 pt-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="requiere_refrigeracion"
-                      checked={formData.requiere_refrigeracion}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Requiere Refrigeración
-                    </span>
+              <div className="medication-form__checkboxes">
+                <div className="medication-form__checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="requiere_refrigeracion"
+                    checked={formData.requiere_refrigeracion}
+                    onChange={handleChange}
+                    className="medication-form__checkbox"
+                    id="requiere_refrigeracion_update"
+                  />
+                  <label htmlFor="requiere_refrigeracion_update" className="medication-form__checkbox-label">
+                    Requiere Refrigeración
                   </label>
+                </div>
 
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="controlado"
-                      checked={formData.controlado}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Medicamento Controlado
-                    </span>
+                <div className="medication-form__checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    name="controlado"
+                    checked={formData.controlado}
+                    onChange={handleChange}
+                    className="medication-form__checkbox"
+                    id="controlado_update"
+                  />
+                  <label htmlFor="controlado_update" className="medication-form__checkbox-label">
+                    Medicamento Controlado
                   </label>
                 </div>
               </div>
@@ -379,34 +393,28 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
 
             {/* Información Médica */}
             {(formData.tipo === 'vacuna' || formData.tipo === 'medicamento') && (
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">
-                  Información Médica
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Enfermedad que Trata
-                    </label>
+              <div className="medication-form__section">
+                <h3 className="medication-form__section-title">Información Médica</h3>
+                <div className="medication-form__grid">
+                  <div className="medication-form__field">
+                    <label className="medication-form__label">Enfermedad que Trata</label>
                     <input
                       type="text"
                       name="enfermedad"
                       value={formData.enfermedad}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="medication-form__input"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Dosis Recomendada
-                    </label>
+                  <div className="medication-form__field">
+                    <label className="medication-form__label">Dosis Recomendada</label>
                     <input
                       type="text"
                       name="dosis_recomendada"
                       value={formData.dosis_recomendada}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="medication-form__input"
                     />
                   </div>
                 </div>
@@ -416,12 +424,12 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t rounded-b-2xl">
+        <div className="medication-modal__footer">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium disabled:opacity-50"
+            className="medication-modal__button medication-modal__button--cancel"
           >
             Cancelar
           </button>
@@ -429,11 +437,11 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
             type="submit"
             onClick={handleSubmit}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="medication-modal__button medication-modal__button--update"
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="medication-modal__spinner"></div>
                 Actualizando...
               </>
             ) : (

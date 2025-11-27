@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import inventoryService from '../../services/inventoryService';
 import { X, ArrowDownCircle, AlertCircle, AlertTriangle } from 'lucide-react';
+import './RegisterExitModal.css'
 
 const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
   const [formData, setFormData] = useState({
@@ -60,48 +61,54 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
   const willBeLowStock = nuevoStock <= medication?.stock_minimo && nuevoStock > 0;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl">
+    <div className="medication-modal__overlay">
+      <div className="medication-modal__container">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-600 to-red-600 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-          <div className="flex items-center gap-3">
-            <div className="bg-white/20 p-2 rounded-lg">
-              <ArrowDownCircle size={24} className="text-white" />
+        <div className="exit-modal__header">
+          <div className="medication-modal__header-content">
+            <div className="medication-modal__title-wrapper">
+              <div className="exit-modal__icon-bg">
+                <ArrowDownCircle size={24} />
+              </div>
+              <div className="medication-modal__title-content">
+                <h2 className="exit-modal__title">Registrar Salida</h2>
+                <p className="exit-modal__subtitle">{medication?.nombre}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Registrar Salida</h2>
-              <p className="text-orange-100 text-sm">{medication?.nombre}</p>
-            </div>
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="medication-modal__close-btn"
+            >
+              <X size={24} />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors disabled:opacity-50"
-          >
-            <X size={24} />
-          </button>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mx-6 mt-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 flex-shrink-0" size={20} />
-              <p className="text-red-800 text-sm">{error}</p>
+          <div className="medication-modal__body">
+            <div className="medication-modal__error">
+              <div className="medication-modal__error-content">
+                <AlertCircle className="medication-modal__error-icon" size={20} />
+                <p className="medication-modal__error-text">{error}</p>
+              </div>
             </div>
           </div>
         )}
 
         {/* Warning: Insufficient Stock */}
         {isStockInsufficient && formData.cantidad > 0 && (
-          <div className="mx-6 mt-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="text-red-600 flex-shrink-0" size={20} />
-              <div>
-                <p className="text-red-800 font-semibold text-sm">Stock insuficiente</p>
-                <p className="text-red-700 text-sm">
-                  Solo hay {medication?.stock_actual} {medication?.unidad_medida} disponibles.
-                </p>
+          <div className="medication-modal__body">
+            <div className="exit-modal__warning">
+              <div className="exit-modal__warning-content">
+                <AlertTriangle className="exit-modal__warning-icon exit-modal__warning-icon--danger" size={20} />
+                <div className="exit-modal__warning-text-container">
+                  <p className="exit-modal__warning-title exit-modal__warning-title--danger">Stock insuficiente</p>
+                  <p className="exit-modal__warning-text exit-modal__warning-text--danger">
+                    Solo hay {medication?.stock_actual} {medication?.unidad_medida} disponibles.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -109,44 +116,46 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
 
         {/* Warning: Low Stock */}
         {willBeLowStock && !isStockInsufficient && (
-          <div className="mx-6 mt-4 bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="text-yellow-600 flex-shrink-0" size={20} />
-              <div>
-                <p className="text-yellow-800 font-semibold text-sm">Advertencia de Stock Bajo</p>
-                <p className="text-yellow-700 text-sm">
-                  El stock quedará por debajo del mínimo ({medication?.stock_minimo} {medication?.unidad_medida})
-                </p>
+          <div className="medication-modal__body">
+            <div className="exit-modal__warning exit-modal__warning--stock">
+              <div className="exit-modal__warning-content">
+                <AlertTriangle className="exit-modal__warning-icon exit-modal__warning-icon--warning" size={20} />
+                <div className="exit-modal__warning-text-container">
+                  <p className="exit-modal__warning-title exit-modal__warning-title--warning">Advertencia de Stock Bajo</p>
+                  <p className="exit-modal__warning-text exit-modal__warning-text--warning">
+                    El stock quedará por debajo del mínimo ({medication?.stock_minimo} {medication?.unidad_medida})
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="medication-modal__body">
           {/* Información Actual */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Información Actual</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-600">Stock Actual</p>
-                <p className="text-lg font-bold text-gray-800">
-                  {medication?.stock_actual} {medication?.unidad_medida}
+          <div className="exit-modal__current-info">
+            <h3 className="exit-modal__current-title">Información Actual</h3>
+            <div className="exit-modal__current-grid">
+              <div className="exit-modal__current-item">
+                <p className="exit-modal__current-label">Stock Actual</p>
+                <p className="exit-modal__current-value">
+                  {medication?.stock_actual} <span className="exit-modal__current-unit">{medication?.unidad_medida}</span>
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-gray-600">Stock Mínimo</p>
-                <p className="text-lg font-bold text-gray-800">
-                  {medication?.stock_minimo} {medication?.unidad_medida}
+              <div className="exit-modal__current-item">
+                <p className="exit-modal__current-label">Stock Mínimo</p>
+                <p className="exit-modal__current-value">
+                  {medication?.stock_minimo} <span className="exit-modal__current-unit">{medication?.unidad_medida}</span>
                 </p>
               </div>
             </div>
           </div>
 
           {/* Cantidad */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Cantidad a Retirar <span className="text-red-500">*</span>
+          <div className="medication-form__field exit-modal__quantity-field">
+            <label className="medication-form__label">
+              Cantidad a Retirar <span className="medication-form__required">*</span>
             </label>
             <input
               type="number"
@@ -156,29 +165,30 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
               required
               min="1"
               max={medication?.stock_actual}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg font-semibold"
+              className={`medication-form__input exit-modal__quantity-input ${isStockInsufficient ? 'exit-modal__quantity-input--error' : ''}`}
               placeholder="0"
             />
             {formData.cantidad > 0 && !isStockInsufficient && (
-              <p className="mt-2 text-sm text-gray-600">
-                Nuevo stock: <span className={`font-semibold ${willBeLowStock ? 'text-yellow-600' : 'text-gray-800'}`}>
+              <div className={`exit-modal__new-stock ${willBeLowStock ? 'exit-modal__new-stock--warning' : ''}`}>
+                <p className="exit-modal__new-stock-label">Nuevo stock:</p>
+                <p className={`exit-modal__new-stock-value ${willBeLowStock ? 'exit-modal__new-stock-value--warning' : ''}`}>
                   {nuevoStock} {medication?.unidad_medida}
-                </span>
-              </p>
+                </p>
+              </div>
             )}
           </div>
 
           {/* Motivo */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Motivo <span className="text-red-500">*</span>
+          <div className="medication-form__field">
+            <label className="medication-form__label">
+              Motivo <span className="medication-form__required">*</span>
             </label>
             <select
               name="motivo"
               value={formData.motivo}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="medication-form__select exit-modal__reason-select"
             >
               <option value="">Seleccione un motivo</option>
               <option value="Uso en consulta veterinaria">Uso en consulta veterinaria</option>
@@ -193,8 +203,8 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
           </div>
 
           {/* Referencia */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="medication-form__field">
+            <label className="medication-form__label">
               Referencia (Número de Historia Clínica/Merma)
             </label>
             <input
@@ -202,15 +212,15 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
               name="referencia"
               value={formData.referencia}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="medication-form__input"
               placeholder="Ej: HC-2025-001 o MERMA-2025-001"
             />
           </div>
 
           {/* Observaciones */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Observaciones <span className="text-red-500">*</span>
+          <div className="medication-form__field exit-modal__observations-field">
+            <label className="exit-modal__observations-label">
+              Observaciones <span className="medication-form__required">*</span>
             </label>
             <textarea
               name="observaciones"
@@ -218,19 +228,19 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
               onChange={handleChange}
               required
               rows="3"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="exit-modal__observations-textarea"
               placeholder="Describa el uso del medicamento o el motivo de la salida..."
             />
           </div>
         </form>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t rounded-b-2xl">
+        <div className="medication-modal__footer">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium disabled:opacity-50"
+            className="medication-modal__button medication-modal__button--cancel"
           >
             Cancelar
           </button>
@@ -238,11 +248,11 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
             type="submit"
             onClick={handleSubmit}
             disabled={loading || isStockInsufficient}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="medication-modal__button exit-modal__button--submit"
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="medication-modal__spinner"></div>
                 Registrando...
               </>
             ) : (
