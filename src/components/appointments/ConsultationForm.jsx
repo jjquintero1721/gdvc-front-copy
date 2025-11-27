@@ -4,15 +4,16 @@ import './ConsultationForm.css';
 
 /**
  * ConsultationForm - Formulario para crear/editar consultas
+ * ✅ VERSIÓN CORREGIDA
  *
  * Permite al veterinario registrar:
- * - Motivo de consulta
- * - Anamnesis
- * - Signos vitales
- * - Diagnóstico
- * - Tratamiento
- * - Vacunas aplicadas
- * - Observaciones
+ * - Motivo de consulta (min 5, max 300 caracteres) - OBLIGATORIO
+ * - Anamnesis - OPCIONAL
+ * - Signos vitales (como STRING, no objeto) - OPCIONAL
+ * - Diagnóstico (min 10 caracteres) - OBLIGATORIO
+ * - Tratamiento (min 5 caracteres) - OBLIGATORIO
+ * - Vacunas aplicadas - OPCIONAL
+ * - Observaciones - OPCIONAL
  *
  * @param {Object} consultation - Consulta existente (null si es nueva)
  * @param {Object} appointment - Cita asociada
@@ -22,6 +23,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
   const [formData, setFormData] = useState({
     motivo: '',
     anamnesis: '',
+    // ✅ CAMBIO CRÍTICO: signos_vitales como objeto para el form, pero se envía como string
     signos_vitales: {
       temperatura: '',
       frecuencia_cardiaca: '',
@@ -42,16 +44,38 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
   // Cargar datos de la consulta existente
   useEffect(() => {
     if (consultation) {
+      // ✅ Parsear signos_vitales si viene como string
+      let signosVitalesObj = {
+        temperatura: '',
+        frecuencia_cardiaca: '',
+        frecuencia_respiratoria: '',
+        peso: '',
+        condicion_corporal: ''
+      };
+
+      if (consultation.signos_vitales) {
+        try {
+          // Si es un string, intentar parsearlo
+          if (typeof consultation.signos_vitales === 'string') {
+            // Podría ser JSON o texto plano
+            try {
+              signosVitalesObj = JSON.parse(consultation.signos_vitales);
+            } catch {
+              // Si no es JSON válido, dejarlo como está
+              console.log('Signos vitales en formato texto:', consultation.signos_vitales);
+            }
+          } else if (typeof consultation.signos_vitales === 'object') {
+            signosVitalesObj = consultation.signos_vitales;
+          }
+        } catch (error) {
+          console.error('Error al parsear signos vitales:', error);
+        }
+      }
+
       setFormData({
         motivo: consultation.motivo || '',
         anamnesis: consultation.anamnesis || '',
-        signos_vitales: consultation.signos_vitales || {
-          temperatura: '',
-          frecuencia_cardiaca: '',
-          frecuencia_respiratoria: '',
-          peso: '',
-          condicion_corporal: ''
-        },
+        signos_vitales: signosVitalesObj,
         diagnostico: consultation.diagnostico || '',
         tratamiento: consultation.tratamiento || '',
         vacunas: consultation.vacunas || '',
@@ -91,21 +115,56 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
   };
 
   /**
-   * Valida el formulario
+   * ✅ Convierte signos vitales a string para el backend
+   */
+  const formatSignosVitales = () => {
+    const sv = formData.signos_vitales;
+
+    // Si todos los campos están vacíos, retornar null
+    if (!sv.temperatura && !sv.frecuencia_cardiaca && !sv.frecuencia_respiratoria &&
+        !sv.peso && !sv.condicion_corporal) {
+      return null;
+    }
+
+    // Construir string legible
+    const partes = [];
+
+    if (sv.temperatura) partes.push(`Temperatura: ${sv.temperatura}°C`);
+    if (sv.frecuencia_cardiaca) partes.push(`FC: ${sv.frecuencia_cardiaca} lpm`);
+    if (sv.frecuencia_respiratoria) partes.push(`FR: ${sv.frecuencia_respiratoria} rpm`);
+    if (sv.peso) partes.push(`Peso: ${sv.peso} kg`);
+    if (sv.condicion_corporal) partes.push(`Condición Corporal: ${sv.condicion_corporal}/9`);
+
+    return partes.join(', ');
+  };
+
+  /**
+   * ✅ Valida el formulario según las reglas del backend
    */
   const validateForm = () => {
     const newErrors = {};
 
+    // Motivo: obligatorio, min 5, max 300 caracteres
     if (!formData.motivo?.trim()) {
       newErrors.motivo = 'El motivo de consulta es obligatorio';
+    } else if (formData.motivo.trim().length < 5) {
+      newErrors.motivo = 'El motivo debe tener al menos 5 caracteres';
+    } else if (formData.motivo.length > 300) {
+      newErrors.motivo = 'El motivo no puede exceder 300 caracteres';
     }
 
+    // Diagnóstico: obligatorio, min 10 caracteres
     if (!formData.diagnostico?.trim()) {
       newErrors.diagnostico = 'El diagnóstico es obligatorio';
+    } else if (formData.diagnostico.trim().length < 10) {
+      newErrors.diagnostico = 'El diagnóstico debe tener al menos 10 caracteres';
     }
 
+    // Tratamiento: obligatorio, min 5 caracteres
     if (!formData.tratamiento?.trim()) {
       newErrors.tratamiento = 'El tratamiento es obligatorio';
+    } else if (formData.tratamiento.trim().length < 5) {
+      newErrors.tratamiento = 'El tratamiento debe tener al menos 5 caracteres';
     }
 
     // Si es actualización, requerir descripción del cambio
@@ -118,7 +177,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
   };
 
   /**
-   * Maneja el envío del formulario
+   * ✅ Maneja el envío del formulario con formato correcto
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,7 +189,25 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
     setIsSubmitting(true);
 
     try {
-      await onSubmit(formData);
+      // ✅ Construir payload con el formato correcto para el backend
+      const payload = {
+        motivo: formData.motivo.trim(),
+        diagnostico: formData.diagnostico.trim(),
+        tratamiento: formData.tratamiento.trim(),
+        anamnesis: formData.anamnesis?.trim() || null,
+        signos_vitales: formatSignosVitales(), // ✅ Convertir a string
+        vacunas: formData.vacunas?.trim() || null,
+        observaciones: formData.observaciones?.trim() || null
+      };
+
+      // Si es actualización, agregar descripción del cambio
+      if (consultation) {
+        payload.descripcion_cambio = formData.descripcion_cambio.trim();
+      }
+
+      console.log('📤 Enviando payload:', payload);
+
+      await onSubmit(payload);
 
       // Si es creación, limpiar el formulario
       if (!consultation) {
@@ -150,6 +227,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
           observaciones: '',
           descripcion_cambio: ''
         });
+        setErrors({});
       } else {
         // Si es actualización, solo limpiar la descripción del cambio
         setFormData(prev => ({
@@ -158,7 +236,11 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         }));
       }
     } catch (error) {
-      console.error('Error al enviar formulario:', error);
+      console.error('❌ Error al enviar formulario:', error);
+      setErrors(prev => ({
+        ...prev,
+        submit: error.message || 'Error al guardar la consulta'
+      }));
     } finally {
       setIsSubmitting(false);
     }
@@ -187,7 +269,15 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         </div>
       </div>
 
-      {/* Motivo de consulta */}
+      {/* Error general de envío */}
+      {errors.submit && (
+        <div className="consultation-form-error-banner">
+          <AlertCircle size={20} />
+          <span>{errors.submit}</span>
+        </div>
+      )}
+
+      {/* Motivo de consulta - OBLIGATORIO (5-300 caracteres) */}
       <div className="consultation-form-field">
         <label className="consultation-form-label">
           Motivo de Consulta <span className="required">*</span>
@@ -197,9 +287,13 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
           value={formData.motivo}
           onChange={handleInputChange}
           className={`consultation-form-textarea ${errors.motivo ? 'error' : ''}`}
-          placeholder="Describe el motivo principal de la consulta..."
+          placeholder="Describe el motivo principal de la consulta... (mínimo 5 caracteres)"
           rows="3"
+          maxLength={300}
         />
+        <div className="consultation-form-char-count">
+          {formData.motivo.length}/300 caracteres
+        </div>
         {errors.motivo && (
           <span className="consultation-form-error">
             <AlertCircle size={16} />
@@ -208,7 +302,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         )}
       </div>
 
-      {/* Anamnesis */}
+      {/* Anamnesis - OPCIONAL */}
       <div className="consultation-form-field">
         <label className="consultation-form-label">Anamnesis</label>
         <textarea
@@ -221,9 +315,9 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         />
       </div>
 
-      {/* Signos Vitales */}
+      {/* Signos Vitales - OPCIONAL */}
       <div className="consultation-form-section">
-        <h4 className="consultation-form-section-title">Signos Vitales</h4>
+        <h4 className="consultation-form-section-title">Signos Vitales (Opcional)</h4>
         <div className="consultation-form-grid">
           <div className="consultation-form-field">
             <label className="consultation-form-label">Temperatura (°C)</label>
@@ -291,7 +385,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         </div>
       </div>
 
-      {/* Diagnóstico */}
+      {/* Diagnóstico - OBLIGATORIO (min 10 caracteres) */}
       <div className="consultation-form-field">
         <label className="consultation-form-label">
           Diagnóstico <span className="required">*</span>
@@ -301,9 +395,12 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
           value={formData.diagnostico}
           onChange={handleInputChange}
           className={`consultation-form-textarea ${errors.diagnostico ? 'error' : ''}`}
-          placeholder="Diagnóstico clínico, resultados de exámenes..."
+          placeholder="Diagnóstico clínico, resultados de exámenes... (mínimo 10 caracteres)"
           rows="4"
         />
+        <div className="consultation-form-char-count">
+          {formData.diagnostico.length} caracteres
+        </div>
         {errors.diagnostico && (
           <span className="consultation-form-error">
             <AlertCircle size={16} />
@@ -312,7 +409,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         )}
       </div>
 
-      {/* Tratamiento */}
+      {/* Tratamiento - OBLIGATORIO (min 5 caracteres) */}
       <div className="consultation-form-field">
         <label className="consultation-form-label">
           Tratamiento <span className="required">*</span>
@@ -322,9 +419,12 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
           value={formData.tratamiento}
           onChange={handleInputChange}
           className={`consultation-form-textarea ${errors.tratamiento ? 'error' : ''}`}
-          placeholder="Medicamentos prescritos, dosis, frecuencia..."
+          placeholder="Medicamentos prescritos, dosis, frecuencia... (mínimo 5 caracteres)"
           rows="4"
         />
+        <div className="consultation-form-char-count">
+          {formData.tratamiento.length} caracteres
+        </div>
         {errors.tratamiento && (
           <span className="consultation-form-error">
             <AlertCircle size={16} />
@@ -333,7 +433,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         )}
       </div>
 
-      {/* Vacunas */}
+      {/* Vacunas - OPCIONAL */}
       <div className="consultation-form-field">
         <label className="consultation-form-label">Vacunas Aplicadas</label>
         <textarea
@@ -346,7 +446,7 @@ const ConsultationForm = ({ consultation, appointment, onSubmit }) => {
         />
       </div>
 
-      {/* Observaciones */}
+      {/* Observaciones - OPCIONAL */}
       <div className="consultation-form-field">
         <label className="consultation-form-label">Observaciones Adicionales</label>
         <textarea

@@ -11,6 +11,7 @@ import './AppointmentManagementPanel.css';
 
 /**
  * AppointmentManagementPanel - Panel principal de gestión de citas
+ * ✅ VERSIÓN CORREGIDA
  *
  * Este componente se abre cuando el veterinario inicia una cita (/start)
  * y permite gestionar todo el ciclo de vida de la consulta:
@@ -82,27 +83,66 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
   };
 
   /**
-   * Maneja la creación de una nueva consulta
+   * ✅ Maneja la creación de una nueva consulta - VERSIÓN CORREGIDA
    */
   const handleCreateConsultation = async (consultationData) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await consultationService.createConsultation({
-        ...consultationData,
-        cita_id: appointment.id,
+      // ✅ Validar que existan los datos necesarios
+      if (!appointment.mascota?.historia_clinica_id) {
+        throw new Error('La mascota no tiene una historia clínica asociada');
+      }
+
+      if (!appointment.veterinario_id) {
+        throw new Error('No hay veterinario asignado a esta cita');
+      }
+
+      // ✅ Construir payload con TODOS los campos obligatorios
+      const payload = {
+        // Campos obligatorios del schema
         historia_clinica_id: appointment.mascota.historia_clinica_id,
-        veterinario_id: appointment.veterinario_id
-      });
+        veterinario_id: appointment.veterinario_id,
+        motivo: consultationData.motivo.trim(),
+        diagnostico: consultationData.diagnostico.trim(),
+        tratamiento: consultationData.tratamiento.trim(),
+
+        // Campos opcionales
+        cita_id: appointment.id,
+        anamnesis: consultationData.anamnesis?.trim() || null,
+        signos_vitales: consultationData.signos_vitales || null,
+        vacunas: consultationData.vacunas?.trim() || null,
+        observaciones: consultationData.observaciones?.trim() || null
+      };
+
+      // ✅ Validar longitudes antes de enviar
+      if (payload.motivo.length < 5) {
+        throw new Error('El motivo debe tener al menos 5 caracteres');
+      }
+      if (payload.motivo.length > 300) {
+        throw new Error('El motivo no puede exceder 300 caracteres');
+      }
+      if (payload.diagnostico.length < 10) {
+        throw new Error('El diagnóstico debe tener al menos 10 caracteres');
+      }
+      if (payload.tratamiento.length < 5) {
+        throw new Error('El tratamiento debe tener al menos 5 caracteres');
+      }
+
+      console.log('📤 Enviando consulta al backend:', payload);
+
+      const response = await consultationService.createConsultation(payload);
 
       if (response.success) {
         setConsultation(response.data);
-        setSuccess('Consulta creada exitosamente');
+        setSuccess('✅ Consulta creada exitosamente');
         await loadConsultationData();
+      } else {
+        throw new Error(response.message || 'Error al crear la consulta');
       }
     } catch (err) {
-      console.error('Error al crear consulta:', err);
+      console.error('❌ Error al crear consulta:', err);
       setError(err.message || 'Error al crear la consulta');
     } finally {
       setLoading(false);
@@ -110,25 +150,55 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
   };
 
   /**
-   * Maneja la actualización de la consulta
+   * ✅ Maneja la actualización de la consulta - VERSIÓN CORREGIDA
    */
   const handleUpdateConsultation = async (consultationData) => {
     try {
       setLoading(true);
       setError(null);
 
+      // ✅ Construir payload para actualización
+      const payload = {
+        motivo: consultationData.motivo?.trim() || null,
+        diagnostico: consultationData.diagnostico?.trim() || null,
+        tratamiento: consultationData.tratamiento?.trim() || null,
+        anamnesis: consultationData.anamnesis?.trim() || null,
+        signos_vitales: consultationData.signos_vitales || null,
+        vacunas: consultationData.vacunas?.trim() || null,
+        observaciones: consultationData.observaciones?.trim() || null,
+        descripcion_cambio: consultationData.descripcion_cambio?.trim() || null
+      };
+
+      // ✅ Validar longitudes si los campos están presentes
+      if (payload.motivo && payload.motivo.length < 5) {
+        throw new Error('El motivo debe tener al menos 5 caracteres');
+      }
+      if (payload.motivo && payload.motivo.length > 300) {
+        throw new Error('El motivo no puede exceder 300 caracteres');
+      }
+      if (payload.diagnostico && payload.diagnostico.length < 10) {
+        throw new Error('El diagnóstico debe tener al menos 10 caracteres');
+      }
+      if (payload.tratamiento && payload.tratamiento.length < 5) {
+        throw new Error('El tratamiento debe tener al menos 5 caracteres');
+      }
+
+      console.log('📤 Actualizando consulta:', payload);
+
       const response = await consultationService.updateConsultation(
         consultation.id,
-        consultationData
+        payload
       );
 
       if (response.success) {
         setConsultation(response.data);
-        setSuccess('Consulta actualizada exitosamente');
+        setSuccess('✅ Consulta actualizada exitosamente');
         await loadConsultationData();
+      } else {
+        throw new Error(response.message || 'Error al actualizar la consulta');
       }
     } catch (err) {
-      console.error('Error al actualizar consulta:', err);
+      console.error('❌ Error al actualizar consulta:', err);
       setError(err.message || 'Error al actualizar la consulta');
     } finally {
       setLoading(false);
@@ -150,12 +220,14 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
 
       if (response.success) {
         setConsultation(response.data);
-        setSuccess(`Consulta restaurada a la versión ${version}`);
+        setSuccess(`✅ Consulta restaurada a la versión ${version}`);
         await loadConsultationData();
         setActiveTab('consultation');
+      } else {
+        throw new Error(response.message || 'Error al restaurar la versión');
       }
     } catch (err) {
-      console.error('Error al restaurar versión:', err);
+      console.error('❌ Error al restaurar versión:', err);
       setError(err.message || 'Error al restaurar la versión');
     } finally {
       setLoading(false);
@@ -179,12 +251,14 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
       );
 
       if (response.success) {
-        setSuccess('Seguimiento creado exitosamente');
+        setSuccess('✅ Seguimiento creado exitosamente');
         await loadConsultationData();
         setActiveTab('consultation');
+      } else {
+        throw new Error(response.message || 'Error al crear el seguimiento');
       }
     } catch (err) {
-      console.error('Error al crear seguimiento:', err);
+      console.error('❌ Error al crear seguimiento:', err);
       setError(err.message || 'Error al crear el seguimiento');
     } finally {
       setLoading(false);
@@ -196,12 +270,12 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
    */
   const handleCompleteAppointment = async () => {
     if (!consultation) {
-      setError('Debes crear una consulta antes de completar la cita');
+      setError('⚠️ Debes crear una consulta antes de completar la cita');
       return;
     }
 
     const confirmComplete = window.confirm(
-      '¿Estás seguro de que deseas completar esta cita? Esta acción no se puede deshacer.'
+      '¿Estás seguro de que deseas completar esta cita?\n\nEsta acción cambiará el estado de la cita a "Completada" y no se podrá deshacer.'
     );
 
     if (!confirmComplete) return;
@@ -213,18 +287,30 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
       const response = await appointmentService.completeAppointment(appointment.id);
 
       if (response.success) {
-        setSuccess('Cita completada exitosamente');
+        setSuccess('✅ Cita completada exitosamente');
         setTimeout(() => {
           onComplete?.();
         }, 1500);
+      } else {
+        throw new Error(response.message || 'Error al completar la cita');
       }
     } catch (err) {
-      console.error('Error al completar cita:', err);
+      console.error('❌ Error al completar cita:', err);
       setError(err.message || 'Error al completar la cita');
     } finally {
       setLoading(false);
     }
   };
+
+  // Auto-ocultar mensajes de éxito después de 5 segundos
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   if (!isOpen) return null;
 
@@ -252,7 +338,13 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
                 Gestión de Cita - {appointment.mascota?.nombre}
               </h2>
               <p className="appointment-panel-subtitle">
-                Propietario: {appointment.propietario?.nombre} | Fecha: {new Date(appointment.fecha_hora).toLocaleDateString()}
+                Propietario: {appointment.propietario?.nombre} | Fecha: {new Date(appointment.fecha_hora).toLocaleDateString('es-CO', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
               </p>
             </div>
             <button
@@ -266,19 +358,27 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
 
           {/* Alertas */}
           {error && (
-            <div className="appointment-panel-alert appointment-panel-alert--error">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="appointment-panel-alert appointment-panel-alert--error"
+            >
               <AlertCircle size={20} />
               <span>{error}</span>
-              <button onClick={() => setError(null)}>×</button>
-            </div>
+              <button onClick={() => setError(null)} aria-label="Cerrar alerta">×</button>
+            </motion.div>
           )}
 
           {success && (
-            <div className="appointment-panel-alert appointment-panel-alert--success">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="appointment-panel-alert appointment-panel-alert--success"
+            >
               <CheckCircle size={20} />
               <span>{success}</span>
-              <button onClick={() => setSuccess(null)}>×</button>
-            </div>
+              <button onClick={() => setSuccess(null)} aria-label="Cerrar alerta">×</button>
+            </motion.div>
           )}
 
           {/* Tabs de navegación */}
@@ -359,6 +459,7 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
               onClick={handleCompleteAppointment}
               disabled={!consultation || loading}
               className="appointment-panel-btn appointment-panel-btn--primary"
+              title={!consultation ? 'Debes crear una consulta primero' : 'Completar y cerrar la cita'}
             >
               <CheckCircle size={18} />
               Completar Cita
