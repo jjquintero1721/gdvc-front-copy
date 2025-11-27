@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import Button from '@/components/ui/Button'
 import './MedicalHistoryModal.css'
 
 /**
- * Modal Centrado de Historia Clínica - Diseño Profesional
+ * Modal de Historia Clínica con Consultas Colapsables
  *
- * Muestra la historia clínica en formato de documento médico profesional
- * Preparado para exportación a PDF
+ * Muestra la historia clínica completa con un accordion para ver el detalle de cada consulta
+ * Al hacer click en una consulta, se expande/colapsa para mostrar toda la información
  *
  * @param {boolean} isOpen - Controla si el modal está abierto
  * @param {function} onClose - Callback para cerrar el modal
@@ -17,6 +17,7 @@ import './MedicalHistoryModal.css'
  */
 function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) {
   const modalContentRef = useRef(null)
+  const [expandedConsultations, setExpandedConsultations] = useState([])
 
   // Cerrar modal al presionar Escape
   useEffect(() => {
@@ -43,8 +44,38 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
     }
   }, [isOpen])
 
+  // Resetear consultas expandidas al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      setExpandedConsultations([])
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
+  /**
+   * Toggle de expansión/colapso de una consulta
+   */
+  const toggleConsultation = (consultaId) => {
+    setExpandedConsultations(prev => {
+      if (prev.includes(consultaId)) {
+        return prev.filter(id => id !== consultaId)
+      } else {
+        return [...prev, consultaId]
+      }
+    })
+  }
+
+  /**
+   * Verifica si una consulta está expandida
+   */
+  const isExpanded = (consultaId) => {
+    return expandedConsultations.includes(consultaId)
+  }
+
+  /**
+   * Formatea una fecha a formato legible en español
+   */
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A'
     const date = new Date(dateString)
@@ -55,6 +86,9 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
     })
   }
 
+  /**
+   * Formatea una fecha con hora a formato legible en español
+   */
   const formatDateTime = (dateString) => {
     if (!dateString) return 'N/A'
     const date = new Date(dateString)
@@ -67,6 +101,9 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
     })
   }
 
+  /**
+   * Calcula la edad de la mascota en años o meses
+   */
   const calculateAge = (birthDate) => {
     if (!birthDate) return null
     const birth = new Date(birthDate)
@@ -91,7 +128,7 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
 
   return (
     <>
-      {/* Overlay de fondo oscuro */}
+      {/* Overlay de fondo */}
       <div
         className="medical-history-modal-overlay"
         onClick={onClose}
@@ -99,44 +136,50 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
       />
 
       {/* Modal centrado */}
-      <div className="medical-history-modal">
+      <div className="medical-history-modal" role="dialog" aria-modal="true">
         <div className="medical-history-modal__container" ref={modalContentRef}>
-          {/* Header del documento */}
+
+          {/* ============================================
+              HEADER DEL MODAL
+              ============================================ */}
           <div className="medical-history-modal__header">
             <div className="medical-history-modal__header-content">
-              <div className="medical-history-modal__clinic-info">
-                <div className="medical-history-modal__logo">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" fill="currentColor" opacity="0.2"/>
-                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 2.18l8 3.6v8.22c0 4.28-2.92 8.28-7 9.57-4.08-1.29-7-5.29-7-9.57V7.78l8-3.6z" fill="currentColor"/>
-                    <path d="M13 9h-2v3H8v2h3v3h2v-3h3v-2h-3z" fill="currentColor"/>
-                  </svg>
+              <div className="medical-history-modal__title-section">
+                <div className="medical-history-modal__icon" aria-hidden="true">
+                  🏥
                 </div>
-                <div>
-                  <h1 className="medical-history-modal__title">Historia Clínica</h1>
-                  <p className="medical-history-modal__clinic-name">Clínica Veterinaria GDCV</p>
+                <div className="medical-history-modal__title-group">
+                  <h1>Historia Clínica</h1>
+                  <p className="medical-history-modal__subtitle">
+                    Clínica Veterinaria GDCV
+                  </p>
                 </div>
               </div>
               <button
                 className="medical-history-modal__close-btn"
                 onClick={onClose}
-                aria-label="Cerrar"
+                aria-label="Cerrar modal"
               >
                 ✕
               </button>
             </div>
           </div>
 
-          {/* Contenido del documento */}
+          {/* ============================================
+              CONTENIDO DEL MODAL
+              ============================================ */}
           <div className="medical-history-modal__content">
             {loading ? (
+              // Estado de carga
               <div className="medical-history-modal__loading">
                 <div className="medical-history-modal__spinner" />
                 <p>Cargando historia clínica...</p>
               </div>
             ) : (
               <>
-                {/* Información del Paciente */}
+                {/* ============================================
+                    INFORMACIÓN DEL PACIENTE
+                    ============================================ */}
                 {pet && (
                   <div className="medical-history-modal__patient-section">
                     <h2 className="medical-history-modal__section-title">
@@ -144,34 +187,59 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
                     </h2>
                     <div className="medical-history-modal__patient-grid">
                       <div className="medical-history-modal__field-group">
-                        <label className="medical-history-modal__field-label">Nombre:</label>
-                        <span className="medical-history-modal__field-value">{pet.nombre}</span>
+                        <label className="medical-history-modal__field-label">
+                          Nombre
+                        </label>
+                        <span className="medical-history-modal__field-value">
+                          {pet.nombre}
+                        </span>
                       </div>
+
                       <div className="medical-history-modal__field-group">
-                        <label className="medical-history-modal__field-label">Especie:</label>
-                        <span className="medical-history-modal__field-value">{pet.especie}</span>
+                        <label className="medical-history-modal__field-label">
+                          Especie
+                        </label>
+                        <span className="medical-history-modal__field-value">
+                          {pet.especie}
+                        </span>
                       </div>
+
                       <div className="medical-history-modal__field-group">
-                        <label className="medical-history-modal__field-label">Raza:</label>
-                        <span className="medical-history-modal__field-value">{pet.raza || 'N/A'}</span>
+                        <label className="medical-history-modal__field-label">
+                          Raza
+                        </label>
+                        <span className="medical-history-modal__field-value">
+                          {pet.raza || 'No especificada'}
+                        </span>
                       </div>
+
                       <div className="medical-history-modal__field-group">
-                        <label className="medical-history-modal__field-label">Edad:</label>
-                        <span className="medical-history-modal__field-value">{edad || 'N/A'}</span>
+                        <label className="medical-history-modal__field-label">
+                          Edad
+                        </label>
+                        <span className="medical-history-modal__field-value">
+                          {edad || 'No disponible'}
+                        </span>
                       </div>
-                      {pet.microchip && (
-                        <div className="medical-history-modal__field-group medical-history-modal__field-group--full">
-                          <label className="medical-history-modal__field-label">Microchip:</label>
-                          <span className="medical-history-modal__field-value medical-history-modal__microchip">
-                            {pet.microchip}
+
+                      {pet.fecha_nacimiento && (
+                        <div className="medical-history-modal__field-group">
+                          <label className="medical-history-modal__field-label">
+                            Fecha de Nacimiento
+                          </label>
+                          <span className="medical-history-modal__field-value">
+                            {formatDate(pet.fecha_nacimiento)}
                           </span>
                         </div>
                       )}
-                      {pet.fecha_nacimiento && (
-                        <div className="medical-history-modal__field-group">
-                          <label className="medical-history-modal__field-label">Fecha de Nacimiento:</label>
-                          <span className="medical-history-modal__field-value">
-                            {formatDate(pet.fecha_nacimiento)}
+
+                      {pet.microchip && (
+                        <div className="medical-history-modal__field-group medical-history-modal__field-group--full">
+                          <label className="medical-history-modal__field-label">
+                            Microchip
+                          </label>
+                          <span className="medical-history-modal__field-value medical-history-modal__microchip">
+                            {pet.microchip}
                           </span>
                         </div>
                       )}
@@ -179,15 +247,20 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
                   </div>
                 )}
 
-                {/* Registro de Consultas */}
+                {/* ============================================
+                    REGISTRO DE CONSULTAS MÉDICAS (ACCORDION)
+                    ============================================ */}
                 <div className="medical-history-modal__consultations-section">
                   <h2 className="medical-history-modal__section-title">
                     Registro de Consultas Médicas
                   </h2>
 
                   {consultas.length === 0 ? (
+                    // Estado vacío - Sin consultas
                     <div className="medical-history-modal__empty-state">
-                      <div className="medical-history-modal__empty-icon">📋</div>
+                      <div className="medical-history-modal__empty-icon">
+                        📋
+                      </div>
                       <p className="medical-history-modal__empty-title">
                         Sin consultas registradas
                       </p>
@@ -196,94 +269,166 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
                       </p>
                     </div>
                   ) : (
+                    // Lista de consultas con accordion
                     <div className="medical-history-modal__consultations-list">
-                      {consultas.map((consulta, index) => (
-                        <div
-                          key={consulta.id || index}
-                          className="medical-history-modal__consultation-card"
-                        >
-                          {/* Header de la consulta */}
-                          <div className="medical-history-modal__consultation-header">
-                            <div className="medical-history-modal__consultation-number">
-                              Consulta #{consultas.length - index}
+                      {consultas.map((consulta, index) => {
+                        const consultaId = consulta.id || index
+                        const expanded = isExpanded(consultaId)
+
+                        return (
+                          <div
+                            key={consultaId}
+                            className="medical-history-modal__consultation-accordion"
+                          >
+                            {/* Header clickeable del accordion */}
+                            <div
+                              className={`medical-history-modal__accordion-header ${
+                                expanded ? 'medical-history-modal__accordion-header--active' : ''
+                              }`}
+                              onClick={() => toggleConsultation(consultaId)}
+                              role="button"
+                              aria-expanded={expanded}
+                              tabIndex={0}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  toggleConsultation(consultaId)
+                                }
+                              }}
+                            >
+                              <div className="medical-history-modal__accordion-title">
+                                <div className="medical-history-modal__consultation-number">
+                                  Consulta #{consultas.length - index}
+                                </div>
+                                <div className="medical-history-modal__consultation-date">
+                                  {formatDateTime(consulta.fecha_hora)}
+                                </div>
+                              </div>
+
+                              {/* Icono de expandir/colapsar */}
+                              <div className="medical-history-modal__accordion-icon">
+                                <svg
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M6 9L12 15L18 9"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </div>
                             </div>
-                            <div className="medical-history-modal__consultation-date">
-                              {formatDateTime(consulta.fecha_consulta)}
+
+                            {/* Contenido colapsable de la consulta */}
+                            <div
+                              className={`medical-history-modal__accordion-content ${
+                                expanded ? 'medical-history-modal__accordion-content--expanded' : ''
+                              }`}
+                            >
+                              <div className="medical-history-modal__consultation-body">
+
+                                {/* Motivo de Consulta */}
+                                <div className="medical-history-modal__consultation-field">
+                                  <label className="medical-history-modal__consultation-label">
+                                    Motivo de Consulta
+                                  </label>
+                                  <p className="medical-history-modal__consultation-text">
+                                    {consulta.motivo || 'No especificado'}
+                                  </p>
+                                </div>
+
+                                {/* Anamnesis */}
+                                {consulta.anamnesis && (
+                                  <div className="medical-history-modal__consultation-field">
+                                    <label className="medical-history-modal__consultation-label">
+                                      Anamnesis
+                                    </label>
+                                    <p className="medical-history-modal__consultation-text">
+                                      {consulta.anamnesis}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Signos Vitales */}
+                                {consulta.signos_vitales && (
+                                  <div className="medical-history-modal__consultation-field">
+                                    <label className="medical-history-modal__consultation-label">
+                                      Signos Vitales
+                                    </label>
+                                    <p className="medical-history-modal__consultation-text">
+                                      {consulta.signos_vitales}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Diagnóstico */}
+                                <div className="medical-history-modal__consultation-field">
+                                  <label className="medical-history-modal__consultation-label">
+                                    Diagnóstico
+                                  </label>
+                                  <p className="medical-history-modal__consultation-text">
+                                    {consulta.diagnostico || 'No especificado'}
+                                  </p>
+                                </div>
+
+                                {/* Tratamiento y Vacunas en 2 columnas */}
+                                <div className="medical-history-modal__consultation-row">
+                                  <div className="medical-history-modal__consultation-field">
+                                    <label className="medical-history-modal__consultation-label">
+                                      Tratamiento
+                                    </label>
+                                    <p className="medical-history-modal__consultation-text">
+                                      {consulta.tratamiento || 'No especificado'}
+                                    </p>
+                                  </div>
+
+                                  <div className="medical-history-modal__consultation-field">
+                                    <label className="medical-history-modal__consultation-label">
+                                      Vacunas
+                                    </label>
+                                    <p className="medical-history-modal__consultation-text">
+                                      {consulta.vacunas || 'Ninguna'}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Observaciones (opcional) */}
+                                {consulta.observaciones && (
+                                  <div className="medical-history-modal__consultation-field">
+                                    <label className="medical-history-modal__consultation-label">
+                                      Observaciones
+                                    </label>
+                                    <p className="medical-history-modal__consultation-text">
+                                      {consulta.observaciones}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Metadatos */}
+                                <div className="medical-history-modal__consultation-metadata">
+                                  {consulta.version && (
+                                    <span className="medical-history-modal__metadata-item">
+                                      Versión {consulta.version}
+                                    </span>
+                                  )}
+                                  {consulta.fecha_actualizacion && (
+                                    <span className="medical-history-modal__metadata-item">
+                                      Actualizado: {formatDateTime(consulta.fecha_actualizacion)}
+                                    </span>
+                                  )}
+                                  {consulta.veterinario_id && (
+                                    <span className="medical-history-modal__metadata-item">
+                                      Veterinario ID: {consulta.veterinario_id.substring(0, 8)}...
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
-
-                          {/* Contenido de la consulta */}
-                          <div className="medical-history-modal__consultation-body">
-                            {/* Veterinario */}
-                            {consulta.veterinario && (
-                              <div className="medical-history-modal__consultation-field">
-                                <label className="medical-history-modal__consultation-label">
-                                  Veterinario Tratante:
-                                </label>
-                                <p className="medical-history-modal__consultation-text">
-                                  {consulta.veterinario.nombre || consulta.veterinario}
-                                </p>
-                              </div>
-                            )}
-
-                            {/* Motivo */}
-                            <div className="medical-history-modal__consultation-field">
-                              <label className="medical-history-modal__consultation-label">
-                                Motivo de Consulta:
-                              </label>
-                              <p className="medical-history-modal__consultation-text">
-                                {consulta.motivo || 'No especificado'}
-                              </p>
-                            </div>
-
-                            {/* Diagnóstico */}
-                            <div className="medical-history-modal__consultation-field">
-                              <label className="medical-history-modal__consultation-label">
-                                Diagnóstico:
-                              </label>
-                              <p className="medical-history-modal__consultation-text">
-                                {consulta.diagnostico || 'No especificado'}
-                              </p>
-                            </div>
-
-                            {/* Tratamiento */}
-                            <div className="medical-history-modal__consultation-field">
-                              <label className="medical-history-modal__consultation-label">
-                                Tratamiento:
-                              </label>
-                              <p className="medical-history-modal__consultation-text">
-                                {consulta.tratamiento || 'No especificado'}
-                              </p>
-                            </div>
-
-                            {/* Observaciones */}
-                            {consulta.observaciones && (
-                              <div className="medical-history-modal__consultation-field">
-                                <label className="medical-history-modal__consultation-label">
-                                  Observaciones:
-                                </label>
-                                <p className="medical-history-modal__consultation-text">
-                                  {consulta.observaciones}
-                                </p>
-                              </div>
-                            )}
-
-                            {/* Metadatos */}
-                            <div className="medical-history-modal__consultation-metadata">
-                              {consulta.version && (
-                                <span className="medical-history-modal__metadata-item">
-                                  Versión: {consulta.version}
-                                </span>
-                              )}
-                              {consulta.fecha_actualizacion && (
-                                <span className="medical-history-modal__metadata-item">
-                                  Última actualización: {formatDateTime(consulta.fecha_actualizacion)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                 </div>
@@ -291,7 +436,9 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
             )}
           </div>
 
-          {/* Footer con acciones */}
+          {/* ============================================
+              FOOTER CON INFORMACIÓN Y ACCIONES
+              ============================================ */}
           <div className="medical-history-modal__footer">
             <div className="medical-history-modal__footer-info">
               <small>
@@ -304,11 +451,7 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
               )}
             </div>
             <div className="medical-history-modal__footer-actions">
-              {/* TODO: Botón para exportar PDF en futuro */}
-              {/* <Button variant="outline" size="small">
-                📄 Exportar PDF
-              </Button> */}
-              <Button onClick={onClose}>
+              <Button onClick={onClose} variant="primary">
                 Cerrar
               </Button>
             </div>
@@ -333,6 +476,7 @@ MedicalHistoryModal.propTypes = {
   medicalHistory: PropTypes.shape({
     id: PropTypes.string,
     mascota_id: PropTypes.string,
+    numero: PropTypes.string,
     fecha_creacion: PropTypes.string,
     consultas: PropTypes.arrayOf(PropTypes.object)
   }),
