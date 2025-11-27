@@ -211,9 +211,10 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
                     <div className="inventory-reports__item-stat">
                       <p className="inventory-reports__item-stat-label">Faltante</p>
                       <p className="inventory-reports__item-stat-value inventory-reports__item-stat-value--warning">
-                        {alert.cantidad_faltante} <span className="inventory-reports__item-stat-unit">{alert.unidad_medida}</span>
+                        {Math.max(alert.stock_minimo - alert.stock_actual, 0)} <span className="inventory-reports__item-stat-unit">{alert.unidad_medida}</span>
                       </p>
                     </div>
+
 
                     <div className="inventory-reports__item-stat">
                       <p className="inventory-reports__item-stat-label">Nivel de Stock</p>
@@ -380,7 +381,7 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
                       <div className="inventory-reports__purchase-order-stat">
                         <p className="inventory-reports__purchase-order-stat-label">Costo Total</p>
                         <p className="inventory-reports__purchase-order-stat-value inventory-reports__purchase-order-stat-value--success">
-                          {formatCurrency(item.costo_total_sugerido)}
+                          {formatCurrency(item.precio_compra * item.cantidad_sugerida)}
                         </p>
                       </div>
                     </div>
@@ -399,7 +400,7 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
                   <span className="inventory-reports__purchase-order-total-label">Total Estimado:</span>
                   <span className="inventory-reports__purchase-order-total-value">
                     {formatCurrency(
-                      purchaseOrder.reduce((sum, item) => sum + (item.costo_total_sugerido || 0), 0)
+                      purchaseOrder.reduce((sum, item) => sum + (item.precio_compra * item.cantidad_sugerida || 0), 0)
                     )}
                   </span>
                 </div>
