@@ -68,36 +68,33 @@ class ConsultationService {
    * @returns {Promise} Consulta asociada a la cita
    */
   async getConsultationByAppointment(appointmentId) {
-    try {
-      console.log(`🔍 Buscando consulta para la cita ${appointmentId}`)
+      try {
+        console.log(`🔍 Buscando consulta para la cita ${appointmentId}`)
 
-      // Nota: El backend no tiene un endpoint directo para esto,
-      // pero podemos inferir que cada consulta tiene un cita_id
-      // Por ahora, retornamos null si no existe y dejamos que el componente
-      // maneje la creación de la primera consulta
+        const response = await apiClient.get(
+          `/medical-history/citas/${appointmentId}/consulta`
+        )
 
-      // Esto es una implementación temporal hasta que se agregue
-      // el endpoint específico en el backend si es necesario
-      // GET /api/v1/medical-history/consultas/by-cita/{cita_id}
-
-      return {
-        success: false,
-        data: null,
-        message: 'Consulta no encontrada para esta cita'
-      }
-    } catch (error) {
-      // Si hay un error 404, es normal (la consulta aún no existe)
-      if (error.response?.status === 404) {
-        return {
-          success: false,
-          data: null,
-          message: 'Consulta no encontrada'
+        console.log('✅ Consulta encontrada para la cita:', response.data)
+        return response.data
+      } catch (error) {
+        // Si hay un error 404, es NORMAL y ESPERADO
+        // Significa que la cita aún no tiene una consulta creada
+        if (error.response?.status === 404) {
+          console.log('ℹ️ No existe consulta para esta cita (aún no creada)')
+          return {
+            success: false,
+            data: null,
+            message: 'Consulta no encontrada para esta cita'
+          }
         }
+
+        // Para otros errores, propagar la excepción
+        console.error(`❌ Error al buscar consulta por cita:`, error)
+        throw this.handleError(error)
       }
-      console.error(`❌ Error al buscar consulta por cita:`, error)
-      throw this.handleError(error)
     }
-  }
+
 
   /**
    * Actualiza una consulta existente
