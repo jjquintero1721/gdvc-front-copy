@@ -28,6 +28,7 @@ import ServicesPage from "@pages/services/ServicesPage.jsx";
 import OwnerAppointmentsPage from "@pages/appointments/OwnerAppointmentsPage.jsx";
 import ConsultasPage from "@pages/consultations/ConsultasPage.jsx";
 import MedicalHistoryPage from "@pages/medical-history/MedicalHistoryPage.jsx";
+import InventoryPage from "@pages/inventory/InventoryPage.jsx";
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -242,6 +243,17 @@ function AppRoutes() {
             <ProtectedRoute>
               <DashboardLayout>
                 <MedicalHistoryPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+      <Route
+          path="/inventario"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <InventoryPage />
               </DashboardLayout>
             </ProtectedRoute>
           }
