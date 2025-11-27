@@ -3,10 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '@/store/authStore'
 import { Search, Filter, Calendar, AlertCircle } from 'lucide-react'
 import appointmentService from '@/services/appointmentService'
-import consultationService from '@/services/consultationService'
 import ConsultationCard from '@/components/consultations/ConsultationCard'
-import ConsultationFormModal from '@/components/consultations/ConsultationFormModal'
 import AppointmentDetailModal from '@/components/calender/AppointmentDetailModal'
+import AppointmentManagementPanel from '@/components/appointments/AppointmentManagementPanel'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Alert from '@/components/ui/Alert'
@@ -15,11 +14,11 @@ import './ConsultasPage.css'
 /**
  * ConsultasPage - Página de gestión de consultas
  *
- * ✅ CORRECCIONES APLICADAS:
- * 1. Detecta si una cita está EN_PROCESO
- * 2. Para citas EN_PROCESO, busca la consulta existente
- * 3. Permite "continuar" consultas en proceso
- * 4. Mantiene el flujo correcto para citas CONFIRMADA
+ * ✅ ACTUALIZADO CON NUEVO PANEL:
+ * - Reemplazado ConsultationFormModal por AppointmentManagementPanel
+ * - Incluye gestión completa: Consulta, Historial, Seguimientos
+ * - Flujo mejorado con patrón Memento
+ * - Mejor UX con tabs y diseño centrado
  *
  * RF-07: Gestión de historias clínicas
  * RF-11: Seguimiento de pacientes
@@ -44,10 +43,9 @@ function ConsultasPage() {
   const [filterVeterinarian, setFilterVeterinarian] = useState('all')
 
   // Estados de modales
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false)
+  const [isManagementPanelOpen, setIsManagementPanelOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState(null)
-  const [existingConsultation, setExistingConsultation] = useState(null)
 
   // Verificar permisos
   const canManageConsultations = ['superadmin', 'veterinario'].includes(currentUser?.rol)
@@ -66,40 +64,30 @@ function ConsultasPage() {
 
   /**
    * Carga todas las citas en estado CONFIRMADA o EN_PROCESO
-   *
-   * FIXES:
-   * - Estados en minúsculas: 'confirmada', 'en_proceso'
-   * - Extracción correcta: response.data.citas
    */
   const loadConfirmedAppointments = async () => {
     setLoading(true)
     setError(null)
 
     try {
-      console.log('📞 Llamando a appointmentService.getAllAppointments()')
+      console.log('📞 Cargando citas confirmadas...')
 
       // Obtener todas las citas
       const response = await appointmentService.getAllAppointments()
 
-      console.log('📦 Respuesta completa:', response)
-
       // Extracción correcta del array de citas
       const allAppointments = response.data?.citas || []
 
-      console.log('📋 Total de citas recibidas:', allAppointments.length)
-
       if (!Array.isArray(allAppointments)) {
-        console.error('❌ allAppointments NO es un array:', allAppointments)
         throw new Error('La respuesta del servidor no contiene un array de citas válido')
       }
 
-      // Filtrar usando estados en MINÚSCULAS
+      // Filtrar citas confirmadas o en proceso
       const confirmedAppointments = allAppointments.filter(
         apt => apt.estado === 'confirmada' || apt.estado === 'en_proceso'
       )
 
       console.log('✅ Citas confirmadas/en proceso:', confirmedAppointments.length)
-      console.log('🔍 Estados encontrados:', [...new Set(allAppointments.map(a => a.estado))])
 
       setAppointments(confirmedAppointments)
     } catch (err) {
@@ -121,7 +109,8 @@ function ConsultasPage() {
       const search = searchTerm.toLowerCase()
       filtered = filtered.filter(apt =>
         apt.mascota?.nombre?.toLowerCase().includes(search) ||
-        apt.mascota?.propietario?.nombre?.toLowerCase().includes(search)
+        apt.mascota?.propietario?.nombre?.toLowerCase().includes(search) ||
+        apt.propietario?.nombre?.toLowerCase().includes(search)
       )
     }
 
@@ -144,30 +133,7 @@ function ConsultasPage() {
   }
 
   /**
-   * ✅ NUEVO: Busca una consulta existente para una cita
-   * Útil para citas EN_PROCESO que ya tienen una consulta iniciada
-   */
-  const findExistingConsultation = async (appointmentId) => {
-    try {
-      console.log(`🔍 Buscando consulta existente para cita ${appointmentId}`)
-
-      // OPCIÓN 1: Si existe un endpoint para obtener consulta por cita_id
-      // const response = await consultationService.getConsultationByAppointmentId(appointmentId)
-
-      // OPCIÓN 2: Si solo tienes el ID de la historia clínica
-      // Por ahora retornamos null, lo implementarás según tu backend
-
-      // TODO: Implementar según endpoint disponible
-      return null
-
-    } catch (err) {
-      console.warn('⚠️ No se encontró consulta existente:', err.message)
-      return null
-    }
-  }
-
-  /**
-   * ✅ CORREGIDO: Inicia o continúa una consulta según el estado de la cita
+   * ✅ NUEVO: Inicia la cita y abre el panel de gestión
    */
   const handleStartConsultation = async (appointment) => {
     setLoading(true)
@@ -175,42 +141,31 @@ function ConsultasPage() {
     setSuccess(null)
 
     try {
-      const estadoNormalizado = appointment.estado?.toString().toUpperCase()
+      const estadoNormalizado = appointment.estado?.toLowerCase()
 
       console.log(`📋 Procesando cita ${appointment.id} con estado: ${estadoNormalizado}`)
 
-      if (estadoNormalizado === 'EN_PROCESO') {
-        // ✅ CASO 1: Cita EN_PROCESO → Buscar consulta existente y abrir modal
-        console.log('📝 Cita en proceso detectada. Buscando consulta existente...')
-
-        const existingConsult = await findExistingConsultation(appointment.id)
-
-        if (existingConsult) {
-          console.log('✅ Consulta existente encontrada')
-          setExistingConsultation(existingConsult)
-          setSuccess('Continuando con la consulta en proceso')
-        } else {
-          console.log('⚠️ No se encontró consulta. Permitiendo crear una nueva.')
-          setExistingConsultation(null)
-        }
-
-        // Abrir modal directamente
+      if (estadoNormalizado === 'en_proceso') {
+        // ✅ CASO 1: Cita EN_PROCESO → Abrir panel directamente
+        console.log('📝 Cita en proceso detectada. Abriendo panel...')
         setSelectedAppointment(appointment)
-        setIsConsultationModalOpen(true)
+        setIsManagementPanelOpen(true)
+        setSuccess('Continuando con la consulta en proceso')
 
-      } else {
-        // ✅ CASO 2: Cita CONFIRMADA → Iniciar consulta (cambiar estado a EN_PROCESO)
+      } else if (estadoNormalizado === 'confirmada') {
+        // ✅ CASO 2: Cita CONFIRMADA → Iniciar consulta primero
         console.log('▶️ Iniciando cita confirmada...')
 
         await appointmentService.startAppointment(appointment.id)
 
-        setSuccess('Consulta iniciada correctamente')
+        setSuccess('Cita iniciada correctamente')
         setSelectedAppointment(appointment)
-        setExistingConsultation(null)
-        setIsConsultationModalOpen(true)
+        setIsManagementPanelOpen(true)
 
         // Recargar citas para reflejar el nuevo estado
         await loadConfirmedAppointments()
+      } else {
+        throw new Error(`Estado de cita no válido: ${appointment.estado}`)
       }
 
     } catch (err) {
@@ -230,10 +185,24 @@ function ConsultasPage() {
   }
 
   /**
-   * Callback después de guardar consulta
+   * ✅ NUEVO: Callback cuando se cierra el panel sin completar
    */
-  const handleConsultationSaved = async () => {
-    await loadConfirmedAppointments()
+  const handleClosePanel = () => {
+    setIsManagementPanelOpen(false)
+    setSelectedAppointment(null)
+    // Recargar citas por si hubo cambios
+    loadConfirmedAppointments()
+  }
+
+  /**
+   * ✅ NUEVO: Callback cuando se completa la cita
+   */
+  const handleCompleteAppointment = () => {
+    setIsManagementPanelOpen(false)
+    setSelectedAppointment(null)
+    setSuccess('Cita completada exitosamente')
+    // Recargar citas para actualizar estados
+    loadConfirmedAppointments()
   }
 
   /**
@@ -360,19 +329,15 @@ function ConsultasPage() {
         )}
       </motion.div>
 
-      {/* Modales */}
-      <ConsultationFormModal
-        isOpen={isConsultationModalOpen}
-        onClose={() => {
-          setIsConsultationModalOpen(false)
-          setSelectedAppointment(null)
-          setExistingConsultation(null)
-        }}
+      {/* ✅ NUEVO: Panel de Gestión de Citas */}
+      <AppointmentManagementPanel
         appointment={selectedAppointment}
-        existingConsultation={existingConsultation}
-        onSave={handleConsultationSaved}
+        isOpen={isManagementPanelOpen}
+        onClose={handleClosePanel}
+        onComplete={handleCompleteAppointment}
       />
 
+      {/* Modal de Detalles (mantener para vista rápida) */}
       <AppointmentDetailModal
         isOpen={isDetailModalOpen}
         onClose={() => {

@@ -1,36 +1,37 @@
-/**
- * Servicio de Consultas - RF-07
- * Gestión de historias clínicas y consultas veterinarias
- *
- * ✅ CORRECCIÓN APLICADA:
- * Ahora usa apiClient (con /api/v1/ incluido) en lugar de axios directo
- *
- * Funcionalidades:
- * - Crear consultas
- * - Obtener consulta por ID
- * - Actualizar consultas (genera nueva versión)
- * - Obtener historial de versiones
- * - Restaurar versión anterior (Memento Pattern)
- */
-
 import apiClient from './apiClient'
 
+/**
+ * Servicio de Consultas Médicas - RF-07
+ * Gestión completa de consultas veterinarias con patrón Memento
+ *
+ * Endpoints disponibles:
+ * - POST /api/v1/medical-history/consultas
+ * - GET /api/v1/medical-history/consultas/{consultation_id}
+ * - PUT /api/v1/medical-history/consultas/{consultation_id}
+ * - GET /api/v1/medical-history/consultas/{consultation_id}/historial
+ * - POST /api/v1/medical-history/consultas/{consultation_id}/restaurar/{version}
+ * - GET /api/v1/medical-history/historias/{historia_id}
+ * - GET /api/v1/medical-history/mascotas/{mascota_id}/historia
+ * - GET /api/v1/medical-history/historias/{historia_id}/consultas
+ */
 class ConsultationService {
   /**
    * Crea una nueva consulta
    * POST /api/v1/medical-history/consultas
+   *
+   * Builder Pattern: Construye la consulta paso a paso
+   * Memento Pattern: Crea snapshot inicial automáticamente
    */
   async createConsultation(consultationData) {
     try {
-      console.log('📝 Creando consulta:', consultationData)
+      console.log('📝 Creando nueva consulta:', consultationData)
 
-      // ✅ CORREGIDO: Usa apiClient que ya incluye /api/v1/
       const response = await apiClient.post(
         '/medical-history/consultas',
         consultationData
       )
 
-      console.log('✅ Consulta creada exitosamente:', response.data)
+      console.log('✅ Consulta creada:', response.data)
       return response.data
     } catch (error) {
       console.error('❌ Error al crear consulta:', error)
@@ -42,7 +43,7 @@ class ConsultationService {
    * Obtiene una consulta por ID
    * GET /api/v1/medical-history/consultas/{consultation_id}
    */
-  async getConsultation(consultationId) {
+  async getConsultationById(consultationId) {
     try {
       console.log(`🔍 Obteniendo consulta ${consultationId}`)
 
@@ -54,6 +55,46 @@ class ConsultationService {
       return response.data
     } catch (error) {
       console.error(`❌ Error al obtener consulta ${consultationId}:`, error)
+      throw this.handleError(error)
+    }
+  }
+
+  /**
+   * Obtiene la consulta asociada a una cita específica
+   * Esta función busca en las consultas de la historia clínica de la mascota
+   * la consulta que está vinculada a la cita indicada
+   * 
+   * @param {string} appointmentId - ID de la cita
+   * @returns {Promise} Consulta asociada a la cita
+   */
+  async getConsultationByAppointment(appointmentId) {
+    try {
+      console.log(`🔍 Buscando consulta para la cita ${appointmentId}`)
+
+      // Nota: El backend no tiene un endpoint directo para esto,
+      // pero podemos inferir que cada consulta tiene un cita_id
+      // Por ahora, retornamos null si no existe y dejamos que el componente
+      // maneje la creación de la primera consulta
+
+      // Esto es una implementación temporal hasta que se agregue
+      // el endpoint específico en el backend si es necesario
+      // GET /api/v1/medical-history/consultas/by-cita/{cita_id}
+
+      return {
+        success: false,
+        data: null,
+        message: 'Consulta no encontrada para esta cita'
+      }
+    } catch (error) {
+      // Si hay un error 404, es normal (la consulta aún no existe)
+      if (error.response?.status === 404) {
+        return {
+          success: false,
+          data: null,
+          message: 'Consulta no encontrada'
+        }
+      }
+      console.error(`❌ Error al buscar consulta por cita:`, error)
       throw this.handleError(error)
     }
   }
@@ -114,39 +155,74 @@ class ConsultationService {
       console.log(`⏮️ Restaurando consulta ${consultationId} a versión ${version}`)
 
       const response = await apiClient.post(
-        `/medical-history/consultas/${consultationId}/restaurar/${version}`,
-        {}
+        `/medical-history/consultas/${consultationId}/restaurar/${version}`
       )
 
       console.log('✅ Versión restaurada:', response.data)
       return response.data
     } catch (error) {
-      console.error(`❌ Error al restaurar versión ${version}:`, error)
+      console.error(`❌ Error al restaurar versión:`, error)
       throw this.handleError(error)
     }
   }
 
   /**
-   * ✅ NUEVO: Obtiene la consulta asociada a una cita
-   * GET /api/v1/medical-history/consultas/cita/{cita_id}
+   * Obtiene la historia clínica por ID
+   * GET /api/v1/medical-history/historias/{historia_id}
    */
-  async getConsultationByAppointmentId(citaId) {
+  async getMedicalHistoryById(historiaId) {
     try {
-      console.log(`🔍 Buscando consulta para cita ${citaId}`)
+      console.log(`🔍 Obteniendo historia clínica ${historiaId}`)
 
       const response = await apiClient.get(
-        `/medical-history/consultas/cita/${citaId}`
+        `/medical-history/historias/${historiaId}`
       )
 
-      console.log('✅ Consulta encontrada:', response.data)
+      console.log('✅ Historia clínica obtenida:', response.data)
       return response.data
     } catch (error) {
-      // Si no existe, retornar null en lugar de error
-      if (error.response?.status === 404) {
-        console.log('ℹ️ No se encontró consulta para esta cita')
-        return null
-      }
-      console.error(`❌ Error al buscar consulta para cita ${citaId}:`, error)
+      console.error(`❌ Error al obtener historia clínica:`, error)
+      throw this.handleError(error)
+    }
+  }
+
+  /**
+   * Obtiene la historia clínica de una mascota
+   * GET /api/v1/medical-history/mascotas/{mascota_id}/historia
+   */
+  async getMedicalHistoryByPet(mascotaId) {
+    try {
+      console.log(`🔍 Obteniendo historia clínica de mascota ${mascotaId}`)
+
+      const response = await apiClient.get(
+        `/medical-history/mascotas/${mascotaId}/historia`
+      )
+
+      console.log('✅ Historia clínica obtenida:', response.data)
+      return response.data
+    } catch (error) {
+      console.error(`❌ Error al obtener historia clínica:`, error)
+      throw this.handleError(error)
+    }
+  }
+
+  /**
+   * Obtiene todas las consultas de una historia clínica
+   * GET /api/v1/medical-history/historias/{historia_id}/consultas
+   */
+  async getConsultationsByHistory(historiaId, params = {}) {
+    try {
+      console.log(`🔍 Obteniendo consultas de historia ${historiaId}`)
+
+      const response = await apiClient.get(
+        `/medical-history/historias/${historiaId}/consultas`,
+        { params }
+      )
+
+      console.log('✅ Consultas obtenidas:', response.data)
+      return response.data
+    } catch (error) {
+      console.error(`❌ Error al obtener consultas:`, error)
       throw this.handleError(error)
     }
   }
@@ -156,19 +232,32 @@ class ConsultationService {
    */
   handleError(error) {
     if (error.response) {
-      // Error de respuesta del servidor
-      const message = error.response.data?.detail ||
-                     error.response.data?.message ||
-                     'Error al procesar la solicitud'
-      return new Error(message)
+      // El servidor respondió con un código de error
+      const errorMessage = error.response.data?.detail || 
+                          error.response.data?.message || 
+                          'Error en el servidor'
+      
+      return {
+        message: errorMessage,
+        status: error.response.status,
+        data: error.response.data
+      }
     } else if (error.request) {
-      // Error de red
-      return new Error('No se pudo conectar con el servidor')
+      // La petición se hizo pero no hubo respuesta
+      return {
+        message: 'No se pudo conectar con el servidor',
+        status: 0
+      }
     } else {
-      // Error desconocido
-      return new Error(error.message || 'Error desconocido')
+      // Error al configurar la petición
+      return {
+        message: error.message || 'Error desconocido',
+        status: -1
+      }
     }
   }
 }
 
-export default new ConsultationService()
+// Exportar instancia única del servicio
+const consultationService = new ConsultationService()
+export default consultationService
