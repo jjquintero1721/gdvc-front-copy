@@ -184,7 +184,7 @@ export default function LandingPage() {
           >
             <motion.div className="hero__badge" variants={scaleIn}>
               <span className="hero__badge-icon">🐾</span>
-              <span>Clínica Veterinaria Premium</span>
+              <span>PatFlow</span>
             </motion.div>
 
             <motion.h1 className="hero__title" variants={cinematicReveal}>
@@ -663,10 +663,10 @@ export default function LandingPage() {
             <div className="footer__brand">
               <div className="footer__logo">
                 <span>🐾</span>
-                <span>GDCV</span>
+                <span>PawFlow</span>
               </div>
               <p className="footer__tagline">
-                Gestión de Clínica Veterinaria - Cuidando a tus mascotas con amor y profesionalismo desde 2010.
+                PawFlow - Cuidando a tus mascotas con amor y profesionalismo desde 2010.
               </p>
             </div>
 
@@ -693,7 +693,7 @@ export default function LandingPage() {
             <div className="footer__section">
               <h3>Contacto</h3>
               <ul className="footer__links">
-                <li><a href="mailto:info@gdcv.com">info@gdcv.com</a></li>
+                <li><a href="mailto:info@gdcv.com">info@pawflow.com</a></li>
                 <li><a href="tel:+123456789">+1 (234) 567-89</a></li>
                 <li><a href="#ubicacion">Ubicación</a></li>
                 <li><a href="#horarios">Horarios</a></li>
@@ -703,7 +703,7 @@ export default function LandingPage() {
 
           <div className="footer__bottom">
             <p className="footer__copyright">
-              © {new Date().getFullYear()} GDCV - Gestión de Clínica Veterinaria. Todos los derechos reservados.
+              © {new Date().getFullYear()} PawFlow - Gestión de Clínica Veterinaria. Todos los derechos reservados.
             </p>
             <div className="footer__social">
               <a href="#facebook" aria-label="Facebook">f</a>

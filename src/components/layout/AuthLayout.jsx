@@ -26,7 +26,7 @@ function AuthLayout({ children }) {
             <div className="auth-layout-modern__logo-icon">
               <PawPrint size={48} strokeWidth={2} />
             </div>
-            <h1 className="auth-layout-modern__logo-text">GDCV</h1>
+            <h1 className="auth-layout-modern__logo-text">PawFlow</h1>
           </div>
 
           <div className="auth-layout-modern__welcome">
@@ -34,7 +34,7 @@ function AuthLayout({ children }) {
               Gestión Veterinaria <br /> Profesional
             </h2>
             <p className="auth-layout-modern__welcome-subtitle">
-              La plataforma más elegante y profesional para clínicas veterinarias
+              Gestión que inspira confianza, cuidado que deja huella.
             </p>
           </div>
 
