@@ -1,0 +1,161 @@
+/**
+ * Estilos para TriageForm
+ */
+
+.triage-form {
+  width: 100%;
+}
+
+/* Campos del formulario */
+.triage-form__field {
+  margin-bottom: 20px;
+}
+
+.triage-form__label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.triage-form__required {
+  color: #DC2626;
+}
+
+.triage-form__select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background-color: white;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+
+.triage-form__select:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.triage-form__select:disabled {
+  background-color: #F3F4F6;
+  cursor: not-allowed;
+}
+
+.triage-form__textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.triage-form__textarea:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.triage-form__textarea:disabled {
+  background-color: #F3F4F6;
+  cursor: not-allowed;
+}
+
+.triage-form__helper-text {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.triage-form__error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #DC2626;
+  font-weight: 500;
+}
+
+/* Grid para signos vitales */
+.triage-form__vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Fila para campos lado a lado */
+.triage-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Ayuda con rangos */
+.triage-form__help {
+  margin-bottom: 20px;
+}
+
+.triage-form__help-button {
+  background: #EFF6FF;
+  color: #1E40AF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.triage-form__help-button:hover {
+  background: #DBEAFE;
+  border-color: #93C5FD;
+}
+
+.triage-form__rangos {
+  margin: 12px 0 0 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.triage-form__rangos li {
+  margin-bottom: 6px;
+  color: #374151;
+  font-size: 14px;
+}
+
+/* Botones de acción */
+.triage-form__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .triage-form__vitals-grid,
+  .triage-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .triage-form__actions {
+    flex-direction: column-reverse;
+  }
+
+  .triage-form__actions button {
+    width: 100%;
+  }
+}

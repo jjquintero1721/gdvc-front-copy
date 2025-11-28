@@ -9,7 +9,7 @@ import CreateAppointmentModal from '@/components/appointments/CreateAppointmentM
 import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
 import './OwnerAppointmentsPage.css'
-
+import TriageModal from '@/components/triage/TriageModal'
 /**
  * OwnerAppointmentsPage - Página de gestión de citas para propietarios
  *
@@ -39,6 +39,8 @@ function OwnerAppointmentsPage() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
   const [currentOwner, setCurrentOwner] = useState(null) // ID del propietario actual
+  const [showTriageModal, setShowTriageModal] = useState(false)
+  const [selectedCita, setSelectedCita] = useState(null)
 
   // Estados de filtros
   const [filterStatus, setFilterStatus] = useState('all') // all, AGENDADA, CONFIRMADA, ATENDIDA, CANCELADA
@@ -273,6 +275,11 @@ function OwnerAppointmentsPage() {
     loadAppointments()
   }
 
+  const handleOpenTriage = (cita) => {
+      setSelectedCita(cita)
+      setShowTriageModal(true)
+    }
+
   return (
     <div className="owner-appointments-page">
       {/* Header */}
@@ -356,6 +363,7 @@ function OwnerAppointmentsPage() {
         <div className="owner-appointments-page__grid">
           <AnimatePresence>
             {filteredAppointments.map(appointment => (
+            <div key={appointment.id}>
               <AppointmentCard
                 key={appointment.id}
                 appointment={appointment}
@@ -365,6 +373,14 @@ function OwnerAppointmentsPage() {
                 onReschedule={handleRescheduleAppointment}
                 userRole={currentUser?.rol}
               />
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={() => handleOpenTriage(appointment)}
+                >
+                  🩺 Registrar Triage
+                </Button>
+            </div>
             ))}
           </AnimatePresence>
         </div>
@@ -384,6 +400,23 @@ function OwnerAppointmentsPage() {
           onSuccess={handleAppointmentCreated}
         />
       )}
+
+      {showTriageModal && selectedCita && (
+          <TriageModal
+            isOpen={showTriageModal}
+            onClose={() => {
+              setShowTriageModal(false)
+              setSelectedCita(null)
+            }}
+            cita={selectedCita}
+            onSuccess={(triage) => {
+              console.log('Triage registrado:', triage)
+              // Opcional: recargar citas
+              loadAppointments()
+            }}
+          />
+        )}
+
     </div>
   )
 }

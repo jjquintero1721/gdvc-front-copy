@@ -1,0 +1,246 @@
+/**
+ * Estilos para TriagePage
+ */
+
+.triage-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.triage-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.triage-page__title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.triage-page__subtitle {
+  font-size: 16px;
+  color: #6B7280;
+  margin: 0;
+}
+
+/* Estadísticas */
+.triage-page__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.triage-stat {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.triage-stat:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.triage-stat__icon {
+  font-size: 36px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.triage-stat--urgente .triage-stat__icon {
+  background: #FEE2E2;
+}
+
+.triage-stat--alta .triage-stat__icon {
+  background: #FFEDD5;
+}
+
+.triage-stat--media .triage-stat__icon {
+  background: #FEF3C7;
+}
+
+.triage-stat--baja .triage-stat__icon {
+  background: #D1FAE5;
+}
+
+.triage-stat__content {
+  flex: 1;
+}
+
+.triage-stat__value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.triage-stat__label {
+  font-size: 14px;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+/* Filtros */
+.triage-page__filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.triage-filter-button {
+  padding: 8px 16px;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.triage-filter-button:hover {
+  border-color: #3B82F6;
+  background: #EFF6FF;
+  color: #1E40AF;
+}
+
+.triage-filter-button.active {
+  border-color: #3B82F6;
+  background: #3B82F6;
+  color: white;
+}
+
+/* Contenido */
+.triage-page__content {
+  min-height: 400px;
+}
+
+/* Grid de triages */
+.triage-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+}
+
+/* Loading */
+.triage-page__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #6B7280;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #E5E7EB;
+  border-top-color: #3B82F6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estado vacío */
+.triage-page__empty {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border: 2px dashed #D1D5DB;
+  border-radius: 12px;
+}
+
+.triage-page__empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.triage-page__empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.triage-page__empty-text {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .triage-page__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .triage-page__grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .triage-page {
+    padding: 16px;
+  }
+
+  .triage-page__header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .triage-page__title {
+    font-size: 24px;
+  }
+
+  .triage-page__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .triage-page__filters {
+    flex-direction: column;
+  }
+
+  .triage-filter-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .triage-page__grid {
+    grid-template-columns: 1fr;
+  }
+}

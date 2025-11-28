@@ -1,0 +1,273 @@
+/**
+ * Estilos para TriageDetailModal
+ */
+
+.triage-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.triage-detail-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+/* Header */
+.triage-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #E5E7EB;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.triage-detail__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.triage-detail__close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #6B7280;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.triage-detail__close:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+/* Sección de Prioridad */
+.triage-detail__priority-section {
+  padding: 24px;
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+}
+
+.triage-detail__priority-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E40AF;
+}
+
+/* Secciones */
+.triage-detail__section {
+  padding: 24px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.triage-detail__section:last-of-type {
+  border-bottom: none;
+}
+
+.triage-detail__section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Grid de información */
+.triage-detail__info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.triage-detail__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.triage-detail__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.triage-detail__value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.triage-detail__value--alert {
+  color: #DC2626;
+}
+
+/* Badges de estado */
+.triage-detail__badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.triage-detail__badge--critico {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.triage-detail__badge--decaido {
+  background: #FED7AA;
+  color: #9A3412;
+}
+
+.triage-detail__badge--alerta {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.triage-detail__badge--estable {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+/* Signos vitales */
+.triage-detail__vitals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.triage-detail__vital-card {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.triage-detail__vital-icon {
+  font-size: 32px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.triage-detail__vital-content {
+  flex: 1;
+}
+
+.triage-detail__vital-label {
+  font-size: 12px;
+  color: #6B7280;
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.triage-detail__vital-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Observaciones */
+.triage-detail__observations {
+  background: #F9FAFB;
+  border-left: 4px solid #3B82F6;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #374151;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Acciones */
+.triage-detail__actions {
+  padding: 20px 24px;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  background: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .triage-detail-modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .triage-detail__header {
+    padding: 16px;
+  }
+
+  .triage-detail__title {
+    font-size: 20px;
+  }
+
+  .triage-detail__section {
+    padding: 16px;
+  }
+
+  .triage-detail__info-grid,
+  .triage-detail__vitals {
+    grid-template-columns: 1fr;
+  }
+
+  .triage-detail__priority-section {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .triage-detail__actions {
+    padding: 16px;
+  }
+}

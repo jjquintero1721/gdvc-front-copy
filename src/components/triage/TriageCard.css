@@ -1,0 +1,182 @@
+/**
+ * Estilos para TriageCard
+ */
+
+.triage-card {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.triage-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: #3B82F6;
+}
+
+/* Header */
+.triage-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.triage-card__date {
+  color: #6B7280;
+}
+
+/* Patient Info */
+.triage-card__patient {
+  margin-bottom: 16px;
+}
+
+.triage-card__patient-name {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.triage-card__patient-owner {
+  display: flex;
+  gap: 8px;
+  color: #6B7280;
+}
+
+.triage-card__label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.triage-card__value {
+  color: #111827;
+}
+
+/* Signos Vitales */
+.triage-card__vitals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #F9FAFB;
+  border-radius: 8px;
+}
+
+.triage-card__vital {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.triage-card__vital-icon {
+  font-size: 18px;
+}
+
+.triage-card__vital-label {
+  font-weight: 600;
+  color: #6B7280;
+}
+
+.triage-card__vital-value {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Estado General */
+.triage-card__state {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.triage-card__state-value {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.triage-card__state-value--critico {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.triage-card__state-value--decaido {
+  background: #FED7AA;
+  color: #9A3412;
+}
+
+.triage-card__state-value--alerta {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.triage-card__state-value--estable {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+/* Observaciones */
+.triage-card__observations {
+  margin-bottom: 16px;
+}
+
+.triage-card__observations-text {
+  margin-top: 4px;
+  color: #4B5563;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Acciones */
+.triage-card__actions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #F3F4F6;
+}
+
+.triage-card__actions--visible {
+  opacity: 1;
+}
+
+/* Animación de entrada */
+@keyframes slideInCard {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.triage-card {
+  animation: slideInCard 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .triage-card__vitals {
+    grid-template-columns: 1fr;
+  }
+
+  .triage-card__actions {
+    opacity: 1;
+  }
+}

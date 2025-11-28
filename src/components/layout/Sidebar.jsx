@@ -29,7 +29,8 @@ const navigationByRole = {
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
-    { name: 'Inventario', path: '/inventario', icon:'briefcase'}
+    { name: 'Inventario', path: '/inventario', icon:'briefcase'},
+    { name: 'Triage', path: '/triage', icon: 'medical' },
   ],
   veterinario: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
@@ -41,7 +42,8 @@ const navigationByRole = {
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
-    { name: 'Inventario', path: '/inventario', icon:'briefcase'}
+    { name: 'Inventario', path: '/inventario', icon:'briefcase'},
+    { name: 'Triage', path: '/triage', icon: 'medical' },
   ],
   auxiliar: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
@@ -52,7 +54,8 @@ const navigationByRole = {
     { name: 'Citas', path: '/citas', icon: 'calendar' },
     { name: 'Consultas', path: '/consultas', icon: 'dna' },
     { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' },
-    { name: 'Inventario', path: '/inventario', icon:'briefcase'}
+    { name: 'Inventario', path: '/inventario', icon:'briefcase'},
+    { name: 'Triage', path: '/triage', icon: 'medical' },
   ],
   propietario: [
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
