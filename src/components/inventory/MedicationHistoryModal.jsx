@@ -20,7 +20,24 @@ const MedicationHistoryModal = ({ isOpen, onClose, medication }) => {
       setError(null);
       const data = await inventoryService.getMedicationHistory(medication.id);
       console.log("HISTORY DATA =>", data);
-      setHistory(Array.isArray(data.data) ? data.data : []);
+
+      // 🔥 CORRECCIÓN: Detectar automáticamente la estructura de datos
+      let movimientos = [];
+
+      if (Array.isArray(data)) {
+        // Si data es directamente un array
+        movimientos = data;
+      } else if (data.data && Array.isArray(data.data)) {
+        // Si viene en data.data
+        movimientos = data.data;
+      } else if (data.movimientos && Array.isArray(data.movimientos)) {
+        // Si viene en data.movimientos
+        movimientos = data.movimientos;
+      }
+
+      console.log("MOVIMIENTOS PROCESADOS =>", movimientos);
+      setHistory(movimientos);
+
     } catch (err) {
       setError('Error al cargar el historial');
       console.error('Error:', err);

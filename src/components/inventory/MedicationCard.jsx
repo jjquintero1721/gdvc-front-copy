@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { Pill, AlertCircle, Snowflake, MapPin, Calendar, DollarSign, Package, Edit, Trash2, ArrowDownCircle, ArrowUpCircle, Clock } from 'lucide-react';
+import {
+  Pill,
+  AlertCircle,
+  Snowflake,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Package,
+  Edit,
+  Trash2,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Clock
+} from 'lucide-react';
+
 import UpdateMedicationModal from './UpdateMedicationModal';
 import RegisterEntryModal from './RegisterEntryModal';
 import RegisterExitModal from './RegisterExitModal';
@@ -7,10 +21,7 @@ import MedicationHistoryModal from './MedicationHistoryModal';
 import DeactivateMedicationModal from './DesactivateMedicationModal';
 import './MedicationCard.css';
 
-const MedicationCard = ({ medication, onUpdate }) => {
-  const [showActions, setShowActions] = useState(false);
-
-  // Estados para los modales
+const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
@@ -29,15 +40,16 @@ const MedicationCard = ({ medication, onUpdate }) => {
 
   const isExpired = () => {
     if (!medication.fecha_vencimiento) return false;
-    const expiryDate = new Date(medication.fecha_vencimiento);
-    const today = new Date();
-    return expiryDate < today;
+    return new Date(medication.fecha_vencimiento) < new Date();
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(dateString).toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
   const formatCurrency = (value) => {
@@ -74,16 +86,14 @@ const MedicationCard = ({ medication, onUpdate }) => {
 
   const handleModalSuccess = () => {
     onUpdate();
+    if (onInventoryChange) onInventoryChange();
   };
 
   return (
     <>
-      <div
-        className="medication-card"
-        onMouseEnter={() => setShowActions(true)}
-        onMouseLeave={() => setShowActions(false)}
-      >
-        {/* Header with Badge */}
+      <div className="medication-card">
+
+        {/* HEADER */}
         <div className="medication-card__header">
           <div className="medication-card__header-top">
             <div className="medication-card__title-wrapper">
@@ -91,25 +101,23 @@ const MedicationCard = ({ medication, onUpdate }) => {
                 <Pill size={24} className="medication-card__icon" />
               </div>
               <div className="medication-card__title-content">
-                <h3 className="medication-card__name">
-                  {medication.nombre}
-                </h3>
+                <h3 className="medication-card__name">{medication.nombre}</h3>
                 <p className="medication-card__type">{medication.tipo}</p>
               </div>
             </div>
+
             <span className={`medication-card__badge ${getBadgeClass()}`}>
               {getBadgeText()}
             </span>
           </div>
         </div>
 
-        {/* Body */}
+        {/* BODY */}
         <div className="medication-card__body">
-          {/* Stock Info */}
           <div className={`medication-card__stock ${getStockClass()}`}>
             <div className="medication-card__stock-left">
               <Package size={18} className="medication-card__stock-icon" />
-              <div className="medication-card__stock-info">
+              <div>
                 <p className="medication-card__stock-label">Stock Actual</p>
                 <p className="medication-card__stock-value">{medication.stock_actual}</p>
               </div>
@@ -120,23 +128,21 @@ const MedicationCard = ({ medication, onUpdate }) => {
             </div>
           </div>
 
-          {/* Stock Limits */}
           <div className="medication-card__limits">
-            <div className="medication-card__limit">
+            <div>
               <p className="medication-card__limit-label">Mínimo</p>
               <p className="medication-card__limit-value">{medication.stock_minimo}</p>
             </div>
-            <div className="medication-card__limit">
+            <div>
               <p className="medication-card__limit-label">Máximo</p>
               <p className="medication-card__limit-value">{medication.stock_maximo}</p>
             </div>
           </div>
 
-          {/* Price Info */}
           <div className="medication-card__price">
             <div className="medication-card__price-left">
-              <DollarSign size={16} className="medication-card__price-icon" />
-              <div className="medication-card__price-info">
+              <DollarSign size={16} />
+              <div>
                 <p className="medication-card__price-label">Precio Venta</p>
                 <p className="medication-card__price-value">
                   {formatCurrency(medication.precio_venta)}
@@ -145,10 +151,9 @@ const MedicationCard = ({ medication, onUpdate }) => {
             </div>
           </div>
 
-          {/* Expiry Date */}
-          <div className="medication-card__info-item medication-card__info-item--date">
-            <Calendar size={16} className="medication-card__info-icon medication-card__info-icon--date" />
-            <div className="medication-card__info-content">
+          <div className="medication-card__info-item">
+            <Calendar size={16} />
+            <div>
               <p className="medication-card__info-label">Vencimiento</p>
               <p className={`medication-card__info-value ${getDateClass()}`}>
                 {formatDate(medication.fecha_vencimiento)}
@@ -156,10 +161,9 @@ const MedicationCard = ({ medication, onUpdate }) => {
             </div>
           </div>
 
-          {/* Location */}
-          <div className="medication-card__info-item medication-card__info-item--location">
-            <MapPin size={16} className="medication-card__info-icon medication-card__info-icon--location" />
-            <div className="medication-card__info-content">
+          <div className="medication-card__info-item">
+            <MapPin size={16} />
+            <div>
               <p className="medication-card__info-label">Ubicación</p>
               <p className="medication-card__info-value">
                 {medication.ubicacion || 'No especificada'}
@@ -167,7 +171,6 @@ const MedicationCard = ({ medication, onUpdate }) => {
             </div>
           </div>
 
-          {/* Laboratory */}
           {medication.laboratorio && (
             <div className="medication-card__lab">
               <p className="medication-card__lab-label">Laboratorio</p>
@@ -175,7 +178,6 @@ const MedicationCard = ({ medication, onUpdate }) => {
             </div>
           )}
 
-          {/* Special Badges */}
           {(medication.requiere_refrigeracion || medication.controlado) && (
             <div className="medication-card__special-badges">
               {medication.requiere_refrigeracion && (
@@ -184,6 +186,7 @@ const MedicationCard = ({ medication, onUpdate }) => {
                   <span>Refrigeración</span>
                 </div>
               )}
+
               {medication.controlado && (
                 <div className="medication-card__special-badge medication-card__special-badge--controlled">
                   <AlertCircle size={12} />
@@ -194,80 +197,63 @@ const MedicationCard = ({ medication, onUpdate }) => {
           )}
         </div>
 
-        {/* Footer - Actions */}
+        {/* 🟦 FOOTER NUEVO Y MEJORADO */}
         <div className="medication-card__footer">
-          <div className="medication-card__actions">
-            <button
-              onClick={() => setIsUpdateModalOpen(true)}
-              className="medication-card__action-button medication-card__action-button--update"
-            >
-              <Edit size={16} />
-              Actualizar
+
+          {/* FILA 1 */}
+          <div className="medication-card__footer-row">
+            <button className="medication-card__action-button" onClick={() => setIsUpdateModalOpen(true)}>
+              <Edit size={16} /> Actualizar
             </button>
 
-            <button
-              onClick={() => setIsHistoryModalOpen(true)}
-              className="medication-card__action-button medication-card__action-button--history"
-            >
-              <Clock size={16} />
-              Historial
-            </button>
-
-            <button
-              onClick={() => setIsEntryModalOpen(true)}
-              className="medication-card__action-button medication-card__action-button--entry"
-            >
-              <ArrowUpCircle size={16} />
-              Entrada
-            </button>
-
-            <button
-              onClick={() => setIsExitModalOpen(true)}
-              className="medication-card__action-button medication-card__action-button--exit"
-            >
-              <ArrowDownCircle size={16} />
-              Salida
+            <button className="medication-card__action-button" onClick={() => setIsHistoryModalOpen(true)}>
+              <Clock size={16} /> Historial
             </button>
           </div>
 
+          {/* FILA 2 */}
+          <div className="medication-card__footer-row">
+            <button className="medication-card__action-button medication-card__action-button--entry"
+              onClick={() => setIsEntryModalOpen(true)}>
+              <ArrowUpCircle size={16} /> Entrada
+            </button>
+
+            <button className="medication-card__action-button medication-card__action-button--exit"
+              onClick={() => setIsExitModalOpen(true)}>
+              <ArrowDownCircle size={16} /> Salida
+            </button>
+          </div>
+
+          {/* BOTÓN DESTRUCTIVO – ANCHO COMPLETO */}
           <button
+            className="medication-card__action-button medication-card__action-button--deactivate-full"
             onClick={() => setIsDeactivateModalOpen(true)}
-            className="medication-card__action-button medication-card__action-button--deactivate"
           >
             <Trash2 size={16} />
             Desactivar
           </button>
+
         </div>
       </div>
 
-      {/* Modales */}
       <UpdateMedicationModal
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
-        onSuccess={() => {
-          setIsUpdateModalOpen(false);
-          handleModalSuccess();
-        }}
+        onSuccess={() => { setIsUpdateModalOpen(false); handleModalSuccess(); }}
         medication={medication}
       />
 
       <RegisterEntryModal
         isOpen={isEntryModalOpen}
         onClose={() => setIsEntryModalOpen(false)}
-        onSuccess={() => {
-          setIsEntryModalOpen(false);
-          handleModalSuccess();
-        }}
+        onSuccess={() => { setIsEntryModalOpen(false); handleModalSuccess(); }}
         medication={medication}
       />
 
       <RegisterExitModal
         isOpen={isExitModalOpen}
         onClose={() => setIsExitModalOpen(false)}
-        onSuccess={() => {
-          setIsExitModalOpen(false);
-          handleModalSuccess();
-        }}
+        onSuccess={() => { setIsExitModalOpen(false); handleModalSuccess(); }}
         medication={medication}
       />
 
@@ -280,10 +266,7 @@ const MedicationCard = ({ medication, onUpdate }) => {
       <DeactivateMedicationModal
         isOpen={isDeactivateModalOpen}
         onClose={() => setIsDeactivateModalOpen(false)}
-        onSuccess={() => {
-          setIsDeactivateModalOpen(false);
-          handleModalSuccess();
-        }}
+        onSuccess={() => { setIsDeactivateModalOpen(false); handleModalSuccess(); }}
         medication={medication}
       />
     </>

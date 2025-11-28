@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, FileText, Edit, History, Plus, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, FileText, Edit, History, Plus, CheckCircle, AlertCircle, Pill } from 'lucide-react';
 import ConsultationForm from './ConsultationForm';
 import ConsultationHistory from './ConsultationHistory';
 import FollowUpForm from './FollowUpForm';
+import MedicationsTab from './MedicationsTab';
 import consultationService from '@/services/consultationService';
 import followUpService from '@/services/followUpService';
 import appointmentService from '@/services/appointmentService';
@@ -11,7 +12,7 @@ import './AppointmentManagementPanel.css';
 
 /**
  * AppointmentManagementPanel - Panel principal de gestión de citas
- * ✅ VERSIÓN CORREGIDA
+ * ✅ VERSIÓN CORREGIDA CON PESTAÑA DE MEDICAMENTOS
  *
  * Este componente se abre cuando el veterinario inicia una cita (/start)
  * y permite gestionar todo el ciclo de vida de la consulta:
@@ -20,6 +21,7 @@ import './AppointmentManagementPanel.css';
  * - Editar consulta existente
  * - Ver/restaurar versiones anteriores
  * - Crear seguimientos
+ * - 🆕 Gestionar medicamentos e insumos
  * - Completar la cita
  *
  * @param {Object} appointment - Cita actual
@@ -29,7 +31,7 @@ import './AppointmentManagementPanel.css';
  */
 const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }) => {
   // Estados principales
-  const [activeTab, setActiveTab] = useState('consultation'); // consultation | history | followup
+  const [activeTab, setActiveTab] = useState('consultation'); // consultation | history | followup | medications
   const [consultation, setConsultation] = useState(null);
   const [consultationHistory, setConsultationHistory] = useState([]);
   const [followUps, setFollowUps] = useState([]);
@@ -237,83 +239,83 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
   /**
    * Maneja la creación de un seguimiento
    */
-    const handleCreateFollowUp = async (followUpData) => {
-      try {
-        setLoading(true);
-        setError(null);
+  const handleCreateFollowUp = async (followUpData) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        // ✅ Validación 1: Verificar que existe la consulta
-        if (!consultation) {
-          throw new Error('⚠️ No hay consulta disponible para crear seguimiento');
-        }
-
-        // ✅ Validación 2: Verificar que existe la cita con datos completos
-        if (!appointment) {
-          throw new Error('⚠️ No hay datos de la cita disponibles');
-        }
-
-        // ✅ Validación 3: Verificar veterinario
-        if (!appointment.veterinario_id) {
-          throw new Error('⚠️ No hay veterinario asignado a esta cita');
-        }
-
-        // ✅ Validación 4: Verificar servicio
-        if (!appointment.servicio_id) {
-          throw new Error('⚠️ No hay servicio asignado a esta cita');
-        }
-
-        // ✅ Validación 5: Verificar que la fecha esté en formato ISO
-        if (!followUpData.fecha_hora || !followUpData.fecha_hora.includes('T')) {
-          throw new Error('⚠️ Formato de fecha inválido. Use formato: YYYY-MM-DDTHH:mm');
-        }
-
-        // ✅ Validación 6: Verificar que el motivo tenga mínimo 10 caracteres
-        const motivo = followUpData.motivo || followUpData.motivo_seguimiento || '';
-        if (motivo.length < 10) {
-          throw new Error('⚠️ El motivo debe tener mínimo 10 caracteres');
-        }
-
-        // ✅ Construir payload con TODOS los campos obligatorios
-        const payload = {
-          // Campos obligatorios del schema FollowUpCreate
-          consulta_origen_id: consultation.id,
-          veterinario_id: appointment.veterinario_id,  // ✅ Desde la cita actual
-          servicio_id: appointment.servicio_id,        // ✅ Desde la cita actual
-          fecha_hora_seguimiento: followUpData.fecha_hora,  // ✅ Debe estar en formato ISO
-          motivo_seguimiento: motivo,                   // ✅ Renombrar 'motivo' a 'motivo_seguimiento'
-
-          // Campos opcionales
-          dias_recomendados: followUpData.dias_recomendados || null,
-          notas: followUpData.notas || null
-        };
-
-        console.log('📤 Enviando payload de seguimiento:', payload);
-
-        // ✅ Enviar la petición
-        const response = await followUpService.createFollowUp(
-          consultation.id,
-          payload
-        );
-
-        // ✅ Validar respuesta
-        if (response.success) {
-          setSuccess('✅ Seguimiento creado exitosamente');
-
-          // Recargar datos
-          await loadConsultationData();
-
-          // Volver a la pestaña de consulta
-          setActiveTab('consultation');
-        } else {
-          throw new Error(response.message || 'Error al crear el seguimiento');
-        }
-      } catch (err) {
-        console.error('❌ Error al crear seguimiento:', err);
-        setError(err.message || 'Error al crear el seguimiento');
-      } finally {
-        setLoading(false);
+      // ✅ Validación 1: Verificar que existe la consulta
+      if (!consultation) {
+        throw new Error('⚠️ No hay consulta disponible para crear seguimiento');
       }
-    };
+
+      // ✅ Validación 2: Verificar que existe la cita con datos completos
+      if (!appointment) {
+        throw new Error('⚠️ No hay datos de la cita disponibles');
+      }
+
+      // ✅ Validación 3: Verificar veterinario
+      if (!appointment.veterinario_id) {
+        throw new Error('⚠️ No hay veterinario asignado a esta cita');
+      }
+
+      // ✅ Validación 4: Verificar servicio
+      if (!appointment.servicio_id) {
+        throw new Error('⚠️ No hay servicio asignado a esta cita');
+      }
+
+      // ✅ Validación 5: Verificar que la fecha esté en formato ISO
+      if (!followUpData.fecha_hora || !followUpData.fecha_hora.includes('T')) {
+        throw new Error('⚠️ Formato de fecha inválido. Use formato: YYYY-MM-DDTHH:mm');
+      }
+
+      // ✅ Validación 6: Verificar que el motivo tenga mínimo 10 caracteres
+      const motivo = followUpData.motivo || followUpData.motivo_seguimiento || '';
+      if (motivo.length < 10) {
+        throw new Error('⚠️ El motivo debe tener mínimo 10 caracteres');
+      }
+
+      // ✅ Construir payload con TODOS los campos obligatorios
+      const payload = {
+        // Campos obligatorios del schema FollowUpCreate
+        consulta_origen_id: consultation.id,
+        veterinario_id: appointment.veterinario_id,  // ✅ Desde la cita actual
+        servicio_id: appointment.servicio_id,        // ✅ Desde la cita actual
+        fecha_hora_seguimiento: followUpData.fecha_hora,  // ✅ Debe estar en formato ISO
+        motivo_seguimiento: motivo,                   // ✅ Renombrar 'motivo' a 'motivo_seguimiento'
+
+        // Campos opcionales
+        dias_recomendados: followUpData.dias_recomendados || null,
+        notas: followUpData.notas || null
+      };
+
+      console.log('📤 Enviando payload de seguimiento:', payload);
+
+      // ✅ Enviar la petición
+      const response = await followUpService.createFollowUp(
+        consultation.id,
+        payload
+      );
+
+      // ✅ Validar respuesta
+      if (response.success) {
+        setSuccess('✅ Seguimiento creado exitosamente');
+
+        // Recargar datos
+        await loadConsultationData();
+
+        // Volver a la pestaña de consulta
+        setActiveTab('consultation');
+      } else {
+        throw new Error(response.message || 'Error al crear el seguimiento');
+      }
+    } catch (err) {
+      console.error('❌ Error al crear seguimiento:', err);
+      setError(err.message || 'Error al crear el seguimiento');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /**
    * Completa la cita
@@ -363,6 +365,13 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
   }, [success]);
 
   if (!isOpen) return null;
+
+  // Preparar información del paciente para MedicationsTab
+  const patientInfo = {
+    nombre: appointment.mascota?.nombre,
+    especie: appointment.mascota?.especie,
+    raza: appointment.mascota?.raza
+  };
 
   return (
     <AnimatePresence>
@@ -458,6 +467,15 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
                   <Plus size={18} />
                   <span>Seguimiento ({followUps.length})</span>
                 </button>
+
+                {/* 🆕 NUEVA PESTAÑA: Medicamentos */}
+                <button
+                  className={`appointment-panel-tab ${activeTab === 'medications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('medications')}
+                >
+                  <Pill size={18} />
+                  <span>Medicamentos</span>
+                </button>
               </>
             )}
           </div>
@@ -493,6 +511,17 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
                 existingFollowUps={followUps}
                 onSubmit={handleCreateFollowUp}
               />
+            )}
+
+            {/* 🆕 NUEVO PANEL: Medicamentos */}
+            {!loading && activeTab === 'medications' && consultation && (
+              <div className="appointment-panel-tab-medications">
+                <MedicationsTab
+                  appointmentId={appointment.id}
+                  consultationId={consultation.id}
+                  patientInfo={patientInfo}
+                />
+              </div>
             )}
           </div>
 

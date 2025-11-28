@@ -473,3 +473,27 @@
     opacity: 0.7;
   }
 }
+
+.medication-card__footer {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.medication-card__footer-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.medication-card__action-button--deactivate-full {
+  width: 100%;
+  background: #ffdddd;
+  border: 1px solid #ff7a7a;
+  color: #b30000;
+}
+
+.medication-card__action-button--deactivate-full:hover {
+  background: #ffb3b3;
+}

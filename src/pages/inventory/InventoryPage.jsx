@@ -20,6 +20,9 @@ const InventoryPage = () => {
   const [isEntryFromPOModalOpen, setIsEntryFromPOModalOpen] = useState(false);
   const [selectedMedicationForPO, setSelectedMedicationForPO] = useState(null);
 
+  // ✅ SOLUCIÓN: Estado para controlar el refresh de reportes
+  const [reportsRefreshTrigger, setReportsRefreshTrigger] = useState(0);
+
   useEffect(() => {
     loadMedications();
   }, []);
@@ -40,29 +43,30 @@ const InventoryPage = () => {
   }, [searchTerm, medications]);
 
   const loadMedications = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-        const response = await inventoryService.getAllMedications();
+      const response = await inventoryService.getAllMedications();
 
-        // Aseguramos que sea SIEMPRE un array
-        const meds = Array.isArray(response) ? response : response.data;
+      // Aseguramos que sea SIEMPRE un array
+      const meds = Array.isArray(response) ? response : response.data;
 
-        setMedications(meds);
-        setFilteredMedications(meds);
-      } catch (err) {
-        setError('Error al cargar los medicamentos');
-        console.error('Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+      setMedications(meds);
+      setFilteredMedications(meds);
+    } catch (err) {
+      setError('Error al cargar los medicamentos');
+      console.error('Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateSuccess = () => {
     setIsCreateModalOpen(false);
     loadMedications();
+    // ✅ También refrescar reportes cuando se crea un medicamento
+    setReportsRefreshTrigger(prev => prev + 1);
   };
 
   const handlePrevious = () => {
@@ -80,6 +84,21 @@ const InventoryPage = () => {
 
   const handleClearSearch = () => {
     setSearchTerm('');
+  };
+
+  // ✅ SOLUCIÓN: Callback mejorado que actualiza todo
+  const handleEntrySuccess = () => {
+    // Cerrar modal
+    setIsEntryFromPOModalOpen(false);
+
+    // Limpiar medicamento seleccionado
+    setSelectedMedicationForPO(null);
+
+    // ✅ CRÍTICO: Recargar medicamentos (actualiza las cards)
+    loadMedications();
+
+    // ✅ CRÍTICO: Forzar refresh de reportes (actualiza alertas, dashboard, etc.)
+    setReportsRefreshTrigger(prev => prev + 1);
   };
 
   // Calcular medicamentos visibles en el carrusel
@@ -201,6 +220,7 @@ const InventoryPage = () => {
                     key={medication.id}
                     medication={medication}
                     onUpdate={loadMedications}
+                      onInventoryChange={() => setReportsRefreshTrigger(prev => prev + 1)} // ✅ Nuevo
                   />
                 ))}
               </div>
@@ -226,7 +246,7 @@ const InventoryPage = () => {
           )}
         </div>
 
-        {/* Reports Section */}
+        {/* Reports Section - ✅ SOLUCIÓN: Pasar el refreshTrigger */}
         <div className="inventory-page__reports-section">
           <div className="inventory-page__reports-header">
             <h2 className="inventory-page__reports-title">Reportes y Alertas</h2>
@@ -234,7 +254,10 @@ const InventoryPage = () => {
               Monitorea el estado del inventario y gestiona alertas automáticas
             </p>
           </div>
-          <InventoryReports onEntryFromPurchaseOrder={handleEntryFromPurchaseOrder} />
+          <InventoryReports
+            onEntryFromPurchaseOrder={handleEntryFromPurchaseOrder}
+            refreshTrigger={reportsRefreshTrigger} // ✅ Pasar el trigger
+          />
         </div>
       </div>
 
@@ -245,7 +268,7 @@ const InventoryPage = () => {
         onSuccess={handleCreateSuccess}
       />
 
-      {/* Modal de entrada desde Purchase Order */}
+      {/* Modal de entrada desde Purchase Order - ✅ SOLUCIÓN: Usar handleEntrySuccess */}
       {selectedMedicationForPO && (
         <RegisterEntryModal
           isOpen={isEntryFromPOModalOpen}
@@ -253,11 +276,7 @@ const InventoryPage = () => {
             setIsEntryFromPOModalOpen(false);
             setSelectedMedicationForPO(null);
           }}
-          onSuccess={() => {
-            setIsEntryFromPOModalOpen(false);
-            setSelectedMedicationForPO(null);
-            loadMedications();
-          }}
+          onSuccess={handleEntrySuccess} // ✅ Callback mejorado
           medication={selectedMedicationForPO}
         />
       )}

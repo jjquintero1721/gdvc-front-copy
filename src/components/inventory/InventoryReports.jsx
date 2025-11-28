@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import './InventoryReports.css'
 
-const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
+const InventoryReports = ({ onEntryFromPurchaseOrder, refreshTrigger }) => {
   const [lowStockAlerts, setLowStockAlerts] = useState([]);
   const [expiredMedications, setExpiredMedications] = useState([]);
   const [dashboard, setDashboard] = useState(null);
@@ -28,9 +28,10 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
     purchaseOrder: false,
   });
 
+  // ✅ MEJORA: Recargar reportes cuando refreshTrigger cambia
   useEffect(() => {
     loadReports();
-  }, []);
+  }, [refreshTrigger]);
 
   const loadReports = async () => {
     try {
@@ -44,6 +45,25 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
       setLowStockAlerts(lowStock);
       setExpiredMedications(expired);
       setDashboard(dashboardData);
+
+      // ✅ SOLUCIÓN 1: Limpiar orden de compra si ya no hay alertas de stock bajo
+      if (lowStock.length === 0 && purchaseOrder.length > 0) {
+        setPurchaseOrder([]);
+      }
+
+      // ✅ SOLUCIÓN 2: Actualizar orden de compra si cambió la lista de alertas
+      // Solo mantener items que aún están en las alertas
+      if (purchaseOrder.length > 0) {
+        const updatedPO = purchaseOrder.filter(poItem =>
+          lowStock.some(alert => alert.medicamento_id === poItem.medicamento_id)
+        );
+
+        // Si la orden de compra cambió, actualizarla
+        if (updatedPO.length !== purchaseOrder.length) {
+          setPurchaseOrder(updatedPO);
+        }
+      }
+
     } catch (error) {
       console.error('Error loading reports:', error);
     } finally {
@@ -58,6 +78,24 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
       setExpandedSections(prev => ({ ...prev, purchaseOrder: true }));
     } catch (error) {
       console.error('Error generating purchase order:', error);
+    }
+  };
+
+  const handleEntryFromPurchaseOrder = (purchaseOrderItem) => {
+    if (onEntryFromPurchaseOrder) {
+      const medicationData = {
+        id: purchaseOrderItem.medicamento_id,
+        nombre: purchaseOrderItem.nombre,
+        tipo: purchaseOrderItem.tipo,
+        stock_actual: purchaseOrderItem.stock_actual,
+        stock_minimo: purchaseOrderItem.stock_minimo,
+        unidad_medida: purchaseOrderItem.unidad_medida,
+        precio_compra: purchaseOrderItem.precio_compra,
+        laboratorio: purchaseOrderItem.laboratorio,
+        cantidad_sugerida: purchaseOrderItem.cantidad_sugerida,
+      };
+
+      onEntryFromPurchaseOrder(medicationData);
     }
   };
 
@@ -316,7 +354,7 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
         </div>
       )}
 
-      {/* Purchase Order */}
+      {/* Purchase Order - ✅ SOLUCIÓN: Solo mostrar si hay items */}
       {purchaseOrder.length > 0 && (
         <div className="inventory-reports__section inventory-reports__section--purchase-order">
           <button
@@ -353,7 +391,7 @@ const InventoryReports = ({ onEntryFromPurchaseOrder }) => {
                         <p className="inventory-reports__purchase-order-type">Tipo: {item.tipo}</p>
                       </div>
                       <button
-                        onClick={() => onEntryFromPurchaseOrder && onEntryFromPurchaseOrder(item)}
+                        onClick={() => handleEntryFromPurchaseOrder(item)}
                         className="inventory-reports__purchase-order-entry-btn"
                       >
                         <ArrowUpCircle size={16} />

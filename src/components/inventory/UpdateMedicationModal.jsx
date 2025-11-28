@@ -129,7 +129,7 @@ const UpdateMedicationModal = ({ isOpen, onClose, onSuccess, medication }) => {
               <div className="update-medication-modal__current-item">
                 <span className="update-medication-modal__current-label">Última Actualización:</span>
                 <span className="update-medication-modal__current-value">
-                  {new Date(medication.updated_at || medication.created_at).toLocaleDateString('es-CO')}
+                  {new Date(medication.actualizado_en || medication.creado_en).toLocaleDateString('es-CO')}
                 </span>
               </div>
             </div>

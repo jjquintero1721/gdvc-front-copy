@@ -50,8 +50,33 @@ const RegisterEntryModal = ({ isOpen, onClose, onSuccess, medication }) => {
         costo_unitario: medication?.precio_compra || 0,
       });
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error al registrar la entrada');
-      console.error('Error:', err);
+      console.error('Error completo:', err);
+
+      // ✅ CORRECCIÓN: Manejar correctamente diferentes tipos de errores
+      let errorMessage = 'Error al registrar la entrada';
+
+      if (err.response?.data) {
+        const errorData = err.response.data;
+
+        // Si es un array de errores de validación (FastAPI)
+        if (Array.isArray(errorData.detail)) {
+          errorMessage = errorData.detail
+            .map(error => `${error.loc?.join(' → ') || 'Campo'}: ${error.msg}`)
+            .join('\n');
+        }
+        // Si es un string simple
+        else if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail;
+        }
+        // Si es un objeto con mensaje
+        else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -87,13 +112,18 @@ const RegisterEntryModal = ({ isOpen, onClose, onSuccess, medication }) => {
           </div>
         </div>
 
-        {/* Error Message */}
+        {/* Error Message - ✅ CORRECCIÓN: Renderizar el error correctamente */}
         {error && (
           <div className="medication-modal__body">
             <div className="medication-modal__error">
               <div className="medication-modal__error-content">
                 <AlertCircle className="medication-modal__error-icon" size={20} />
-                <p className="medication-modal__error-text">{error}</p>
+                {/* ✅ CORRECCIÓN: Manejar saltos de línea en errores */}
+                <div className="medication-modal__error-text">
+                  {error.split('\n').map((line, index) => (
+                    <p key={index}>{line}</p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
