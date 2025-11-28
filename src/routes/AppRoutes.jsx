@@ -30,6 +30,7 @@ import ConsultasPage from "@pages/consultations/ConsultasPage.jsx";
 import MedicalHistoryPage from "@pages/medical-history/MedicalHistoryPage.jsx";
 import InventoryPage from "@pages/inventory/InventoryPage.jsx";
 import TriagePage from "@pages/triage/TriagePage.jsx";
+import LandingPage from "@pages/LandingPage.jsx";
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -55,6 +56,16 @@ const PublicRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
+       {/* Ruta Principal - Landing Page */}
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        }
+      />
+
       {/* Rutas Públicas (Auth) */}
       <Route
         path="/login"
@@ -274,8 +285,17 @@ function AppRoutes() {
       {/* Redireccionamiento por defecto */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* 404 - Página no encontrada */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* Ruta 404 - Redirigir a landing si no está autenticado, o al dashboard si lo está */}
+      <Route
+        path="*"
+        element={
+          useAuthStore.getState().isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
     </Routes>
   )
 }
