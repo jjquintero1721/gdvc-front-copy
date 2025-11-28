@@ -4,17 +4,19 @@ import dashboardService from '@/services/dashboardService'
 import './OwnerWelcomeDashboard.css'
 
 /**
- * Dashboard de Bienvenida para Propietarios
+ * Dashboard de Bienvenida para Propietarios - VERSIÓN PREMIUM
  *
  * Muestra:
  * - Saludo personalizado
- * - Mascota animada (perro/gato con animaciones)
+ * - Mascota 2D premium con diseño flat profesional
  * - Información de próximas citas
+ * - Lista de todas las mascotas
  *
- * Animaciones:
- * - Mascota abre y cierra los ojos
- * - Saca la lengua
- * - Mueve la cola
+ * Características Premium:
+ * - Diseño flat design de alta calidad
+ * - Animaciones fluidas y profesionales
+ * - Mascota que sigue el cursor
+ * - UI moderna y atractiva
  */
 function OwnerWelcomeDashboard() {
   const { user } = useAuthStore()
@@ -23,45 +25,11 @@ function OwnerWelcomeDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Estados para animaciones
-  const [isBlinking, setIsBlinking] = useState(false)
-  const [isTongueOut, setIsTongueOut] = useState(false)
-  const [isTailWagging, setIsTailWagging] = useState(false)
-
   /**
    * Cargar estadísticas del propietario
    */
   useEffect(() => {
     loadOwnerStats()
-  }, [])
-
-  /**
-   * Ciclo de animaciones aleatorias
-   */
-  useEffect(() => {
-    // Parpadeo cada 3-5 segundos
-    const blinkInterval = setInterval(() => {
-      setIsBlinking(true)
-      setTimeout(() => setIsBlinking(false), 200)
-    }, Math.random() * 2000 + 3000)
-
-    // Lengua fuera cada 5-8 segundos
-    const tongueInterval = setInterval(() => {
-      setIsTongueOut(true)
-      setTimeout(() => setIsTongueOut(false), 1000)
-    }, Math.random() * 3000 + 5000)
-
-    // Cola moviéndose cada 2-4 segundos
-    const tailInterval = setInterval(() => {
-      setIsTailWagging(true)
-      setTimeout(() => setIsTailWagging(false), 1500)
-    }, Math.random() * 2000 + 2000)
-
-    return () => {
-      clearInterval(blinkInterval)
-      clearInterval(tongueInterval)
-      clearInterval(tailInterval)
-    }
   }, [])
 
   const loadOwnerStats = async () => {
@@ -119,9 +87,7 @@ function OwnerWelcomeDashboard() {
   }
 
   const { mascotaSaludo, proximasCitas } = stats
-  const isPet = mascotaSaludo.especie === 'perro'
-  const petEmoji = isPet ? '🐕' : '🐈'
-  const petType = isPet ? 'perrito' : 'gatito'
+  const petType = mascotaSaludo.especie === 'perro' ? 'dog' : 'cat'
 
   return (
     <div className="owner-welcome">
@@ -134,59 +100,26 @@ function OwnerWelcomeDashboard() {
           ¿Cómo ha estado {mascotaSaludo.nombre}?
         </p>
       </div>
-
-      {/* Mascota Animada */}
-      <div className="pet-animation-container">
-        <div className={`animated-pet ${isPet ? 'dog' : 'cat'} ${isTailWagging ? 'wagging' : ''}`}>
-          {/* Cuerpo */}
-          <div className="pet-body">
-            {/* Cabeza */}
-            <div className="pet-head">
-              {/* Orejas */}
-              <div className="pet-ear pet-ear-left"></div>
-              <div className="pet-ear pet-ear-right"></div>
-
-              {/* Cara */}
-              <div className="pet-face">
-                {/* Ojos */}
-                <div className={`pet-eye pet-eye-left ${isBlinking ? 'blinking' : ''}`}>
-                  <div className="pet-pupil"></div>
-                </div>
-                <div className={`pet-eye pet-eye-right ${isBlinking ? 'blinking' : ''}`}>
-                  <div className="pet-pupil"></div>
-                </div>
-
-                {/* Nariz */}
-                <div className="pet-nose"></div>
-
-                {/* Boca */}
-                <div className="pet-mouth">
-                  {isTongueOut && <div className="pet-tongue"></div>}
-                </div>
-              </div>
-            </div>
-
-            {/* Cola */}
-            <div className={`pet-tail ${isTailWagging ? 'wagging' : ''}`}></div>
-          </div>
-        </div>
-
-        <p className="pet-name">{mascotaSaludo.nombre}</p>
-        <p className="pet-emoji">{petEmoji}</p>
-      </div>
+        
 
       {/* Información de Citas */}
       {proximasCitas && proximasCitas.length > 0 ? (
         <div className="upcoming-appointments">
-          <h3>📅 Próximas Citas</h3>
+          <h3 className="upcoming-appointments__title">
+            📅 Próximas Citas
+          </h3>
           <div className="appointments-list">
             {proximasCitas.map((cita, index) => (
-              <div key={index} className="appointment-card">
-                <div className="appointment-icon">🩺</div>
-                <div className="appointment-info">
-                  <p className="appointment-pet">{cita.mascota_nombre}</p>
-                  <p className="appointment-service">{cita.servicio}</p>
-                  <p className="appointment-date">
+              <div
+                key={index}
+                className="appointment-card"
+                style={{ '--card-index': index }}
+              >
+                <div className="appointment-card__icon">🩺</div>
+                <div className="appointment-card__content">
+                  <p className="appointment-card__pet">{cita.mascota_nombre}</p>
+                  <p className="appointment-card__service">{cita.servicio}</p>
+                  <p className="appointment-card__date">
                     {new Date(cita.fecha_hora).toLocaleDateString('es-CO', {
                       weekday: 'long',
                       year: 'numeric',
@@ -196,7 +129,7 @@ function OwnerWelcomeDashboard() {
                       minute: '2-digit'
                     })}
                   </p>
-                  <p className="appointment-vet">Dr(a). {cita.veterinario}</p>
+                  <p className="appointment-card__vet">Dr(a). {cita.veterinario}</p>
                 </div>
               </div>
             ))}
@@ -204,23 +137,32 @@ function OwnerWelcomeDashboard() {
         </div>
       ) : (
         <div className="no-appointments">
-          <p>No tienes citas programadas próximamente</p>
-          <p>¡Agenda una cita para cuidar de {mascotaSaludo.nombre}! 🏥</p>
+          <div className="no-appointments__icon">📅</div>
+          <p className="no-appointments__title">
+            No tienes citas programadas próximamente
+          </p>
+          <p className="no-appointments__subtitle">
+            ¡Agenda una cita para cuidar de {mascotaSaludo.nombre}! 🏥
+          </p>
         </div>
       )}
 
       {/* Información de Mascotas */}
       {stats.mascotas && stats.mascotas.length > 1 && (
-        <div className="all-pets-info">
-          <h3>🐾 Todas tus mascotas</h3>
+        <div className="all-pets-section">
+          <h3 className="all-pets-section__title">🐾 Todas tus mascotas</h3>
           <div className="pets-grid">
             {stats.mascotas.map((mascota, index) => (
-              <div key={index} className="pet-card">
-                <span className="pet-icon">
+              <div
+                key={index}
+                className="pet-card"
+                style={{ '--card-index': index }}
+              >
+                <span className="pet-card__icon">
                   {mascota.especie === 'perro' ? '🐕' : '🐈'}
                 </span>
-                <p className="pet-card-name">{mascota.nombre}</p>
-                <p className="pet-card-breed">{mascota.raza || 'Mestizo'}</p>
+                <p className="pet-card__name">{mascota.nombre}</p>
+                <p className="pet-card__breed">{mascota.raza || 'Mestizo'}</p>
               </div>
             ))}
           </div>
