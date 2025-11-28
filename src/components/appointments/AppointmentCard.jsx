@@ -7,12 +7,6 @@ import './AppointmentCard.css'
 
 /**
  * AppointmentCard - Tarjeta de cita para propietarios
- *
- * ✅ CORRECCIÓN APLICADA:
- * - Normalización de estados (uppercase)
- * - Debugging mejorado
- * - Validación explícita de props
- *
  * Muestra la información de una cita con diseño similar a PetCard
  * Incluye botones de acción según el estado de la cita
  *

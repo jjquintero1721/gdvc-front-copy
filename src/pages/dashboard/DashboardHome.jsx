@@ -87,14 +87,6 @@ function DashboardHome() {
             Panel de Control - Rol: {userRole.toUpperCase()}
           </p>
         </div>
-        <div className="dashboard-home__actions">
-          <Button
-            variant="secondary"
-            onClick={handleLogout}
-          >
-            Cerrar Sesión
-          </Button>
-        </div>
       </div>
 
       {/* Estadísticas del Dashboard - CON DATOS REALES */}

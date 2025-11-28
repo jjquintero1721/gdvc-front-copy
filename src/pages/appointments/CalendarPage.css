@@ -6,12 +6,12 @@
 /* Contenedor principal */
 .calendar-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+  background: white !important;
   padding: 32px 24px;
-  animation: gradientShift 15s ease infinite;
   position: relative;
   overflow-x: hidden;
 }
+
 
 /* Animación de fondo sutil */
 @keyframes gradientShift {
@@ -31,7 +31,7 @@
   left: 0;
   right: 0;
   height: 400px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.05) 100%);
+  background: white; !important;
   clip-path: ellipse(80% 50% at 50% 0%);
   z-index: 0;
   pointer-events: none;

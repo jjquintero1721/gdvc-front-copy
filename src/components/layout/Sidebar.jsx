@@ -1,5 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { useState } from 'react'
+
 import {
   HomeIcon,
   UserIcon,
@@ -124,17 +126,51 @@ export default function Sidebar() {
 
 
       {/* USER FOOTER */}
-      <div className="sidebar__footer glass-footer">
-        <button className="sidebar__user" onClick={() => navigate('/mi-perfil')}>
-          <div className="sidebar__user-icon">
-            <UserIcon className="w-6 h-6" />
-          </div>
-          <div className="sidebar__user-info">
-            <p className="sidebar__user-name">{user?.nombre}</p>
-            <p className="sidebar__user-email">{user?.email || user?.correo}</p>
-          </div>
-        </button>
-      </div>
+        <div className="sidebar__footer glass-footer">
+
+          {/* Estado del menú */}
+          {(() => {
+            const [open, setOpen] = useState(false)
+            const navigateToProfile = () => navigate('/mi-perfil')
+            const logout = () => {
+              useAuthStore.getState().logout()
+              navigate('/login')
+            }
+
+            return (
+              <div className="sidebar-user-container">
+
+                {/* Botón principal */}
+                <button
+                  className="sidebar__user"
+                  onClick={() => setOpen(!open)}
+                >
+                  <div className="sidebar__user-icon">
+                    <UserIcon className="w-6 h-6" />
+                  </div>
+                  <div className="sidebar__user-info">
+                    <p className="sidebar__user-name">{user?.nombre}</p>
+                    <p className="sidebar__user-email">{user?.email || user?.correo}</p>
+                  </div>
+                </button>
+
+                {/* DESPLEGABLE */}
+                <div className={`sidebar-dropdown ${open ? 'open' : ''}`}>
+                  <button className="dropdown-item" onClick={navigateToProfile}>
+                    Ver mi perfil
+                  </button>
+
+                  <button className="dropdown-item logout" onClick={logout}>
+                    Cerrar sesión
+                  </button>
+                </div>
+
+              </div>
+            )
+          })()}
+        </div>
+
+
     </aside>
   )
 }

@@ -98,11 +98,7 @@ const CalendarPage = () => {
 
             {/* Sección de acciones */}
             <div className="calendar-page__actions">
-              {/* Badge de estado en vivo */}
-              <div className="calendar-page__badge calendar-page__badge--live">
-                <span className="calendar-page__badge-dot"></span>
-                <span>En Vivo</span>
-              </div>
+
 
               {/* Botón de refrescar mejorado */}
               <button

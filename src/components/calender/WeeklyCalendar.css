@@ -1,494 +1,173 @@
-/* ============================================
-   WEEKLY CALENDAR - ESTILOS MEJORADOS
-   Versión profesional con animaciones sutiles
-   ============================================ */
-
-/* Contenedor principal del calendario */
-.weekly-calendar {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 24px;
-  animation: fadeInUp 0.5s ease-out;
+/* ===========================
+   CONTENEDOR DEL CALENDARIO
+   =========================== */
+.pawflow-calendar {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-out;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ANIMACIÓN */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================
-   PERSONALIZACIÓN DE FULLCALENDAR
-   ============================================ */
-
-/* Toolbar del calendario */
-.fc .fc-toolbar {
-  padding: 16px;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-  border-radius: 12px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
+/* ===========================
+   TÍTULO
+   =========================== */
 .fc .fc-toolbar-title {
-  color: #ffffff;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #1e3a8a;
+  font-size: 1.8rem;
+  font-weight: 800;
 }
 
-/* Botones del toolbar */
+/* ===========================
+   NAV BUTTONS
+   =========================== */
 .fc .fc-button {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.fc .fc-button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.fc .fc-button:active:not(:disabled),
-.fc .fc-button-active {
-  background: rgba(255, 255, 255, 0.35);
-  border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.fc .fc-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* ============================================
-   ENCABEZADOS DE DÍAS
-   ============================================ */
-
-.fc .fc-col-header {
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 8px 8px 0 0;
-  overflow: hidden;
-}
-
-.fc .fc-col-header-cell {
-  padding: 16px 8px;
-  border-bottom: 2px solid #3b82f6;
-  transition: all 0.3s ease;
-}
-
-.fc .fc-col-header-cell:hover {
-  background: #e0f2fe;
-}
-
-.fc .fc-col-header-cell-cushion {
-  color: #1e40af;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: color 0.3s ease;
-}
-
-/* Día actual en el encabezado */
-.fc .fc-day-today .fc-col-header-cell-cushion {
-  color: #3b82f6;
-  font-weight: 700;
-}
-
-/* ============================================
-   CELDAS DE TIEMPO (HORARIOS)
-   ============================================ */
-
-.fc .fc-timegrid-slot {
-  height: 60px;
-  border-color: #e5e7eb;
-  transition: background-color 0.2s ease;
-}
-
-.fc .fc-timegrid-slot:hover {
-  background: #f9fafb;
-}
-
-.fc .fc-timegrid-slot-label {
-  color: #6b7280;
-  font-weight: 500;
-  font-size: 0.875rem;
-  padding: 8px;
-  border-right: 2px solid #e5e7eb;
-  background: #fafafa;
-  vertical-align: middle;
-}
-
-/* ============================================
-   CELDAS DE DÍAS
-   ============================================ */
-
-.fc .fc-day {
-  background: #ffffff;
-  transition: all 0.3s ease;
-}
-
-.fc .fc-day:hover {
-  background: #f0f9ff;
-  cursor: pointer;
-}
-
-/* Día actual */
-.fc .fc-day-today {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
-  position: relative;
-}
-
-.fc .fc-day-today::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-/* Fin de semana - estilo diferenciado */
-.fc .fc-day-sat,
-.fc .fc-day-sun {
-  background: #fafafa;
-}
-
-.fc .fc-day-sat:hover,
-.fc .fc-day-sun:hover {
-  background: #f3f4f6;
-}
-
-/* ============================================
-   EVENTOS (CITAS)
-   ============================================ */
-
-.fc-event {
+  background: #2563eb !important;
   border: none !important;
-  border-radius: 6px !important;
-  padding: 4px 8px !important;
-  margin: 2px 4px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.3s ease !important;
-  cursor: pointer !important;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Animación de entrada para eventos */
-.fc-event {
-  animation: slideIn 0.4s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.fc-event:hover {
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-  z-index: 10 !important;
-}
-
-/* Efecto de brillo sutil al hover */
-.fc-event::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.fc-event:hover::before {
-  left: 100%;
-}
-
-/* Título del evento */
-.fc-event-title {
-  font-weight: 600 !important;
-  font-size: 0.813rem !important;
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.fc-event-time {
-  font-weight: 500 !important;
-  font-size: 0.75rem !important;
-  opacity: 0.9;
-}
-
-/* Colores personalizados para eventos según tipo */
-.fc-event.event-current-user {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-}
-
-.fc-event.event-other-user {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-}
-
-.fc-event.event-pending {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-}
-
-.fc-event.event-cancelled {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-  opacity: 0.7;
-}
-
-/* ============================================
-   LÍNEA DE TIEMPO ACTUAL (NOW INDICATOR)
-   ============================================ */
-
-.fc .fc-timegrid-now-indicator-line {
-  border-color: #ef4444;
-  border-width: 2px;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-  animation: glow 2s ease-in-out infinite;
-}
-
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(239, 68, 68, 0.8);
-  }
-}
-
-.fc .fc-timegrid-now-indicator-arrow {
-  border-color: #ef4444;
-  border-width: 6px;
-}
-
-/* ============================================
-   GRID Y BORDES
-   ============================================ */
-
-.fc .fc-scrollgrid {
-  border: none;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.fc .fc-scrollgrid-section > * {
-  border-color: #e5e7eb !important;
-}
-
-.fc-theme-standard td,
-.fc-theme-standard th {
-  border-color: #e5e7eb;
-}
-
-/* ============================================
-   ESTADO DE CARGA
-   ============================================ */
-
-.weekly-calendar-loading {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
+  color: white !important;
+  border-radius: 50% !important;
+  width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  font-size: 1.2rem !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
-  border-radius: 16px;
-  animation: fadeIn 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+  transition: 0.25s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.fc .fc-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4) !important;
 }
 
-.weekly-calendar-loading-content {
+.fc .fc-button:active {
+  transform: scale(0.95);
+}
+
+/* BOTÓN DE HOY */
+.fc .fc-customToday-button {
+  background: #10b981 !important;
+  border-radius: 10px !important;
+  padding: 6px 14px !important;
+  font-size: 0.9rem !important;
+}
+
+/* ===========================
+   DÍAS
+   =========================== */
+.fc-daygrid-day {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.fc-daygrid-day:hover {
+  background: #f0f9ff;
+}
+
+/* HOY */
+.fc-day-today {
+  background: #e0f2fe !important;
+  border-radius: 10px;
+  animation: pulseToday 2s infinite;
+}
+
+@keyframes pulseToday {
+  0%,100% { box-shadow: 0 0 0 rgba(37, 99, 235, 0.4); }
+  50%     { box-shadow: 0 0 12px rgba(37, 99, 235, 0.75); }
+}
+
+/* ===========================
+   PUNTO DE CITA
+   =========================== */
+.pawflow-dot-container {
+  margin-top: 6px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  justify-content: center;
 }
 
-.weekly-calendar-spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #3b82f6;
-  border-top-color: transparent;
+.pawflow-dot {
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: pop 0.3s ease-out;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+/* ==========================================
+   INDICADOR TIPO "PILL" (MEJORADO)
+   ========================================== */
+
+/* Contenedor del día para permitir posicionamiento */
+.fc-daygrid-day-frame {
+  position: relative;
+  overflow: visible; /* evita recortes si usamos sombras suaves */
 }
 
-.weekly-calendar-loading-text {
-  color: #6b7280;
-  font-weight: 500;
-  font-size: 0.938rem;
-}
+/* Indicador en esquina superior derecha */
+.pawflow-pill {
+  position: absolute;
+  top: 10px;
+  right: 3px;
 
-/* ============================================
-   LEYENDA Y NOTAS
-   ============================================ */
+  background-color: var(--pill-color, #ef4444);
+  color: white;
 
-.calendar-legend {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+
+  border-radius: 30px;
+  font-size: 0.65rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 24px;
-  margin-top: 24px;
-  padding: 16px;
-  background: #f9fafb;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  animation: fadeIn 0.5s ease-out 0.3s both;
+  justify-content: center;
+
+  z-index: 20;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+
+  animation: pillPop 0.2s ease-out;
 }
 
-.calendar-legend-item {
+/* Animación rápida */
+@keyframes pillPop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================
+   FIX — ACOMODAR BOTONES DE NAVEGACIÓN
+   ========================================== */
+
+/* Contenedor de los botones prev / hoy / next */
+.fc-toolbar.fc-header-toolbar {
+  margin-bottom: 25px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Alinear a la izquierda el grupo de navegación */
+.fc-toolbar-chunk:first-child {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  color: #6b7280;
-  transition: transform 0.2s ease;
+  gap: 10px; /* separación uniforme */
 }
 
-.calendar-legend-item:hover {
-  transform: translateX(4px);
+/* Ajustar posición para que no estén tan arriba */
+.fc .fc-prev-button,
+.fc .fc-next-button,
+.fc .fc-customToday-button {
+  margin-top: 5px !important;
 }
-
-.calendar-legend-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.calendar-tip {
-  margin-top: 16px;
-  padding: 16px;
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-radius: 12px;
-  border-left: 4px solid #3b82f6;
-  animation: fadeIn 0.5s ease-out 0.5s both;
-}
-
-.calendar-tip-text {
-  font-size: 0.875rem;
-  color: #1e40af;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.calendar-tip-icon {
-  flex-shrink: 0;
-  font-size: 1.125rem;
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
-@media (max-width: 768px) {
-  .fc .fc-toolbar {
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px;
-  }
-
-  .fc .fc-toolbar-title {
-    font-size: 1.25rem;
-  }
-
-  .fc .fc-button {
-    padding: 6px 12px;
-    font-size: 0.875rem;
-  }
-
-  .calendar-legend {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .weekly-calendar {
-    padding: 16px;
-  }
-}
-
-/* ============================================
-   SCROLL PERSONALIZADO
-   ============================================ */
-
-.fc-scroller::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.fc-scroller::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-.fc-scroller::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-  transition: background 0.3s ease;
-}
-
-.fc-scroller::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* ============================================
-   TRANSICIONES GLOBALES
-   ============================================ */
-
-* {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-in-out;
-}
-
