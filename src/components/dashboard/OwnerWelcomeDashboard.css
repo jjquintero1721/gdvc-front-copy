@@ -1,19 +1,22 @@
-/* ===================================
-   Dashboard de Bienvenida - Propietario
-   VERSIÓN MEJORADA Y PROFESIONAL
-   =================================== */
+/* ============================================
+   DASHBOARD PROPIETARIO - ESTILOS MEJORADOS
+   Diseño moderno, organizado y profesional
+   ============================================ */
 
-.owner-welcome {
+.owner-dashboard {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  animation: fadeIn 0.6s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -21,13 +24,138 @@
   }
 }
 
-/* ===================================
-   Header de Bienvenida
-   =================================== */
+/* ============================================
+   ESTADOS DE CARGA Y ERROR
+   ============================================ */
 
-.welcome-header {
+.owner-dashboard__loading,
+.owner-dashboard__error,
+.owner-dashboard__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
   text-align: center;
-  margin-bottom: 2rem;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 1.125rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.owner-dashboard__error {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-radius: 16px;
+  border: 2px dashed #fca5a5;
+}
+
+.error-icon {
+  width: 64px;
+  height: 64px;
+  color: #dc2626;
+}
+
+.owner-dashboard__error h3 {
+  font-size: 1.5rem;
+  color: #991b1b;
+  margin: 0;
+}
+
+.owner-dashboard__error p {
+  color: #b91c1c;
+  margin: 0;
+}
+
+.btn-retry {
+  padding: 0.75rem 1.5rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-retry:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.owner-dashboard__empty {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  border: 2px dashed #bae6fd;
+}
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  color: #0284c7;
+}
+
+.owner-dashboard__empty h2 {
+  font-size: 1.875rem;
+  color: #0c4a6e;
+  margin: 0;
+}
+
+.owner-dashboard__empty p {
+  color: #075985;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.btn-primary {
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* ============================================
+   HERO SECTION - BIENVENIDA
+   ============================================ */
+
+.dashboard-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  color: white;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
   animation: slideDown 0.8s ease-out;
 }
 
@@ -42,555 +170,754 @@
   }
 }
 
-.welcome-title {
+.hero-content {
+  flex: 1;
+}
+
+.hero-title {
   font-size: 2.5rem;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.hero-name {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.welcome-subtitle {
-  font-size: 1.25rem;
-  color: #64748b;
-  font-weight: 400;
-}
-
-/* ===================================
-   Loading State
-   =================================== */
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  gap: 1.5rem;
-}
-
-.spinner {
-  width: 60px;
-  height: 60px;
-  border: 4px solid #e2e8f0;
-  border-top-color: #667eea;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-container p {
+.hero-subtitle {
   font-size: 1.125rem;
-  color: #64748b;
-  font-weight: 500;
+  opacity: 0.9;
+  margin: 0;
 }
 
-/* ===================================
-   Error State
-   =================================== */
-
-.error-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  gap: 1.5rem;
-  background: #fef2f2;
-  border-radius: 16px;
-  border: 2px dashed #fca5a5;
-}
-
-.error-container p {
-  font-size: 1.125rem;
-  color: #dc2626;
-  font-weight: 500;
-  text-align: center;
-}
-
-.btn-retry {
-  padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  border: none;
+.hero-pet {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
   border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 280px;
+}
+
+.hero-pet-badge {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-icon {
+  width: 24px;
+  height: 24px;
+  color: #fbbf24;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.hero-pet-text {
+  margin: 0;
   font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  line-height: 1.5;
 }
 
-.btn-retry:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-}
-
-.btn-retry:active {
-  transform: translateY(0);
-}
-
-/* ===================================
-   No Pets State
-   =================================== */
-
-.no-pets-container {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border-radius: 20px;
-  border: 2px dashed #93c5fd;
-}
-
-.no-pets-container h2 {
-  font-size: 2rem;
-  color: #1e293b;
-  margin-bottom: 1rem;
-}
-
-.no-pets-container p {
-  font-size: 1.125rem;
-  color: #64748b;
-  margin-bottom: 0.5rem;
-}
-
-/* ===================================
-   Próximas Citas
-   =================================== */
-
-.upcoming-appointments {
-  margin-top: 3rem;
-  animation: slideUp 0.8s ease-out 0.3s backwards;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.upcoming-appointments__title {
-  font-size: 1.75rem;
-  color: #1e293b;
-  margin-bottom: 1.5rem;
+.hero-pet-text strong {
   font-weight: 700;
+  font-size: 1.125rem;
+  display: block;
+}
+
+/* ============================================
+   STATS CARDS - ESTADÍSTICAS
+   ============================================ */
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card--primary {
+  border-color: #e0e7ff;
+  background: linear-gradient(135deg, #fafafa 0%, #f0f4ff 100%);
+}
+
+.stat-card--primary:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+}
+
+.stat-card--success {
+  border-color: #d1fae5;
+  background: linear-gradient(135deg, #fafafa 0%, #f0fdf4 100%);
+}
+
+.stat-card--success:hover {
+  border-color: #a7f3d0;
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.2);
+}
+
+.stat-card--warning {
+  border-color: #fed7aa;
+  background: linear-gradient(135deg, #fafafa 0%, #fffbeb 100%);
+}
+
+.stat-card--warning:hover {
+  border-color: #fdba74;
+  box-shadow: 0 8px 24px rgba(251, 146, 60, 0.2);
+}
+
+.stat-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card--primary .stat-card__icon {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+}
+
+.stat-card--success .stat-card__icon {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+}
+
+.stat-card--warning .stat-card__icon {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  color: white;
+}
+
+.stat-card__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.stat-card__content {
+  flex: 1;
+}
+
+.stat-card__label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card__value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1e293b;
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin: 0;
+}
+
+.section-icon {
+  width: 28px;
+  height: 28px;
+  color: #6366f1;
+}
+
+.btn-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-link:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.arrow-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s;
+}
+
+.btn-link:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+/* ============================================
+   LAYOUT DE 2 COLUMNAS - COMPACTO
+   ============================================ */
+
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.dashboard-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-right-column {
+  position: sticky;
+  top: 2rem;
+}
+
+/* ============================================
+   APPOINTMENTS LIST - LISTA COMPACTA
+   ============================================ */
+
+.dashboard-appointments {
+  animation: fadeIn 0.8s ease-out 0.2s both;
 }
 
 .appointments-list {
-  display: grid;
-  gap: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
-
-/* ===================================
-   Tarjeta de Cita
-   =================================== */
 
 .appointment-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.25rem;
-  padding: 1.75rem;
   background: white;
   border-radius: 16px;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: cardFadeIn 0.6s ease-out backwards;
-  animation-delay: calc(var(--card-index, 0) * 0.1s);
-}
-
-@keyframes cardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  padding: 1.5rem;
+  display: flex;
+  gap: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+  border: 2px solid #e2e8f0;
 }
 
 .appointment-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 12px 24px rgba(102, 126, 234, 0.15),
-    0 0 0 1px rgba(102, 126, 234, 0.1);
+  transform: translateX(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
 }
 
-.appointment-card__icon {
-  font-size: 2.5rem;
-  width: 70px;
-  height: 70px;
+.appointment-card--next {
+  border-color: #a5b4fc;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+}
+
+.appointment-card--next:hover {
+  border-color: #818cf8;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+}
+
+.appointment-card__indicator {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
-  border-radius: 16px;
+  background: #f1f5f9;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+.appointment-card--next .appointment-card__indicator {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+
+.indicator-icon {
+  width: 24px;
+  height: 24px;
+  color: #64748b;
+}
+
+.indicator-icon--active {
+  color: white;
 }
 
 .appointment-card__content {
   flex: 1;
-  min-width: 0;
-}
-
-.appointment-card__pet {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 0.5rem 0;
-}
-
-.appointment-card__service {
-  font-size: 1rem;
-  color: #7c3aed;
-  margin: 0 0 0.75rem 0;
-  font-weight: 600;
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: #ede9fe;
-  border-radius: 6px;
-}
-
-.appointment-card__date {
-  font-size: 0.9375rem;
-  color: #475569;
-  margin: 0 0 0.375rem 0;
-  font-weight: 500;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
-.appointment-card__date::before {
-  content: '🕒';
+.appointment-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.appointment-card__title-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.appointment-card__pet {
   font-size: 1.125rem;
-}
-
-.appointment-card__vet {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin: 0;
-  font-weight: 500;
-}
-
-.appointment-card__vet::before {
-  content: '👨‍⚕️ ';
-  margin-right: 0.25rem;
-}
-
-/* ===================================
-   Sin Citas
-   =================================== */
-
-.no-appointments {
-  text-align: center;
-  padding: 3.5rem 2rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 20px;
-  margin-top: 2rem;
-  border: 2px dashed #cbd5e1;
-  animation: slideUp 0.8s ease-out 0.3s backwards;
-}
-
-.no-appointments__icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
-}
-
-.no-appointments__title {
-  font-size: 1.25rem;
-  color: #475569;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.no-appointments__subtitle {
-  font-size: 1rem;
-  color: #64748b;
-  margin: 0;
-}
-
-/* ===================================
-   Todas las Mascotas
-   =================================== */
-
-.all-pets-section {
-  margin-top: 3rem;
-  animation: slideUp 0.8s ease-out 0.4s backwards;
-}
-
-.all-pets-section__title {
-  font-size: 1.75rem;
-  color: #1e293b;
-  margin-bottom: 1.5rem;
   font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.appointment-card__badge {
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.appointment-card__date {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+/* NUEVOS ESTILOS - Motivo y Servicio */
+.appointment-card__motivo,
+.appointment-card__servicio {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: #475569;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.motivo-label,
+.servicio-label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.inline-icon {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.appointment-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+.appointment-status {
+  padding: 0.375rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.appointment-status--confirmada {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.appointment-status--pendiente {
+  background: #fed7aa;
+  color: #92400e;
+}
+
+.appointment-status--completada {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* ============================================
+   PETS GRID - GRID DE MASCOTAS COMPACTO
+   ============================================ */
+
+.dashboard-pets {
+  animation: fadeIn 0.8s ease-out 0.4s both;
 }
 
 .pets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.25rem;
-}
-
-/* ===================================
-   Tarjeta de Mascota
-   =================================== */
-
-.pet-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 2rem 1.5rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: cardZoomIn 0.6s ease-out backwards;
-  animation-delay: calc(var(--card-index, 0) * 0.1s);
+  gap: 1rem;
 }
 
-@keyframes cardZoomIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.pet-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+  cursor: pointer;
+  border: 2px solid #e2e8f0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
 }
 
 .pet-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow:
-    0 16px 32px rgba(102, 126, 234, 0.2),
-    0 0 0 1px rgba(102, 126, 234, 0.15);
+  transform: translateX(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #6366f1;
 }
 
-.pet-card__icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-  animation: bounce 2s ease-in-out infinite;
-  animation-delay: calc(var(--card-index, 0) * 0.2s);
+.pet-card__emoji {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+.pet-emoji {
+  font-size: 3rem;
+  line-height: 1;
+  display: block;
+}
+
+.pet-card__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .pet-card__name {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: #1e293b;
-  margin: 0 0 0.375rem 0;
-  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pet-card__breed {
-  font-size: 0.9375rem;
   color: #64748b;
+  font-size: 0.875rem;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pet-card__details {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+.pet-detail {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+.pet-detail__label {
+  font-size: 0.75rem;
+  color: #64748b;
   font-weight: 500;
+}
+
+.pet-detail__value {
+  font-size: 0.8125rem;
+  color: #1e293b;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Botón "Ver todas" si hay más de 3 mascotas */
+.pets-show-more {
+  margin-top: 1rem;
   text-align: center;
 }
 
-/* ===================================
-   Responsive Design
-   =================================== */
+.btn-show-more {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
 
-@media (max-width: 768px) {
-  .owner-welcome {
-    padding: 1.5rem 1rem;
+.btn-show-more:hover {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border-color: #6366f1;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-show-more .arrow-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s;
+}
+
+.btn-show-more:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+/* ============================================
+   QUICK ACTIONS - ACCESOS RÁPIDOS
+   ============================================ */
+
+.dashboard-quick-actions {
+  animation: fadeIn 0.8s ease-out 0.6s both;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+.quick-action-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.quick-action-card:hover {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border-color: #6366f1;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.quick-action-icon {
+  width: 36px;
+  height: 36px;
+  color: #6366f1;
+  transition: color 0.3s;
+}
+
+.quick-action-card:hover .quick-action-icon {
+  color: white;
+}
+
+.quick-action-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  transition: color 0.3s;
+  text-align: center;
+}
+
+.quick-action-card:hover .quick-action-label {
+  color: white;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr 350px;
   }
+}
 
-  .welcome-title {
-    font-size: 2rem;
-  }
-
-  .welcome-subtitle {
-    font-size: 1.125rem;
-  }
-
-  .upcoming-appointments__title,
-  .all-pets-section__title {
-    font-size: 1.5rem;
-  }
-
-  .appointment-card {
+@media (max-width: 1024px) {
+  .dashboard-hero {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 1rem;
+    align-items: stretch;
   }
 
-  .appointment-card__icon {
-    width: 60px;
-    height: 60px;
-    font-size: 2rem;
+  .hero-pet {
+    min-width: auto;
   }
 
-  .appointment-card__date::before {
-    display: none;
+  .dashboard-stats {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-right-column {
+    position: static;
   }
 
   .pets-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 
   .pet-card {
-    padding: 1.5rem 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
   }
 
-  .pet-card__icon {
-    font-size: 3rem;
+  .pet-card__emoji {
+    width: 100%;
+    height: 120px;
+    border-radius: 12px 12px 0 0;
   }
 
-  .pet-card__name {
-    font-size: 1.125rem;
+  .pet-emoji {
+    font-size: 3.5rem;
   }
 
-  .pet-card__breed {
-    font-size: 0.875rem;
+  .pet-card__content {
+    padding: 1rem 1.25rem 1.25rem 1.25rem;
+  }
+
+  .pet-card:hover {
+    transform: translateY(-4px);
   }
 }
 
-@media (max-width: 480px) {
-  .owner-welcome {
-    padding: 1rem 0.75rem;
+@media (max-width: 768px) {
+  .owner-dashboard {
+    padding: 1rem;
+    gap: 1.5rem;
   }
 
-  .welcome-header {
-    margin-bottom: 1.5rem;
+  .dashboard-hero {
+    padding: 1.5rem;
   }
 
-  .welcome-title {
-    font-size: 1.75rem;
+  .hero-title {
+    font-size: 2rem;
   }
 
-  .welcome-subtitle {
+  .hero-subtitle {
     font-size: 1rem;
   }
 
-  .upcoming-appointments,
-  .all-pets-section {
-    margin-top: 2rem;
+  .stat-card {
+    padding: 1.25rem;
   }
 
-  .appointment-card {
-    padding: 1.5rem;
+  .stat-card__value {
+    font-size: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
   }
 
   .pets-grid {
     grid-template-columns: 1fr;
   }
-}
 
-/* ===================================
-   Mejoras de Accesibilidad
-   =================================== */
-
-@media (prefers-reduced-motion: reduce) {
-  .owner-welcome,
-  .welcome-header,
-  .upcoming-appointments,
-  .all-pets-section,
-  .appointment-card,
-  .pet-card,
-  .pet-card__icon {
-    animation: none;
+  .appointment-card {
+    flex-direction: column;
   }
 
-  .appointment-card:hover,
-  .pet-card:hover {
-    transform: none;
-  }
-
-  .spinner {
-    animation: none;
-    border-top-color: #667eea;
+  .appointment-card__indicator {
+    align-self: flex-start;
   }
 }
 
-/* ===================================
-   Modo Oscuro (Opcional)
-   =================================== */
-
-@media (prefers-color-scheme: dark) {
-  .owner-welcome {
-    background-color: #0f172a;
+@media (max-width: 480px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
-  .welcome-title {
-    color: #f8fafc;
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
   }
 
-  .welcome-subtitle {
-    color: #94a3b8;
-  }
-
-  .appointment-card,
-  .pet-card {
-    background: #1e293b;
-    box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
-  }
-
-  .appointment-card__pet,
-  .pet-card__name,
-  .upcoming-appointments__title,
-  .all-pets-section__title {
-    color: #f8fafc;
-  }
-
-  .appointment-card__date,
-  .appointment-card__vet,
-  .pet-card__breed {
-    color: #94a3b8;
-  }
-
-  .no-appointments {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border-color: #334155;
-  }
-
-  .no-appointments__title {
-    color: #cbd5e1;
-  }
-
-  .no-appointments__subtitle {
-    color: #94a3b8;
+  .dashboard-stats {
+    grid-template-columns: 1fr;
   }
 }
