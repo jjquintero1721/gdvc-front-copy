@@ -1,7 +1,19 @@
+import React, { useEffect } from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import AppRoutes from './routes/AppRoutes'
+import { useAuthStore } from '@/store/authStore'
+import AppRoutes from '@/routes/AppRoutes'
 
 function App() {
+  const { isAuthenticated, isTokenExpired, logout } = useAuthStore()
+
+  // Validar token al cargar
+  useEffect(() => {
+    if (isAuthenticated && isTokenExpired()) {
+      console.warn('⚠️ Token expirado, cerrando sesión...')
+      logout()
+    }
+  }, [isAuthenticated, isTokenExpired, logout])
+
   return (
     <BrowserRouter>
       <AppRoutes />
