@@ -1,62 +1,168 @@
-.auth-layout {
+/* ============================================
+   AUTH LAYOUT MEJORADO CON IMAGEN DIFUMINADA
+   ============================================ */
+
+.auth-layout-modern {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--gray-100);
-  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
 }
 
-.auth-layout__container {
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* -------------------------------------------------
+   PANEL IZQUIERDO CON IMAGEN DE FONDO DIFUMINADA
+   ------------------------------------------------- */
+
+.auth-layout-modern__brand-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: var(--spacing-2xl);
+  overflow: hidden;
+
+  background-image: url('../../assets/images/veterinaria-cover.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Capa de blur + overlay */
+.auth-layout-modern__bg-overlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(18px);
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1;
+}
+
+/* Contenido del panel */
+.auth-layout-modern__brand-content {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+  animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Logo */
+.auth-layout-modern__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.auth-layout-modern__logo-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50%    { transform: translateY(-8px); }
+}
+
+.auth-layout-modern__logo-text {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Welcome */
+.auth-layout-modern__welcome-title {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.2;
+  background: linear-gradient(to right, #fff, rgba(255,255,255,0.8));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-layout-modern__welcome-subtitle {
+  font-size: 18px;
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+/* Features */
+.auth-layout-modern__features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
+}
+
+.auth-layout-modern__feature {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.25s ease;
+}
+
+.auth-layout-modern__feature:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateX(6px);
+}
+
+/* -------------------------------------------------
+   PANEL DERECHO
+   ------------------------------------------------- */
+
+.auth-layout-modern__form-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--gray-50);
+  padding: var(--spacing-2xl);
+}
+
+.auth-layout-modern__form-container {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-lg);
+  animation: slideInRight 0.8s ease-out;
 }
 
-.auth-layout__footer {
-  padding: var(--spacing-lg) 0;
-  background-color: transparent;
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-.auth-layout__footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
+/* Footer */
+.auth-layout-modern__footer {
+  padding-top: var(--spacing-xl);
+  text-align: center;
   color: var(--gray-500);
 }
 
-.auth-layout__footer-links {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.auth-layout__footer-links a {
-  color: var(--gray-500);
-  transition: color var(--transition-fast);
-}
-
-.auth-layout__footer-links a:hover {
-  color: var(--primary-blue-500);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .auth-layout__container {
-    padding: var(--spacing-md);
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .auth-layout-modern {
+    grid-template-columns: 1fr;
   }
-
-  .auth-layout__footer-content {
-    padding: 0 var(--spacing-md);
-  }
-
-  .auth-layout__footer-links {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+  .auth-layout-modern__brand-panel { display: none; }
 }

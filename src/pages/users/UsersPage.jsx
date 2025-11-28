@@ -321,62 +321,60 @@ function UsersPage() {
         </Alert>
       )}
 
-      {/* Filtros y búsqueda */}
-      <div className="users-page__filters">
-        <div className="users-page__search">
-          <Input
-            type="text"
-            placeholder="Buscar por nombre o correo..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          />
-          <Button onClick={handleSearch} disabled={loading}>
-            Buscar
-          </Button>
-        </div>
+      {/* Filtros - ESTRUCTURA MEJORADA */}
+        <div className="users-page__filters">
+          <div className="users-page__filters-row">
+            {/* Campo de búsqueda - ya existe, mantener */}
+            <div className="users-page__search">
+              <Input
+                type="text"
+                placeholder="Buscar por nombre o correo..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                icon="🔍"
+              />
+            </div>
 
-        <div className="users-page__filter-row">
-          <div className="users-page__filter-group">
-            <label>Rol:</label>
-            <select
-              value={filterRole}
-              onChange={(e) => setFilterRole(e.target.value)}
-              className="users-page__select"
+            {/* Filtro por Rol */}
+            <div className="users-page__filter-group">
+              <label className="users-page__filter-label">Rol:</label>
+              <select
+                className="users-page__filter-select"
+                value={filterRole}
+                onChange={(e) => setFilterRole(e.target.value)}
+              >
+                <option value="all">Todos los roles</option>
+                <option value="superadmin">Superadmin</option>
+                <option value="veterinario">Veterinario</option>
+                <option value="auxiliar">Auxiliar</option>
+                <option value="propietario">Propietario</option>
+              </select>
+            </div>
+
+            {/* Filtro por Estado */}
+            <div className="users-page__filter-group">
+              <label className="users-page__filter-label">Estado:</label>
+              <select
+                className="users-page__filter-select"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="all">Todos los estados</option>
+                <option value="active">Activos</option>
+                <option value="inactive">Inactivos</option>
+              </select>
+            </div>
+
+            {/* Botón Recargar */}
+            <button
+              className="users-page__reload-button"
+              onClick={loadUsers}
               disabled={loading}
             >
-              <option value="all">Todos los roles</option>
-              <option value="superadmin">Superadmin</option>
-              <option value="veterinario">Veterinario</option>
-              <option value="auxiliar">Auxiliar</option>
-              <option value="propietario">Propietario</option>
-            </select>
+              🔄 Recargar
+            </button>
           </div>
-
-          <div className="users-page__filter-group">
-            <label>Estado:</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="users-page__select"
-              disabled={loading}
-            >
-              <option value="all">Todos los estados</option>
-              <option value="active">Activos</option>
-              <option value="inactive">Inactivos</option>
-            </select>
-          </div>
-
-          <Button
-            variant="secondary"
-            onClick={handleClearFilters}
-            disabled={loading}
-            size="small"
-          >
-            🔄 Recargar
-          </Button>
         </div>
-      </div>
 
       {/* Estadísticas */}
       <div className="users-page__stats">

@@ -5,7 +5,8 @@ import userService from '@/services/userService'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Alert from '@/components/ui/Alert'
-import '../users/UsersPage.css' // ✅ Reutilizamos los mismos estilos
+import '../users/UsersPage.css'
+import './OwnerPage.css'
 
 function PropietariosPage() {
   const navigate = useNavigate()
@@ -102,22 +103,30 @@ function PropietariosPage() {
       {success && <Alert variant="success">{success}</Alert>}
       {error && <Alert variant="error">{error}</Alert>}
 
-      {/* Filtros */}
-      <div className="users-page__filters">
-        <div className="users-page__search">
-          <Input
-            placeholder="Buscar por nombre o correo..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            onKeyPress={e => e.key === 'Enter' && handleSearch()}
-          />
-          <Button onClick={handleSearch}>Buscar</Button>
-        </div>
+      {/* Filtros - ESTRUCTURA MEJORADA */}
+        <div className="owners-page__filters">
+          <div className="owners-page__filters-row">
+            {/* Campo de búsqueda */}
+            <div className="owners-page__search">
+              <Input
+                type="text"
+                placeholder="Buscar por nombre o correo..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                icon="🔍"
+              />
+            </div>
 
-        <Button variant="secondary" size="small" onClick={handleClear}>
-          🔄 Recargar
-        </Button>
-      </div>
+            {/* Botón Recargar */}
+            <button
+              className="owners-page__reload-button"
+              onClick={loadOwners}
+              disabled={loading}
+            >
+              🔄 Recargar
+            </button>
+          </div>
+        </div>
 
       {/* Estadísticas */}
       <div className="users-page__stats">

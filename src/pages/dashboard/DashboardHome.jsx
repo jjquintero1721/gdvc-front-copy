@@ -89,12 +89,6 @@ function DashboardHome() {
         </div>
         <div className="dashboard-home__actions">
           <Button
-            variant="outline"
-            onClick={() => navigate('/cambiar-contrasena')}
-          >
-            Cambiar Contraseña
-          </Button>
-          <Button
             variant="secondary"
             onClick={handleLogout}
           >

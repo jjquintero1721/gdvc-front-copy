@@ -48,7 +48,7 @@ function PetsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalPets, setTotalPets] = useState(0)
-  const pageSize = 12 // Mascotas por página
+  const pageSize = 6 // Mascotas por página
 
   // Verificar permisos
   const canViewAll = ['superadmin', 'veterinario', 'auxiliar'].includes(currentUser?.rol)
@@ -84,8 +84,8 @@ function PetsPage() {
             pets: ownerResponse.data?.mascotas || ownerResponse.data?.pets || [],
             total: ownerResponse.data?.mascotas?.length || 0,
             page: 1,
-            page_size: 999,
-            total_pages: 1
+            page_size: 6,
+            total_pages: 100
           }
         }
       }
@@ -203,50 +203,53 @@ function PetsPage() {
         </Alert>
       )}
 
-      {/* Filtros y búsqueda */}
-      <div className="pets-page__filters">
-        <div className="pets-page__search">
-          <Input
-            type="text"
-            placeholder="Buscar por nombre..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            icon="search"
-          />
-        </div>
-
-        <div className="pets-page__filter-group">
-          {/* Filtro por especie */}
-          <div className="pets-page__filter">
-            <label className="pets-page__filter-label">Especie:</label>
-            <select
-              className="pets-page__filter-select"
-              value={filterSpecies}
-              onChange={(e) => setFilterSpecies(e.target.value)}
-            >
-              <option value="all">Todas</option>
-              <option value="perro">Perros</option>
-              <option value="gato">Gatos</option>
-            </select>
-          </div>
-
-          {/* Filtro por estado (solo para staff) */}
-          {canViewAll && (
-            <div className="pets-page__filter">
-              <label className="pets-page__filter-label">Estado:</label>
-              <select
-                className="pets-page__filter-select"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="all">Todos</option>
-                <option value="active">Activos</option>
-                <option value="inactive">Inactivos</option>
-              </select>
+      {/* Filtros y búsqueda - ESTRUCTURA MEJORADA */}
+        <div className="pets-page__filters">
+          <div className="pets-page__filters-row">
+            {/* Campo de búsqueda */}
+            <div className="pets-page__search">
+              <Input
+                type="text"
+                placeholder="Buscar por nombre..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                icon="🔍"
+              />
             </div>
-          )}
+
+            <div className="pets-page__filter-group">
+              {/* Filtro por especie */}
+              <div className="pets-page__filter">
+                <label className="pets-page__filter-label">Especie:</label>
+                <select
+                  className="pets-page__filter-select"
+                  value={filterSpecies}
+                  onChange={(e) => setFilterSpecies(e.target.value)}
+                >
+                  <option value="all">Todas</option>
+                  <option value="perro">Perros</option>
+                  <option value="gato">Gatos</option>
+                </select>
+              </div>
+
+              {/* Filtro por estado (solo para staff) */}
+              {canViewAll && (
+                <div className="pets-page__filter">
+                  <label className="pets-page__filter-label">Estado:</label>
+                  <select
+                    className="pets-page__filter-select"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                  >
+                    <option value="all">Todos</option>
+                    <option value="active">Activos</option>
+                    <option value="inactive">Inactivos</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
 
       {/* Grid de mascotas */}
       <div className="pets-page__content">
