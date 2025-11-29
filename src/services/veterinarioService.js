@@ -157,8 +157,50 @@ const veterinarioService = {
     } catch (error) {
       throw handleVeterinarioError(error)
     }
+  },
+  /**
+   * Obtener auxiliares de un veterinario
+   * @param {string} veterinarioId - ID del veterinario
+   * @param {boolean} activo - Filtrar por estado activo
+   * @returns {Promise} Lista de auxiliares
+   */
+  getAuxiliaresByVeterinario: async (veterinarioId, activo = null) => {
+    try {
+      const params = {}
+      if (activo !== null) params.activo = activo
+
+      const response = await apiClient.get(
+        `/users/veterinario/${veterinarioId}/auxiliares`,
+        { params }
+      )
+      return response.data
+    } catch (error) {
+      throw handleVeterinarioError(error)
+    }
+  },
+
+  /**
+   * Crear auxiliar para un veterinario
+   * @param {string} veterinarioId - ID del veterinario
+   * @param {Object} auxiliarData - Datos del auxiliar
+   * @returns {Promise} Auxiliar creado
+   */
+  createAuxiliar: async (veterinarioId, auxiliarData) => {
+    try {
+      const data = {
+        ...auxiliarData,
+        rol: 'auxiliar',
+        veterinario_encargado_id: veterinarioId
+      }
+
+      const response = await apiClient.post('/auth/register', data)
+      return response.data
+    } catch (error) {
+      throw handleVeterinarioError(error)
+    }
   }
 }
+
 
 /**
  * Manejo de errores específicos para veterinarios

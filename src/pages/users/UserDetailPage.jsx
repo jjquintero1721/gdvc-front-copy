@@ -11,6 +11,9 @@ import Alert from '@/components/ui/Alert'
 import Card from '@/components/ui/Card'
 import PetGrid from '@/components/pets/PetGrid'
 import './UserDetailPage.css'
+import AuxiliarCard from '@/components/users/AuxiliarCard.jsx'
+import VeterinarioInfoCard from '@/components/users/VeterinarioInfoCard.jsx'
+import userMeService from "@/services/userMeService.js";
 
 /**
  * Página de Detalle de Usuario - MEJORADA
@@ -28,6 +31,8 @@ function UserDetailPage() {
   const { userId } = useParams() // Si viene de la URL
   const navigate = useNavigate()
   const currentUser = useAuthStore(state => state.user)
+  const [auxiliares, setAuxiliares] = useState([])
+  const [veterinario, setVeterinario] = useState(null)
 
   // Determinar si es el perfil propio o de otro usuario
   const isOwnProfile = !userId || userId === currentUser?.id
@@ -94,6 +99,22 @@ function UserDetailPage() {
         if (userResponse.data.rol === 'veterinario') {
           await loadAppointments(targetUserId)
         }
+      // Si el usuario es veterinario, cargar sus auxiliares
+        if (userResponse.data.rol === 'veterinario') {
+          const auxRes = await userMeService.getMyAuxiliares()
+          if (auxRes.success && auxRes.data) {
+            setAuxiliares(auxRes.data.auxiliares || [])
+          }
+        }
+
+        // Si el usuario es auxiliar, cargar su veterinario encargado
+        if (userResponse.data.rol === 'auxiliar') {
+          const vetRes = await userMeService.getMyVeterinario()
+          if (vetRes.success) {
+              setVeterinario(vetRes.data || vetRes.data?.veterinario || null)
+            }
+        }
+
       }
     } catch (err) {
       console.error('Error al cargar usuario:', err)
@@ -383,6 +404,29 @@ function UserDetailPage() {
             )}
           </button>
         )}
+        {user.rol === 'veterinario' && (
+          <button
+            className={`user-detail-page__tab ${
+              activeTab === 'auxiliares' ? 'user-detail-page__tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('auxiliares')}
+          >
+            Mis Auxiliares
+            {auxiliares.length > 0 && (
+              <span className="user-detail-page__tab-badge">{auxiliares.length}</span>
+            )}
+          </button>
+        )}
+        {user.rol === 'auxiliar' && (
+          <button
+            className={`user-detail-page__tab ${
+              activeTab === 'veterinario' ? 'user-detail-page__tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('veterinario')}
+          >
+            Mi Veterinario
+          </button>
+        )}
 
         {isOwnProfile && (
           <button
@@ -514,7 +558,44 @@ function UserDetailPage() {
             )}
           </div>
         )}
+        {activeTab === 'auxiliares' && user.rol === 'veterinario' && (
+          <div className="user-detail-page__pets-section">
+            <div className="user-detail-page__section-header">
+              <h2 className="user-detail-page__section-title">Mis Auxiliares</h2>
+            </div>
 
+            {auxiliares.length === 0 ? (
+              <Card className="user-detail-page__empty-state">
+                <div className="user-detail-page__empty-icon">👥</div>
+                <p className="user-detail-page__empty-text">
+                  No tienes auxiliares asignados actualmente
+                </p>
+              </Card>
+            ) : (
+              <div className="user-detail-page__pets-grid">
+                {auxiliares.map(aux => (
+                  <AuxiliarCard key={aux.id} auxiliar={aux} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {activeTab === 'veterinario' && user.rol === 'auxiliar' && (
+          <div className="user-detail-page__pets-section">
+            <h2 className="user-detail-page__section-title">Mi Veterinario Encargado</h2>
+
+            {!veterinario ? (
+              <Card className="user-detail-page__empty-state">
+                <div className="user-detail-page__empty-icon">🩺</div>
+                <p className="user-detail-page__empty-text">
+                  No tienes un veterinario asignado actualmente.
+                </p>
+              </Card>
+            ) : (
+              <VeterinarioInfoCard veterinario={veterinario} />
+            )}
+          </div>
+        )}
         {/* Pestaña: Seguridad (solo para perfil propio) */}
         {activeTab === 'seguridad' && isOwnProfile && (
           <div className="user-detail-page__security-container">

@@ -1,0 +1,130 @@
+.vet-info-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vet-info-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.12);
+  transform: translateY(-4px);
+}
+
+.vet-info-card__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.vet-info-card:hover .vet-info-card__icon {
+  transform: scale(1.08) rotate(-5deg);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}
+
+.vet-info-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.vet-info-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.vet-info-card__name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vet-info-card__badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+  color: #5b21b6;
+}
+
+.vet-info-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vet-info-card__detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.vet-info-card__detail svg {
+  flex-shrink: 0;
+  color: #9ca3af;
+}
+
+.vet-info-card__detail span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .vet-info-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+  }
+
+  .vet-info-card__icon {
+    margin: 0 auto;
+  }
+
+  .vet-info-card__header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .vet-info-card__badge {
+    align-self: center;
+  }
+}

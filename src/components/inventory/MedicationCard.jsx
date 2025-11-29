@@ -69,7 +69,7 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
   const getBadgeClass = () => {
     if (isExpired()) return 'medication-card__badge--expired';
     if (isLowStock) return 'medication-card__badge--low';
-    return 'medication-card__badge--ok';
+    return 'medication-card__badge--ok2';
   };
 
   const getBadgeText = () => {
@@ -106,7 +106,7 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
               </div>
             </div>
 
-            <span className={`medication-card__badge ${getBadgeClass()}`}>
+            <span className={`medication-card__badge2 ${getBadgeClass()}`}>
               {getBadgeText()}
             </span>
           </div>

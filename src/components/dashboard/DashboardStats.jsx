@@ -109,12 +109,7 @@ function DashboardStats() {
           icon: 'alert',
           color: 'orange'
         },
-        {
-          title: 'Notificaciones',
-          value: stats.notificaciones || 0,
-          icon: 'bell',
-          color: 'red'
-        }
+
       ],
       veterinario: [
         {
@@ -130,11 +125,11 @@ function DashboardStats() {
           color: 'green'
         },
         {
-          title: 'Notificaciones',
-          value: stats.notificaciones || 0,
-          icon: 'bell',
-          color: 'red'
-        }
+          title: 'Stock Bajo',
+          value: stats.stockBajo || 0,
+          icon: 'alert',
+          color: 'orange'
+        },
       ],
       auxiliar: [
         {

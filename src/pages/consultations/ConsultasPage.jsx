@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '@/store/AuthStore.jsx'
 import { Search, Filter, Calendar, AlertCircle } from 'lucide-react'
 import appointmentService from '@/services/appointmentService'
@@ -8,7 +7,8 @@ import AppointmentDetailModal from '@/components/calender/AppointmentDetailModal
 import AppointmentManagementPanel from '@/components/appointments/AppointmentManagementPanel'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Alert from '@/components/ui/Alert'
+import useToast from "@utils/useToast.js";
+import { motion, AnimatePresence } from 'framer-motion'
 import './ConsultasPage.css'
 
 /**
@@ -28,14 +28,11 @@ function ConsultasPage() {
   const [appointments, setAppointments] = useState([])
   const [filteredAppointments, setFilteredAppointments] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
-
   // Estados de búsqueda y filtros
   const [searchTerm, setSearchTerm] = useState('')
   const [filterDate, setFilterDate] = useState('')
   const [filterVeterinarian, setFilterVeterinarian] = useState('all')
-
+  const toast = useToast()
   // Estados de modales
   const [isManagementPanelOpen, setIsManagementPanelOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
@@ -61,7 +58,6 @@ function ConsultasPage() {
    */
   const loadConfirmedAppointments = async () => {
     setLoading(true)
-    setError(null)
 
     try {
       console.log('📞 Cargando citas confirmadas...')
@@ -86,7 +82,7 @@ function ConsultasPage() {
       setAppointments(confirmedAppointments)
     } catch (err) {
       console.error('❌ Error al cargar citas:', err)
-      setError(err.message || 'Error al cargar las citas confirmadas')
+      toast.error(err.message || 'Error al cargar las citas confirmadas')
     } finally {
       setLoading(false)
     }
@@ -130,9 +126,7 @@ function ConsultasPage() {
    *  Inicia la cita y abre el panel de gestión
    */
   const handleStartConsultation = async (appointment) => {
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
+      setLoading(true)
 
     try {
       const estadoNormalizado = appointment.estado?.toLowerCase()
@@ -144,7 +138,7 @@ function ConsultasPage() {
         console.log('📝 Cita en proceso detectada. Abriendo panel...')
         setSelectedAppointment(appointment)
         setIsManagementPanelOpen(true)
-        setSuccess('Continuando con la consulta en proceso')
+        toast.success('Continuando con la consulta en proceso')
 
       } else if (estadoNormalizado === 'confirmada') {
         // Cita CONFIRMADA → Iniciar consulta primero
@@ -152,7 +146,7 @@ function ConsultasPage() {
 
         await appointmentService.startAppointment(appointment.id)
 
-        setSuccess('Cita iniciada correctamente')
+        toast.success('Cita iniciada correctamente')
         setSelectedAppointment(appointment)
         setIsManagementPanelOpen(true)
 
@@ -164,7 +158,7 @@ function ConsultasPage() {
 
     } catch (err) {
       console.error('❌ Error al procesar consulta:', err)
-      setError(err.message || 'Error al procesar la consulta')
+      toast.error(err.message || 'Error al procesar la consulta')
     } finally {
       setLoading(false)
     }
@@ -194,7 +188,7 @@ function ConsultasPage() {
   const handleCompleteAppointment = () => {
     setIsManagementPanelOpen(false)
     setSelectedAppointment(null)
-    setSuccess('Cita completada exitosamente')
+    toast.success('Cita completada exitosamente')
     // Recargar citas para actualizar estados
     loadConfirmedAppointments()
   }
@@ -230,22 +224,7 @@ function ConsultasPage() {
       </div>
 
       {/* Alertas */}
-      <AnimatePresence>
-        {error && (
-          <Alert
-            type="error"
-            message={error}
-            onClose={() => setError(null)}
-          />
-        )}
-        {success && (
-          <Alert
-            type="success"
-            message={success}
-            onClose={() => setSuccess(null)}
-          />
-        )}
-      </AnimatePresence>
+
 
       {/* Filtros */}
       <motion.div

@@ -104,7 +104,76 @@
   white-space: nowrap;
 }
 
-/* Acciones */
+/* Sección de auxiliares */
+.veterinario-card__auxiliares-section {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 100px;
+    padding: 12px 0;
+  }
+}
+
+.veterinario-card__auxiliar-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 2px solid;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  background: white;
+}
+
+.veterinario-card__auxiliar-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.veterinario-card__auxiliar-btn--create {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.veterinario-card__auxiliar-btn--create:hover {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+.veterinario-card__auxiliar-btn--view {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.veterinario-card__auxiliar-btn--view:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+}
+
+/* Acciones principales */
 .veterinario-card__actions {
   display: flex;
   gap: 8px;
@@ -176,6 +245,14 @@
 @media (max-width: 768px) {
   .veterinario-card {
     padding: 20px;
+  }
+
+  .veterinario-card__auxiliares-section {
+    flex-direction: column;
+  }
+
+  .veterinario-card__auxiliar-btn {
+    width: 100%;
   }
 
   .veterinario-card__actions {

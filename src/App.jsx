@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { useAuthStore } from '@/store/AuthStore.jsx'
 import AppRoutes from '@/routes/AppRoutes.jsx'
+import { ToastProvider} from "@components/ui/ToastProvider.jsx";
 
 function App() {
   const { isAuthenticated, isTokenExpired, logout } = useAuthStore()
@@ -15,9 +16,11 @@ function App() {
   }, [isAuthenticated, isTokenExpired, logout])
 
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <ToastProvider >
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+    </ToastProvider>
   )
 }
 

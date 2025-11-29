@@ -141,6 +141,30 @@ const VeterinariosListPage = () => {
     }
   }
 
+  // ➤ FUNCIÓN PARA CREAR AUXILIAR
+  const handleCreateAuxiliar = async (veterinarioId, auxiliarData) => {
+    try {
+      const response = await veterinarioService.createAuxiliar(veterinarioId, auxiliarData)
+
+      if (!response.success) throw new Error(response.message)
+
+      showToast('Auxiliar creado correctamente', 'success')
+      return true
+    } catch (err) {
+      throw new Error(err.message || 'Error al crear el auxiliar')
+    }
+  }
+
+  // ➤ FUNCIÓN PARA OBTENER AUXILIARES
+  const handleFetchAuxiliares = async (veterinarioId) => {
+    try {
+      const res = await veterinarioService.getAuxiliaresByVeterinario(veterinarioId)
+      return { success: true, data: res.data }
+    } catch (err) {
+      return { success: false, message: err.message }
+    }
+  }
+
   // Función para cambiar estado del veterinario
   const handleToggleStatus = async () => {
     if (!selectedVeterinario) return
@@ -311,6 +335,9 @@ const VeterinariosListPage = () => {
               onToggleStatus={openConfirmModal}
               canEdit={canEdit(veterinario)}
               canToggleStatus={canToggleStatus}
+              canManageAuxiliares={user.rol === 'veterinario' || user.rol === 'admin'}
+              onCreateAuxiliar={handleCreateAuxiliar}
+              onViewAuxiliares={handleFetchAuxiliares}
             />
           ))}
         </div>
