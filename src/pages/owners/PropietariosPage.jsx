@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import userService from '@/services/userService'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -12,7 +12,7 @@ function PropietariosPage() {
   const navigate = useNavigate()
   const currentUser = useAuthStore(state => state.user)
 
-  // ⚠ Validar roles permitidos
+  // Validar roles permitidos
   useEffect(() => {
     if (!['superadmin', 'veterinario', 'auxiliar'].includes(currentUser?.rol)) {
       navigate('/') // Redirigir si no tiene permisos

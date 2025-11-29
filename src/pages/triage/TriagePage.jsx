@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import triageService from '@/services/triageService'
 import TriageCard from '@/components/triage/TriageCard'
 import PriorityBadge from '@/components/triage/PriorityBadge'
@@ -17,10 +17,6 @@ import './TriagePage.css'
  * Página de Triage - Cola de Urgencias
  * RF-08 | Gestión de Triage
  *
- * VERSIÓN CORREGIDA:
- * - Usa GET /api/v1/triage/ en lugar de /urgencias
- * - Muestra TODOS los triages, no solo urgentes
- * - Ordena por prioridad manualmente en el frontend
  *
  * Funcionalidades:
  * - Ver todos los triages ordenados por prioridad

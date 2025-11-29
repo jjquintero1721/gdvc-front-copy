@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
-import AppRoutes from '@/routes/AppRoutes'
+import { useAuthStore } from '@/store/AuthStore.jsx'
+import AppRoutes from '@/routes/AppRoutes.jsx'
 
 function App() {
   const { isAuthenticated, isTokenExpired, logout } = useAuthStore()

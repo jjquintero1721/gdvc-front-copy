@@ -11,7 +11,7 @@ import './StatCard.css'
  */
 function StatCard({ title, value, icon, color = 'blue' }) {
 
-  // Nuevo método estándar para seleccionar iconos
+  //  método estándar para seleccionar iconos
   const renderIcon = () => {
     switch (icon) {
       case 'calendar':

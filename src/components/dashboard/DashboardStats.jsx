@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import dashboardService from '@/services/dashboardService'
 import StatCard from './StatCard.jsx'
 import './DashboardStats.css'

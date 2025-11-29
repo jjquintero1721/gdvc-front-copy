@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import { Search, Filter, Calendar, AlertCircle } from 'lucide-react'
 import appointmentService from '@/services/appointmentService'
 import ConsultationCard from '@/components/consultations/ConsultationCard'
@@ -13,12 +13,6 @@ import './ConsultasPage.css'
 
 /**
  * ConsultasPage - Página de gestión de consultas
- *
- * ✅ ACTUALIZADO CON NUEVO PANEL:
- * - Reemplazado ConsultationFormModal por AppointmentManagementPanel
- * - Incluye gestión completa: Consulta, Historial, Seguimientos
- * - Flujo mejorado con patrón Memento
- * - Mejor UX con tabs y diseño centrado
  *
  * RF-07: Gestión de historias clínicas
  * RF-11: Seguimiento de pacientes
@@ -133,7 +127,7 @@ function ConsultasPage() {
   }
 
   /**
-   * ✅ NUEVO: Inicia la cita y abre el panel de gestión
+   *  Inicia la cita y abre el panel de gestión
    */
   const handleStartConsultation = async (appointment) => {
     setLoading(true)
@@ -146,14 +140,14 @@ function ConsultasPage() {
       console.log(`📋 Procesando cita ${appointment.id} con estado: ${estadoNormalizado}`)
 
       if (estadoNormalizado === 'en_proceso') {
-        // ✅ CASO 1: Cita EN_PROCESO → Abrir panel directamente
+        // Cita EN_PROCESO → Abrir panel directamente
         console.log('📝 Cita en proceso detectada. Abriendo panel...')
         setSelectedAppointment(appointment)
         setIsManagementPanelOpen(true)
         setSuccess('Continuando con la consulta en proceso')
 
       } else if (estadoNormalizado === 'confirmada') {
-        // ✅ CASO 2: Cita CONFIRMADA → Iniciar consulta primero
+        // Cita CONFIRMADA → Iniciar consulta primero
         console.log('▶️ Iniciando cita confirmada...')
 
         await appointmentService.startAppointment(appointment.id)
@@ -185,7 +179,7 @@ function ConsultasPage() {
   }
 
   /**
-   * ✅ NUEVO: Callback cuando se cierra el panel sin completar
+   *  Callback cuando se cierra el panel sin completar
    */
   const handleClosePanel = () => {
     setIsManagementPanelOpen(false)
@@ -195,7 +189,7 @@ function ConsultasPage() {
   }
 
   /**
-   * ✅ NUEVO: Callback cuando se completa la cita
+   * Callback cuando se completa la cita
    */
   const handleCompleteAppointment = () => {
     setIsManagementPanelOpen(false)
@@ -329,7 +323,7 @@ function ConsultasPage() {
         )}
       </motion.div>
 
-      {/* ✅ NUEVO: Panel de Gestión de Citas */}
+      {/*  Panel de Gestión de Citas */}
       <AppointmentManagementPanel
         appointment={selectedAppointment}
         isOpen={isManagementPanelOpen}

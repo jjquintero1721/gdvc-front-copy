@@ -6,15 +6,7 @@ import { useAuthStore } from '@store/AuthStore.jsx';
 import './CalendarPage.css';
 
 /**
- * CalendarPage - Página de Calendario de Horarios Mejorada
- *
- * Features:
- * ✅ Diseño profesional con gradientes
- * ✅ Animaciones sutiles y elegantes
- * ✅ Header mejorado con estadísticas
- * ✅ Botón de refrescar con animación
- * ✅ Responsive y accesible
- * ✅ Estado de carga mejorado
+ * CalendarPage - Página de Calendario de Horarios
  *
  * Restricciones:
  * - Solo accesible para: superadmin, veterinario, auxiliar

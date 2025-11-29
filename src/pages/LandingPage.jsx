@@ -6,14 +6,6 @@ import './LandingPage.css';
 /**
  * 🐾 Landing Page Premium MEJORADA - Clínica Veterinaria
  *
- * ✨ NUEVAS CARACTERÍSTICAS:
- * ✅ Pet Trail Cursor - Huellas siguiendo el cursor
- * ✅ Dark Mode Toggle - Modo oscuro con botón lobo
- * ✅ Pet Stories - Animaciones avanzadas en hover
- * ✅ Scroll Reveal Cinematográfico - Blur + fade + scale
- * ✅ Pet Path Animation - SVG animado con huellas
- * ✅ CTA Emocional - Corazones y elementos emotivos
- * ✅ Typing Animation - Texto auto-escribiéndose
  */
 export default function LandingPage() {
   const { scrollYProgress } = useScroll();

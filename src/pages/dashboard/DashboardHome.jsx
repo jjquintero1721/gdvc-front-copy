@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import { useNavigate } from 'react-router-dom'
 import DashboardStats from '../../components/dashboard/DashboardStats.jsx'
 import AppointmentsList from '../../components/dashboard/AppointmentsList.jsx'

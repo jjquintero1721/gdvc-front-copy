@@ -28,7 +28,7 @@ const InventoryReports = ({ onEntryFromPurchaseOrder, refreshTrigger }) => {
     purchaseOrder: false,
   });
 
-  // ✅ MEJORA: Recargar reportes cuando refreshTrigger cambia
+  //  Recargar reportes cuando refreshTrigger cambia
   useEffect(() => {
     loadReports();
   }, [refreshTrigger]);
@@ -46,12 +46,12 @@ const InventoryReports = ({ onEntryFromPurchaseOrder, refreshTrigger }) => {
       setExpiredMedications(expired);
       setDashboard(dashboardData);
 
-      // ✅ SOLUCIÓN 1: Limpiar orden de compra si ya no hay alertas de stock bajo
+      //  Limpiar orden de compra si ya no hay alertas de stock bajo
       if (lowStock.length === 0 && purchaseOrder.length > 0) {
         setPurchaseOrder([]);
       }
 
-      // ✅ SOLUCIÓN 2: Actualizar orden de compra si cambió la lista de alertas
+      //  Actualizar orden de compra si cambió la lista de alertas
       // Solo mantener items que aún están en las alertas
       if (purchaseOrder.length > 0) {
         const updatedPO = purchaseOrder.filter(poItem =>
@@ -354,7 +354,7 @@ const InventoryReports = ({ onEntryFromPurchaseOrder, refreshTrigger }) => {
         </div>
       )}
 
-      {/* Purchase Order - ✅ SOLUCIÓN: Solo mostrar si hay items */}
+      {/* Purchase Order - Solo mostrar si hay items */}
       {purchaseOrder.length > 0 && (
         <div className="inventory-reports__section inventory-reports__section--purchase-order">
           <button

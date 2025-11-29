@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import petService from '@/services/petService'
 import medicalHistoryService from '@/services/medicalHistoryService'
 import MedicalHistoryModal from '@/components/medical-history/MedicalHistoryModal'

@@ -6,7 +6,6 @@ import './ConfirmModal.css'
  * Modal de Confirmación Reutilizable
  *
  * Componente para mostrar diálogos de confirmación con animaciones suaves
- * Reemplaza el uso de window.confirm() por una interfaz más profesional
  *
  * @param {boolean} isOpen - Controla si el modal está visible
  * @param {function} onClose - Callback cuando se cierra el modal

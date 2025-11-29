@@ -12,7 +12,6 @@ import './AppointmentManagementPanel.css';
 
 /**
  * AppointmentManagementPanel - Panel principal de gestión de citas
- * ✅ VERSIÓN CORREGIDA CON PESTAÑA DE MEDICAMENTOS
  *
  * Este componente se abre cuando el veterinario inicia una cita (/start)
  * y permite gestionar todo el ciclo de vida de la consulta:
@@ -85,7 +84,7 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
   };
 
   /**
-   * ✅ Maneja la creación de una nueva consulta - VERSIÓN CORREGIDA
+   * Maneja la creación de una nueva consulta
    */
   const handleCreateConsultation = async (consultationData) => {
     try {
@@ -101,7 +100,7 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
         throw new Error('No hay veterinario asignado a esta cita');
       }
 
-      // ✅ Construir payload con TODOS los campos obligatorios
+      // Construir payload con TODOS los campos obligatorios
       const payload = {
         // Campos obligatorios del schema
         historia_clinica_id: appointment.mascota.historia_clinica_id,
@@ -118,7 +117,7 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
         observaciones: consultationData.observaciones?.trim() || null
       };
 
-      // ✅ Validar longitudes antes de enviar
+      // Validar longitudes antes de enviar
       if (payload.motivo.length < 5) {
         throw new Error('El motivo debe tener al menos 5 caracteres');
       }
@@ -152,14 +151,14 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
   };
 
   /**
-   * ✅ Maneja la actualización de la consulta - VERSIÓN CORREGIDA
+   *  Maneja la actualización de la consulta
    */
   const handleUpdateConsultation = async (consultationData) => {
     try {
       setLoading(true);
       setError(null);
 
-      // ✅ Construir payload para actualización
+      // Construir payload para actualización
       const payload = {
         motivo: consultationData.motivo?.trim() || null,
         diagnostico: consultationData.diagnostico?.trim() || null,
@@ -171,7 +170,7 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
         descripcion_cambio: consultationData.descripcion_cambio?.trim() || null
       };
 
-      // ✅ Validar longitudes si los campos están presentes
+      //  Validar longitudes si los campos están presentes
       if (payload.motivo && payload.motivo.length < 5) {
         throw new Error('El motivo debe tener al menos 5 caracteres');
       }
@@ -244,45 +243,45 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
       setLoading(true);
       setError(null);
 
-      // ✅ Validación 1: Verificar que existe la consulta
+      // Validación 1: Verificar que existe la consulta
       if (!consultation) {
         throw new Error('⚠️ No hay consulta disponible para crear seguimiento');
       }
 
-      // ✅ Validación 2: Verificar que existe la cita con datos completos
+      // Validación 2: Verificar que existe la cita con datos completos
       if (!appointment) {
         throw new Error('⚠️ No hay datos de la cita disponibles');
       }
 
-      // ✅ Validación 3: Verificar veterinario
+      //  Validación 3: Verificar veterinario
       if (!appointment.veterinario_id) {
         throw new Error('⚠️ No hay veterinario asignado a esta cita');
       }
 
-      // ✅ Validación 4: Verificar servicio
+      //  Validación 4: Verificar servicio
       if (!appointment.servicio_id) {
         throw new Error('⚠️ No hay servicio asignado a esta cita');
       }
 
-      // ✅ Validación 5: Verificar que la fecha esté en formato ISO
+      //  Validación 5: Verificar que la fecha esté en formato ISO
       if (!followUpData.fecha_hora || !followUpData.fecha_hora.includes('T')) {
         throw new Error('⚠️ Formato de fecha inválido. Use formato: YYYY-MM-DDTHH:mm');
       }
 
-      // ✅ Validación 6: Verificar que el motivo tenga mínimo 10 caracteres
+      //  Validación 6: Verificar que el motivo tenga mínimo 10 caracteres
       const motivo = followUpData.motivo || followUpData.motivo_seguimiento || '';
       if (motivo.length < 10) {
         throw new Error('⚠️ El motivo debe tener mínimo 10 caracteres');
       }
 
-      // ✅ Construir payload con TODOS los campos obligatorios
+      //  Construir payload con TODOS los campos obligatorios
       const payload = {
         // Campos obligatorios del schema FollowUpCreate
         consulta_origen_id: consultation.id,
-        veterinario_id: appointment.veterinario_id,  // ✅ Desde la cita actual
-        servicio_id: appointment.servicio_id,        // ✅ Desde la cita actual
-        fecha_hora_seguimiento: followUpData.fecha_hora,  // ✅ Debe estar en formato ISO
-        motivo_seguimiento: motivo,                   // ✅ Renombrar 'motivo' a 'motivo_seguimiento'
+        veterinario_id: appointment.veterinario_id,  //  Desde la cita actual
+        servicio_id: appointment.servicio_id,        //  Desde la cita actual
+        fecha_hora_seguimiento: followUpData.fecha_hora,  //  Debe estar en formato ISO
+        motivo_seguimiento: motivo,                   //  Renombrar 'motivo' a 'motivo_seguimiento'
 
         // Campos opcionales
         dias_recomendados: followUpData.dias_recomendados || null,
@@ -291,13 +290,13 @@ const AppointmentManagementPanel = ({ appointment, isOpen, onClose, onComplete }
 
       console.log('📤 Enviando payload de seguimiento:', payload);
 
-      // ✅ Enviar la petición
+      //  Enviar la petición
       const response = await followUpService.createFollowUp(
         consultation.id,
         payload
       );
 
-      // ✅ Validar respuesta
+      //  Validar respuesta
       if (response.success) {
         setSuccess('✅ Seguimiento creado exitosamente');
 

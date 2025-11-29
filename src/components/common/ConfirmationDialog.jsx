@@ -13,7 +13,7 @@ import Button from '@/components/ui/Button'
 import './ConfirmationDialog.css'
 
 /**
- * ConfirmationDialog - Modal de confirmación profesional
+ * ConfirmationDialog - Modal de confirmación
  *
  * Reemplaza window.confirm() con una interfaz moderna y accesible
  * Incluye animaciones, variantes de color y mejor UX

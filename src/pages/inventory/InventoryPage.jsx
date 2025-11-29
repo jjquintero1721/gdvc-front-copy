@@ -20,7 +20,7 @@ const InventoryPage = () => {
   const [isEntryFromPOModalOpen, setIsEntryFromPOModalOpen] = useState(false);
   const [selectedMedicationForPO, setSelectedMedicationForPO] = useState(null);
 
-  // ✅ SOLUCIÓN: Estado para controlar el refresh de reportes
+  //  Estado para controlar el refresh de reportes
   const [reportsRefreshTrigger, setReportsRefreshTrigger] = useState(0);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const InventoryPage = () => {
   const handleCreateSuccess = () => {
     setIsCreateModalOpen(false);
     loadMedications();
-    // ✅ También refrescar reportes cuando se crea un medicamento
+    // También refrescar reportes cuando se crea un medicamento
     setReportsRefreshTrigger(prev => prev + 1);
   };
 
@@ -86,7 +86,7 @@ const InventoryPage = () => {
     setSearchTerm('');
   };
 
-  // ✅ SOLUCIÓN: Callback mejorado que actualiza todo
+  //  Callback mejorado que actualiza todo
   const handleEntrySuccess = () => {
     // Cerrar modal
     setIsEntryFromPOModalOpen(false);
@@ -94,10 +94,10 @@ const InventoryPage = () => {
     // Limpiar medicamento seleccionado
     setSelectedMedicationForPO(null);
 
-    // ✅ CRÍTICO: Recargar medicamentos (actualiza las cards)
+    // Recargar medicamentos (actualiza las cards)
     loadMedications();
 
-    // ✅ CRÍTICO: Forzar refresh de reportes (actualiza alertas, dashboard, etc.)
+    // Forzar refresh de reportes (actualiza alertas, dashboard, etc.)
     setReportsRefreshTrigger(prev => prev + 1);
   };
 
@@ -246,7 +246,7 @@ const InventoryPage = () => {
           )}
         </div>
 
-        {/* Reports Section - ✅ SOLUCIÓN: Pasar el refreshTrigger */}
+        {/* Reports Section - Pasar el refreshTrigger */}
         <div className="inventory-page__reports-section">
           <div className="inventory-page__reports-header">
             <h2 className="inventory-page__reports-title">Reportes y Alertas</h2>
@@ -256,7 +256,7 @@ const InventoryPage = () => {
           </div>
           <InventoryReports
             onEntryFromPurchaseOrder={handleEntryFromPurchaseOrder}
-            refreshTrigger={reportsRefreshTrigger} // ✅ Pasar el trigger
+            refreshTrigger={reportsRefreshTrigger} //  Pasar el trigger
           />
         </div>
       </div>
@@ -268,7 +268,7 @@ const InventoryPage = () => {
         onSuccess={handleCreateSuccess}
       />
 
-      {/* Modal de entrada desde Purchase Order - ✅ SOLUCIÓN: Usar handleEntrySuccess */}
+      {/* Modal de entrada desde Purchase Order -  Usar handleEntrySuccess */}
       {selectedMedicationForPO && (
         <RegisterEntryModal
           isOpen={isEntryFromPOModalOpen}
@@ -276,7 +276,7 @@ const InventoryPage = () => {
             setIsEntryFromPOModalOpen(false);
             setSelectedMedicationForPO(null);
           }}
-          onSuccess={handleEntrySuccess} // ✅ Callback mejorado
+          onSuccess={handleEntrySuccess} //  Callback mejorado
           medication={selectedMedicationForPO}
         />
       )}

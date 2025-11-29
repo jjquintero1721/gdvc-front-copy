@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Search, UserPlus, AlertCircle, Loader } from 'lucide-react'
-import { useAuthStore } from '../../store/AuthStore.jsx'
+import { useAuthStore } from '@store/AuthStore.jsx'
 import veterinarioService from '../../services/veterinarioService'
 import VeterinarioCard from '../../components/veterinarios/VeterinarioCard'
 import CreateVeterinarioModal from '../../components/veterinarios/CreateVeterinarioModal'

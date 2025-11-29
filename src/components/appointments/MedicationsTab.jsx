@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import inventoryService from '../../services/inventoryService';
-import RegisterExitModal from '../Inventory/RegisterExitModal';
+import RegisterExitModal from '../inventory/RegisterExitModal';
 import {
   Pill,
   Search,

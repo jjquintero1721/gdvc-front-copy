@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import serviceService from '@/services/serviceService'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'

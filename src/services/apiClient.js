@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 
 /**
  * Cliente Axios configurado para la API del backend

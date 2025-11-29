@@ -14,7 +14,6 @@ const WORK_HOURS = [
 /**
  * OwnerAvailabilityPanel - Panel de disponibilidad para propietarios
  *
- * ✅ CORRECCIONES APLICADAS:
  * 1. Inicialización correcta del estado availability
  * 2. Logs de depuración mejorados
  * 3. Manejo explícito de estados undefined
@@ -33,7 +32,7 @@ function OwnerAvailabilityPanel({
   onTimeSlotSelected,
   selectedTimeSlot
 }) {
-  // ✅ CORRECCIÓN 1: Inicializar con todos los horarios disponibles por defecto
+  //  Inicializar con todos los horarios disponibles por defecto
   const [availability, setAvailability] = useState(() => {
     const initialAvailability = {}
     WORK_HOURS.forEach(hour => {
@@ -46,7 +45,7 @@ function OwnerAvailabilityPanel({
   const [loading, setLoading] = useState(false)
 
   /**
-   * ✅ CORRECCIÓN 2: Agregar logs y recargar cuando cambian las dependencias
+   * Agregar logs y recargar cuando cambian las dependencias
    */
   useEffect(() => {
     console.log('🔵 [OwnerAvailabilityPanel] useEffect disparado')
@@ -61,7 +60,7 @@ function OwnerAvailabilityPanel({
   }, [selectedDate, veterinarianId])
 
   /**
-   * ✅ CORRECCIÓN 3: Función mejorada con logs de depuración
+   * Función mejorada con logs de depuración
    */
   const loadAvailability = async () => {
     try {
@@ -87,7 +86,7 @@ function OwnerAvailabilityPanel({
       console.log(`🔍 [OwnerAvailabilityPanel] ${vetAppointments.length} citas del veterinario ${veterinarianId}`)
       console.log('  - Citas filtradas:', vetAppointments)
 
-      // ✅ CORRECCIÓN 4: Crear un nuevo objeto para el mapa de disponibilidad
+      //  Crear un nuevo objeto para el mapa de disponibilidad
       // Empezar con todos los horarios disponibles
       const newAvailabilityMap = {}
       WORK_HOURS.forEach(hour => {
@@ -108,7 +107,7 @@ function OwnerAvailabilityPanel({
             const hour = timeMatch[1]
             console.log(`    ✅ Hora extraída: ${hour}`)
 
-            // ✅ IMPORTANTE: Marcar como OCUPADO
+            //  Marcar como OCUPADO
             newAvailabilityMap[hour] = false
             console.log(`    🔴 Horario ${hour} marcado como OCUPADO`)
           } else {
@@ -121,7 +120,7 @@ function OwnerAvailabilityPanel({
 
       console.log('📊 [OwnerAvailabilityPanel] Mapa final de disponibilidad:', newAvailabilityMap)
 
-      // ✅ CORRECCIÓN 5: Contar disponibles y ocupados
+      //  Contar disponibles y ocupados
       const availableCount = Object.values(newAvailabilityMap).filter(v => v === true).length
       const occupiedCount = Object.values(newAvailabilityMap).filter(v => v === false).length
 
@@ -129,7 +128,7 @@ function OwnerAvailabilityPanel({
       console.log(`  - Horarios disponibles: ${availableCount}`)
       console.log(`  - Horarios ocupados: ${occupiedCount}`)
 
-      // ✅ CORRECCIÓN 6: Actualizar el estado con el nuevo mapa
+      //  Actualizar el estado con el nuevo mapa
       setAvailability(newAvailabilityMap)
       console.log('✅ [OwnerAvailabilityPanel] Estado actualizado correctamente')
 
@@ -211,7 +210,7 @@ function OwnerAvailabilityPanel({
     }
   }
 
-  // ✅ CORRECCIÓN 7: Log del estado actual antes de renderizar
+  //  Log del estado actual antes de renderizar
   console.log('🎨 [OwnerAvailabilityPanel] Renderizando con estado:', {
     loading,
     availabilityKeys: Object.keys(availability).length,
@@ -260,13 +259,13 @@ function OwnerAvailabilityPanel({
           </div>
         ) : (
           WORK_HOURS.map(hour => {
-            // ✅ CORRECCIÓN 8: Verificar explícitamente el valor
+            //  Verificar explícitamente el valor
             const isAvailable = availability[hour] === true
             const isOccupied = availability[hour] === false
             const isUndefined = availability[hour] === undefined
             const isSelected = isTimeSlotSelected(hour)
 
-            // ✅ Log para debugging de cada slot
+            // Log para debugging de cada slot
             if (isUndefined) {
               console.warn(`⚠️ [OwnerAvailabilityPanel] Horario ${hour} tiene valor undefined`)
             }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import userService from '@/services/userService'
 import petService from '@/services/petService'
 import appointmentService from '@/services/appointmentService'
@@ -19,10 +19,6 @@ import './UserDetailPage.css'
  * - Veterinario: información + citas + cambio de contraseña
  * - Auxiliar: información + cambio de contraseña
  *
- * MEJORAS:
- * ✅ Integración con PetGrid (tarjetas profesionales de mascotas)
- * ✅ Mantiene toda la funcionalidad original
- * ✅ Compatible con la estructura existente
  *
  * Esta página se reutiliza para:
  * 1. Ver usuarios desde la gestión (UsersPage)
@@ -91,7 +87,7 @@ function UserDetailPage() {
 
         // Si es propietario, cargar sus mascotas
         if (userResponse.data.rol === 'propietario' && userResponse.data.propietario_id) {
-          await loadPets(userResponse.data.propietario_id)  // ✅ Usa propietario_id (tabla propietarios)
+          await loadPets(userResponse.data.propietario_id)  //  Usa propietario_id (tabla propietarios)
         }
 
         // Si es veterinario, cargar sus citas

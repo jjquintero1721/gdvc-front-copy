@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, { useEffect } from 'react'
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react'
 import './Toast.css'
@@ -57,6 +58,13 @@ const Toast = ({
       </button>
     </div>
   )
+}
+
+Toast.propTypes = {
+  message: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['success', 'error', 'warning', 'info']),
+  duration: PropTypes.number,
+  onClose: PropTypes.func
 }
 
 export default Toast

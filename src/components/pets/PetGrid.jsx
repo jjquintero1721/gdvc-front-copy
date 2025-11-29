@@ -54,7 +54,7 @@ function PetGrid({
         <EmptyPetsIcon />
         <h3 className="pet-grid__empty-title">{emptyMessage}</h3>
         <p className="pet-grid__empty-subtitle">
-          {onAddPet ? 'Agrega tu primera mascota para comenzar' : 'Aún no hay mascotas en el sistema'}
+          {onAddPet ? 'Agrega la primera mascota a este usuario' : 'Aún no tienes una mascotas en el sistema'}
         </p>
         {onAddPet && (
           <Button onClick={onAddPet}>

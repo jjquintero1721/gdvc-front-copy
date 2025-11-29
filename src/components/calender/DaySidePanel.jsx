@@ -18,16 +18,6 @@ const WORK_HOURS = [
 
 /**
  * DaySidePanel - Panel lateral con horarios del día
- *
- * Features:
- * ✅ Diseño profesional con CSS personalizado
- * ✅ Animaciones suaves de entrada/salida
- * ✅ Lista de horarios con citas
- * ✅ Badges de estado
- * ✅ Iconos SVG profesionales
- * ✅ Responsive design
- * ✅ CORRECCIÓN: Manejo correcto de timezones UTC
- * ✅ NUEVO: Soporte para refreshTrigger
  */
 const DaySidePanel = ({
   isOpen,
@@ -35,14 +25,14 @@ const DaySidePanel = ({
   selectedDate,
   currentUserId,
   currentUserRole,
-  refreshTrigger // ✅ NUEVO: Recibir refreshTrigger
+  refreshTrigger //  Recibir refreshTrigger
 }) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // ✅ CORRECCIÓN: Agregar refreshTrigger a las dependencias
+  // Agregar refreshTrigger a las dependencias
   // Ahora se recargará cuando:
   // 1. Se abre el panel
   // 2. Cambia la fecha
@@ -51,7 +41,7 @@ const DaySidePanel = ({
     if (selectedDate && isOpen) {
       loadDayAppointments();
     }
-  }, [selectedDate, isOpen, refreshTrigger]); // ✅ refreshTrigger agregado
+  }, [selectedDate, isOpen, refreshTrigger]); //  refreshTrigger agregado
 
   /**
    * Cargar citas del día seleccionado
@@ -66,10 +56,10 @@ const DaySidePanel = ({
 
       console.log('📅 [DaySidePanel] Cargando citas del día:', formattedDate);
 
-      // ✅ Usar el servicio correcto
+      // Usar el servicio correcto
       const response = await appointmentService.getAppointmentsByDate(formattedDate);
 
-      // ✅ El backend devuelve: { success: true, data: { total: X, citas: [...] } }
+      // El backend devuelve: { success: true, data: { total: X, citas: [...] } }
       const dayAppointments = response.data?.citas || [];
 
       console.log(`✅ [DaySidePanel] ${dayAppointments.length} citas encontradas`);
@@ -85,7 +75,7 @@ const DaySidePanel = ({
   };
 
   /**
-   * ✅ Extraer hora UTC sin conversión a hora local
+   * Extraer hora UTC sin conversión a hora local
    *
    * Evita problemas de timezone extrayendo directamente del string ISO
    */
@@ -111,7 +101,7 @@ const DaySidePanel = ({
   };
 
   /**
-   * ✅ Agrupar citas por hora usando extracción directa
+   *  Agrupar citas por hora usando extracción directa
    */
   const groupAppointmentsByHour = () => {
     const grouped = {};
@@ -235,7 +225,7 @@ const DaySidePanel = ({
                 ) : (
                   <div className="day-side-panel__slots">
                     {WORK_HOURS.map((hour) => {
-                      // ✅ Buscar citas en este horario
+                      //  Buscar citas en este horario
                       const appointmentsInSlot = groupedAppointments[hour] || [];
                       const hasAppointments = appointmentsInSlot.length > 0;
 

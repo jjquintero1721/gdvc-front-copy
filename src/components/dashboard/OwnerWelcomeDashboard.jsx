@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import dashboardService from '@/services/dashboardService'
 import {
   Calendar,
@@ -169,7 +169,7 @@ function OwnerWelcomeDashboard() {
             onClick={() => navigate('/mascotas')}
             className="btn-primary"
           >
-            Registrar mi primera mascota
+            Consulta con tu veterinario y registra tu primera mascota
           </button>
         </div>
       </div>

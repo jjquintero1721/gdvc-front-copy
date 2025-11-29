@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import appointmentService from '@/services/appointmentService'
 import ownerService from '@/services/ownerService'
 import AppointmentCard from '@/components/appointments/AppointmentCard'
@@ -13,11 +13,6 @@ import TriageModal from '@/components/triage/TriageModal'
 
 /**
  * OwnerAppointmentsPage - Página de gestión de citas para propietarios
- *
- * Cambios principales:
- * - Paginación de 6 cards por página (controles prev / pages / next)
- * - "+ Agendar Cita" visible SOLO para propietarios
- * - Filtrado case-insensitive
  */
 
 function OwnerAppointmentsPage() {
@@ -330,7 +325,7 @@ function OwnerAppointmentsPage() {
               : `No hay citas ${filterStatus.toLowerCase()}`}
           </h3>
           <p className="owner-appointments-page__empty-subtitle">
-            {canCreate ? 'Agenda tu primera cita para comenzar' : 'Espera a que el veterinario te agende una cita'}
+            {canCreate ? 'Agenda tu primera cita para comenzar' : 'Espera a que se te agende una cita'}
           </p>
           {canCreate && (
             <Button onClick={handleCreateAppointment}>

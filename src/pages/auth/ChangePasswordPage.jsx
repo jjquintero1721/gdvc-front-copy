@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/AuthStore.jsx'
 import authService from '@/services/authService'
 
 // Componentes UI
@@ -23,7 +23,7 @@ import './ChangePasswordPage.css'
 function ChangePasswordPage() {
   const navigate = useNavigate()
 
-  // ✅ CORREGIDO: Obtener usuario autenticado y su ID del store
+  //  Obtener usuario autenticado y su ID del store
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const currentUser = useAuthStore((state) => state.user)
 
@@ -94,7 +94,7 @@ function ChangePasswordPage() {
       return
     }
 
-    // ✅ CORREGIDO: Validar que el usuario esté autenticado y tenga ID
+    // Validar que el usuario esté autenticado y tenga ID
     if (!currentUser || !currentUser.id) {
       setError('No se pudo obtener la información del usuario. Por favor, inicia sesión nuevamente.')
       return
@@ -103,11 +103,11 @@ function ChangePasswordPage() {
     setLoading(true)
 
     try {
-      // ✅ CORREGIDO: Llamar al servicio con userId, oldPassword, newPassword
+      //  Llamar al servicio con userId, oldPassword, newPassword
       await authService.changePassword(
-        currentUser.id,           // ✅ userId del usuario autenticado
-        formData.oldPassword,     // ✅ Contraseña actual
-        formData.newPassword      // ✅ Nueva contraseña
+        currentUser.id,           //  userId del usuario autenticado
+        formData.oldPassword,     //  Contraseña actual
+        formData.newPassword      //  Nueva contraseña
       )
 
       // Mostrar mensaje de éxito

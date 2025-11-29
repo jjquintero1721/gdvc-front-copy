@@ -52,7 +52,7 @@ const RegisterEntryModal = ({ isOpen, onClose, onSuccess, medication }) => {
     } catch (err) {
       console.error('Error completo:', err);
 
-      // ✅ CORRECCIÓN: Manejar correctamente diferentes tipos de errores
+      // Manejar correctamente diferentes tipos de errores
       let errorMessage = 'Error al registrar la entrada';
 
       if (err.response?.data) {
@@ -112,13 +112,13 @@ const RegisterEntryModal = ({ isOpen, onClose, onSuccess, medication }) => {
           </div>
         </div>
 
-        {/* Error Message - ✅ CORRECCIÓN: Renderizar el error correctamente */}
+        {/* Error Message - Renderizar el error correctamente */}
         {error && (
           <div className="medication-modal__body">
             <div className="medication-modal__error">
               <div className="medication-modal__error-content">
                 <AlertCircle className="medication-modal__error-icon" size={20} />
-                {/* ✅ CORRECCIÓN: Manejar saltos de línea en errores */}
+                {/* Manejar saltos de línea en errores */}
                 <div className="medication-modal__error-text">
                   {error.split('\n').map((line, index) => (
                     <p key={index}>{line}</p>

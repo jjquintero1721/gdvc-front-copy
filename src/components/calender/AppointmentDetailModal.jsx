@@ -6,8 +6,6 @@ import './AppointmentDetailModal.css';
 
 /**
  * AppointmentDetailModal - Modal para mostrar detalles de una cita
- *
- * ✅ CORRECCIÓN: Usa CSS dedicado con z-index: 10000 para aparecer sobre DaySidePanel
  */
 const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
   if (!appointment) return null;

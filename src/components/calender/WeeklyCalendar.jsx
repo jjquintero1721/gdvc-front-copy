@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
 import appointmentService from "@/services/appointmentService";
-import {useAuthStore} from "@store/AuthStore.jsx"; // <-- NECESARIO PARA SABER SI ES VETERINARIO
+import {useAuthStore} from "@store/AuthStore.jsx";
 
 import "./WeeklyCalendar.css";
 
