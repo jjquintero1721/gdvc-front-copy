@@ -4,27 +4,13 @@ import DashboardStats from '../../components/dashboard/DashboardStats.jsx'
 import AppointmentsList from '../../components/dashboard/AppointmentsList.jsx'
 import StockAlerts from '../../components/dashboard/StockAlerts'
 import OwnerWelcomeDashboard from '../../components/dashboard/OwnerWelcomeDashboard.jsx'
-import Button from '@/components/ui/Button'
 import './DashboardHome.css'
 
-/**
- * Dashboard Home - ACTUALIZADO CON DATOS REALES
- *
- * Muestra diferentes vistas según el rol:
- * - **Staff (superadmin, veterinario, auxiliar):** Dashboard administrativo con estadísticas,
- *   citas del día, y alertas de stock
- * - **Propietario:** Dashboard personalizado con saludo, mascota animada y próximas citas
- *
- * Principios SOLID:
- * - Single Responsibility: Solo renderiza vista principal del dashboard
- * - Open/Closed: Fácil agregar nuevas secciones
- */
 function DashboardHome() {
   const navigate = useNavigate()
   const { user, logout } = useAuthStore()
   const userRole = user?.rol || 'propietario'
 
-  // Determinar si el usuario es staff o propietario
   const isStaff = ['superadmin', 'veterinario', 'auxiliar'].includes(userRole)
   const canViewInventory = isStaff
 
@@ -34,50 +20,36 @@ function DashboardHome() {
   }
 
   /**
-   * Renderizar Dashboard para PROPIETARIO
+   * Dashboard para PROPIETARIO (usando MISMO HEADER QUE STAFF)
    */
   if (!isStaff) {
     return (
       <div className="dashboard-home">
-        {/* Header */}
+        {/* Header idéntico al del Staff */}
         <div className="dashboard-home__header">
           <div>
             <h1 className="dashboard-home__title">
-              Panel de Propietario
+              ¡Bienvenido, {user?.nombre || 'Usuario'}!
             </h1>
             <p className="dashboard-home__subtitle">
-              Bienvenido a tu espacio personal
+              Panel de Control - Propietario
             </p>
           </div>
-          <div className="dashboard-home__actions">
-            <Button
-              variant="outline"
-              onClick={() => navigate('/cambiar-contrasena')}
-            >
-              Cambiar Contraseña
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleLogout}
-            >
-              Cerrar Sesión
-            </Button>
-          </div>
+
+
         </div>
 
-        {/* Dashboard del Propietario */}
+        {/* Dashboard visual del propietario */}
         <OwnerWelcomeDashboard />
       </div>
     )
   }
 
   /**
-   * Renderizar Dashboard para STAFF
-   * (superadmin, veterinario, auxiliar)
+   * Dashboard para STAFF (NO TOCADO)
    */
   return (
     <div className="dashboard-home">
-      {/* Header */}
       <div className="dashboard-home__header">
         <div>
           <h1 className="dashboard-home__title">
@@ -87,23 +59,18 @@ function DashboardHome() {
             Panel de Control - Rol: {userRole.toUpperCase()}
           </p>
         </div>
+
       </div>
 
-      {/* Estadísticas del Dashboard - CON DATOS REALES */}
       <DashboardStats />
 
-      {/* Grid de Secciones */}
       <div className="dashboard-sections">
-        {/* Citas de Hoy - CON DATOS REALES */}
         <AppointmentsList />
-
-        {/* Stock Bajo - Solo para roles que pueden ver inventario */}
         {canViewInventory && <StockAlerts />}
       </div>
 
-      {/* Próximas Funcionalidades */}
-      <div className="dashboard-section">
-        <h2 className="section-title">Próximas Funcionalidades</h2>
+      <div className="dashboard-section-2">
+        <h2 className="section-title">Funcionalidades</h2>
         <div className="features-grid">
           <FeatureCard
             name="Gestión de Usuarios"
@@ -151,9 +118,6 @@ function DashboardHome() {
   )
 }
 
-/**
- * Componente de tarjeta de funcionalidad
- */
 function FeatureCard({ name, status, description }) {
   const isCompleted = status === 'completed'
 

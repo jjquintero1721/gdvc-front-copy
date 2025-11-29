@@ -267,7 +267,7 @@ function ConsultasPage() {
             placeholder="Buscar por paciente o propietario..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="consultas-page__search"
+            className="consultas-page__filter-input"
           />
         </div>
 

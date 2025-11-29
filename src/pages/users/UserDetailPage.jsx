@@ -521,71 +521,146 @@ function UserDetailPage() {
 
         {/* Pestaña: Seguridad (solo para perfil propio) */}
         {activeTab === 'seguridad' && isOwnProfile && (
-          <Card className="user-detail-page__security-card">
-            <h2 className="user-detail-page__section-title">Cambiar Contraseña</h2>
-            <p className="user-detail-page__section-subtitle">
-              Actualiza tu contraseña regularmente para mantener tu cuenta segura
-            </p>
+          <div className="user-detail-page__security-container">
 
-            {passwordError && (
-              <Alert variant="error" onClose={() => setPasswordError(null)}>
-                {passwordError}
-              </Alert>
-            )}
+            {/* ================================
+                🔵 FORMULARIO ACTUALIZAR INFORMACIÓN
+            ================================= */}
+            <Card className="user-detail-page__security-card">
+              <h2 className="user-detail-page__section-title">Actualizar Información</h2>
+              <p className="user-detail-page__section-subtitle">
+                Modifica tus datos personales y mantén tu información actualizada.
+              </p>
 
-            <form onSubmit={handleChangePassword} className="user-detail-page__password-form">
-              <Input
-                label="Contraseña Actual"
-                type="password"
-                name="oldPassword"
-                value={passwordData.oldPassword}
-                onChange={handlePasswordChange}
-                placeholder="Ingresa tu contraseña actual"
-                required
-              />
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault()
 
-              <Input
-                label="Nueva Contraseña"
-                type="password"
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={handlePasswordChange}
-                placeholder="Ingresa tu nueva contraseña"
-                required
-              />
+                  const updatedData = {
+                    nombre: user.nombre,
+                    telefono: user.telefono,
+                    documento: user.documento,
+                    correo: user.correo,
+                  }
 
-              <Input
-                label="Confirmar Nueva Contraseña"
-                type="password"
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordChange}
-                placeholder="Confirma tu nueva contraseña"
-                required
-              />
+                  try {
+                    setLoading(true)
+                    const response = await userService.updateUser(user.id, updatedData)
 
-              <div className="user-detail-page__password-requirements">
-                <p className="user-detail-page__password-requirements-title">
-                  Requisitos de la contraseña:
-                </p>
-                <ul>
-                  <li>Mínimo 8 caracteres</li>
-                  <li>Al menos una letra mayúscula</li>
-                  <li>Al menos una letra minúscula</li>
-                  <li>Al menos un número</li>
-                </ul>
-              </div>
-
-              <Button
-                type="submit"
-                loading={passwordLoading}
-                fullWidth
+                    if (response.success) {
+                      setSuccess("Información actualizada correctamente")
+                      loadUserData()   // recargar datos en pantalla
+                    } else {
+                      setError("No se pudo actualizar la información")
+                    }
+                  } catch (err) {
+                    setError(err.message || "Error al actualizar información")
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+                className="user-detail-page__password-form"
               >
-                Actualizar Contraseña
-              </Button>
-            </form>
-          </Card>
+                <Input
+                  label="Nombre Completo"
+                  value={user.nombre}
+                  onChange={(e) => setUser({ ...user, nombre: e.target.value })}
+                  required
+                />
+
+                <Input
+                  label="Correo Electrónico"
+                  type="email"
+                  value={user.correo}
+                  onChange={(e) => setUser({ ...user, correo: e.target.value })}
+                  required
+                />
+
+                <Input
+                  label="Teléfono"
+                  value={user.telefono || ""}
+                  onChange={(e) => setUser({ ...user, telefono: e.target.value })}
+                />
+
+                <Input
+                  label="Documento"
+                  value={user.documento || ""}
+                  onChange={(e) => setUser({ ...user, documento: e.target.value })}
+                />
+
+                <Button type="submit" fullWidth>
+                  Guardar Cambios
+                </Button>
+              </form>
+            </Card>
+
+            {/* ========================================
+                🟣 CAMBIAR CONTRASEÑA (EXISTENTE)
+            ======================================== */}
+            <Card className="user-detail-page__security-card">
+              <h2 className="user-detail-page__section-title">Cambiar Contraseña</h2>
+              <p className="user-detail-page__section-subtitle">
+                Actualiza tu contraseña regularmente para mantener tu cuenta segura
+              </p>
+
+              {passwordError && (
+                <Alert variant="error" onClose={() => setPasswordError(null)}>
+                  {passwordError}
+                </Alert>
+              )}
+
+              <form onSubmit={handleChangePassword} className="user-detail-page__password-form">
+                <Input
+                  label="Contraseña Actual"
+                  type="password"
+                  name="oldPassword"
+                  value={passwordData.oldPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Ingresa tu contraseña actual"
+                  required
+                />
+
+                <Input
+                  label="Nueva Contraseña"
+                  type="password"
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Ingresa tu nueva contraseña"
+                  required
+                />
+
+                <Input
+                  label="Confirmar Nueva Contraseña"
+                  type="password"
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Confirma tu nueva contraseña"
+                  required
+                />
+
+                <div className="user-detail-page__password-requirements">
+                  <p className="user-detail-page__password-requirements-title">
+                    Requisitos de la contraseña:
+                  </p>
+                  <ul>
+                    <li>Mínimo 8 caracteres</li>
+                    <li>Al menos una letra mayúscula</li>
+                    <li>Al menos una letra minúscula</li>
+                    <li>Al menos un número</li>
+                  </ul>
+                </div>
+
+                <Button type="submit" loading={passwordLoading} fullWidth>
+                  Actualizar Contraseña
+                </Button>
+              </form>
+            </Card>
+
+          </div>
         )}
+
       </div>
     </div>
   )

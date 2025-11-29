@@ -347,3 +347,93 @@
 .consultas-page__grid > * {
   animation: slideUp 0.4s ease-out;
 }
+/* ================================
+   NUEVO DISEÑO DE FILTROS (FIXED)
+   ================================ */
+
+.consultas-page__filters {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+/* 🔍 Grupo de filtros (buscador y fecha) */
+.consultas-page__filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  flex: 1;
+  min-width: 280px;
+  transition: all 0.2s ease;
+}
+
+.consultas-page__filter-group:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Iconos de filtro */
+.consultas-page__filter-icon {
+  color: #6b7280;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Inputs internos del buscador */
+.consultas-page__filter-group input {
+  border: none !important;
+  outline: none !important;
+  flex: 1;
+  padding: 0 !important;
+  background: transparent !important;
+  font-size: 0.95rem;
+}
+
+/* Corregir estilo del INPUT DATE */
+.consultas-page__date-filter input[type="date"] {
+  padding: 0 !important;
+  min-width: 160px;
+  font-size: 0.95rem;
+}
+
+/* =============================================
+   FIX ICONO DEL CARD (Mal Alineado)
+   ============================================= */
+
+.consultation-card__icon-wrapper {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+
+  /* para centrar y evitar que se corte */
+  display: flex;
+  width: 54px;
+  height: 54px;
+  align-items: center;
+  justify-content: center;
+
+  background: #e0fbea;
+  border-radius: 14px;
+  border: 2px solid #b8f3d2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 3;
+}
+
+.consultation-card__icon-wrapper svg {
+  width: 28px;
+  height: 28px;
+  color: #0ea669;
+}
+

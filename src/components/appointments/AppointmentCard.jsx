@@ -2,42 +2,26 @@ import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { motion } from 'framer-motion'
-import { CheckCircle, Calendar, Eye, X, RotateCcw } from 'lucide-react'
+import { CheckCircle, Eye, X, RotateCcw } from 'lucide-react'
+import { Stethoscope } from 'lucide-react'
 import './AppointmentCard.css'
 
-/**
- * AppointmentCard - Tarjeta de cita para propietarios
- * Muestra la información de una cita con diseño similar a PetCard
- * Incluye botones de acción según el estado de la cita
- *
- * @param {Object} appointment - Objeto de cita
- * @param {Function} onViewDetails - Callback para ver detalles
- * @param {Function} onConfirm - Callback para confirmar cita
- * @param {Function} onCancel - Callback para cancelar cita
- * @param {Function} onReschedule - Callback para reprogramar cita
- * @param {String} userRole - Rol del usuario actual
- */
 function AppointmentCard({
   appointment,
   onViewDetails,
   onConfirm,
   onCancel,
   onReschedule,
+  onOpenTriage,
   userRole
 }) {
   const [isLoading, setIsLoading] = useState(false)
 
-  // ✅ DEBUGGING: Verificar props recibidas
-  console.group(`🎴 AppointmentCard #${appointment.id}`)
-  console.log('📋 Appointment:', appointment)
-  console.log('👤 User Role:', userRole)
-  console.log('🔖 Estado Original:', appointment.estado)
+  const estadoNormalized = appointment.estado?.toString().toLowerCase();
 
-  // ✅ CORRECCIÓN: Normalizar estado a UPPERCASE para evitar problemas de comparación
-  const normalizedEstado = appointment.estado?.toString().toUpperCase() || 'DESCONOCIDO'
-  console.log('🔖 Estado Normalizado:', normalizedEstado)
+  const normalizedEstado =
+    appointment.estado?.toString().toUpperCase() || 'DESCONOCIDO'
 
-  // Formatear fecha
   const formatAppointmentDate = (dateString) => {
     try {
       const date = parseISO(dateString)
@@ -45,59 +29,65 @@ function AppointmentCard({
         date: format(date, "d 'de' MMMM, yyyy", { locale: es }),
         time: format(date, 'HH:mm', { locale: es })
       }
-    } catch (error) {
+    } catch {
       return { date: 'Fecha no disponible', time: '' }
     }
   }
 
   const { date, time } = formatAppointmentDate(appointment.fecha_hora)
 
-  // Determinar color según estado
   const getStatusColor = (estado) => {
-    const statusColors = {
+    const map = {
       AGENDADA: 'orange',
       CONFIRMADA: 'green',
-      ATENDIDA: 'blue',
+      EN_PROCESO: 'blue',
+      COMPLETADA: 'green',
       CANCELADA: 'red',
-      PENDIENTE: 'yellow',
-      EN_PROCESO: 'purple'
+      CANCELADA_TARDIA: 'red'
     }
-    return statusColors[estado] || 'gray'
+    return map[estado] || 'gray'
   }
 
   const getStatusLabel = (estado) => {
     const labels = {
       AGENDADA: 'Agendada',
       CONFIRMADA: 'Confirmada',
-      ATENDIDA: 'Atendida',
+      EN_PROCESO: 'En Proceso',
+      COMPLETADA: 'Completada',
       CANCELADA: 'Cancelada',
-      PENDIENTE: 'Pendiente',
-      EN_PROCESO: 'En Proceso'
+      CANCELADA_TARDIA: 'Cancelación tardía'
     }
     return labels[estado] || estado
   }
 
-  // ✅ CORRECCIÓN: Usar estado normalizado para las comparaciones
-  // Determinar si puede confirmar/cancelar/reprogramar
-  const canConfirm = ['superadmin', 'propietario'].includes(userRole) &&
-                     ['AGENDADA', 'PENDIENTE'].includes(normalizedEstado)
+  // =============================
+  //  REGLAS DE VISIBILIDAD
+  // =============================
 
-  const canCancel = ['superadmin', 'propietario'].includes(userRole) &&
-                    !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(normalizedEstado)
+  const estadosSinAcciones = [
+    'CONFIRMADA',
+    'COMPLETADA',
+    'CANCELADA',
+    'CANCELADA_TARDIA'
+  ]
 
-  const canReschedule = ['superadmin', 'propietario'].includes(userRole) &&
-                        !['CANCELADA', 'ATENDIDA', 'EN_PROCESO'].includes(normalizedEstado)
+  const showOnlyDetails = estadosSinAcciones.includes(normalizedEstado)
 
-  // ✅ DEBUGGING: Mostrar evaluación de permisos
-  console.log('✅ Permisos evaluados:')
-  console.log('  - canConfirm:', canConfirm, {
-    hasRole: ['superadmin', 'propietario'].includes(userRole),
-    hasCorrectStatus: ['AGENDADA', 'PENDIENTE'].includes(normalizedEstado),
-    currentStatus: normalizedEstado
-  })
-  console.log('  - canCancel:', canCancel)
-  console.log('  - canReschedule:', canReschedule)
-  console.groupEnd()
+  const canConfirm =
+    !showOnlyDetails && ['AGENDADA'].includes(normalizedEstado)
+
+  const canCancel =
+    !showOnlyDetails &&
+    ['AGENDADA'].includes(normalizedEstado)
+
+  const canReschedule =
+    !showOnlyDetails &&
+    ['AGENDADA'].includes(normalizedEstado)
+
+  const canTriage =
+    !showOnlyDetails &&
+    normalizedEstado === 'EN_PROCESO' &&
+    userRole !== 'superadmin'
 
   return (
     <motion.div
@@ -112,7 +102,7 @@ function AppointmentCard({
       <div className="appointment-card__header">
         <div className="appointment-card__icon">
           <svg className="appointment-card__icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
         </div>
         <span className={`appointment-card__status appointment-card__status--${getStatusColor(normalizedEstado)}`}>
@@ -122,51 +112,36 @@ function AppointmentCard({
 
       {/* Body */}
       <div className="appointment-card__body">
-        {/* Información del paciente */}
         <div className="appointment-card__patient">
-          <h3 className="appointment-card__patient-name">
-            {appointment.mascota?.nombre || 'Paciente'}
-          </h3>
-          <p className="appointment-card__patient-species">
-            {appointment.mascota?.especie || 'Especie no especificada'}
-          </p>
+          <h3 className="appointment-card__patient-name">{appointment.mascota?.nombre}</h3>
+          <p className="appointment-card__patient-species">{appointment.mascota?.especie}</p>
         </div>
 
-        {/* Fecha y Hora */}
         <div className="appointment-card__date-section">
           <div className="appointment-card__date">
-            <svg className="appointment-card__date-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
             <span>{date}</span>
           </div>
           <div className="appointment-card__time">
-            <svg className="appointment-card__time-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
             <span>{time}</span>
           </div>
         </div>
 
-        {/* Servicio */}
         <div className="appointment-card__service">
           <span className="appointment-card__label">Servicio</span>
           <span className="appointment-card__service-name">
-            {appointment.servicio?.nombre || 'Consulta general'}
+            {appointment.servicio?.nombre}
           </span>
         </div>
 
-        {/* Veterinario */}
         {appointment.veterinario && (
           <div className="appointment-card__vet">
             <span className="appointment-card__label">Veterinario</span>
             <span className="appointment-card__vet-name">
-              {appointment.veterinario.nombre || 'No asignado'}
+              {appointment.veterinario.nombre}
             </span>
           </div>
         )}
 
-        {/* Motivo */}
         {appointment.motivo && (
           <div className="appointment-card__motivo">
             <span className="appointment-card__label">Motivo</span>
@@ -175,71 +150,63 @@ function AppointmentCard({
         )}
       </div>
 
-      {/* Footer con botones de acción */}
+      {/* Footer */}
       <div className="appointment-card__footer">
-        {/* Botón de Ver Detalles (siempre visible) */}
+        {/* Ver detalles → siempre */}
         <button
           onClick={() => onViewDetails(appointment)}
           className="appointment-card__button appointment-card__button--secondary"
-          disabled={isLoading}
         >
           <Eye size={18} />
-          <span>Ver Detalles</span>
+          Ver Detalles
         </button>
 
-        {/* ⭐ Botón de Confirmar (solo para AGENDADA/PENDIENTE) */}
-        {canConfirm && (
-          <button
-            onClick={() => {
-              console.log('🎯 Confirmando cita:', appointment.id)
-              onConfirm(appointment)
-            }}
-            className="appointment-card__button appointment-card__button--success"
-            disabled={isLoading}
-            title="Confirmar cita"
-          >
-            <CheckCircle size={18} />
-            <span>Confirmar Cita</span>
-          </button>
+        {/* ACCIONES OCULTAS EN ESTADOS BLOQUEADOS */}
+        {!showOnlyDetails && (
+          <>
+            {canConfirm && (
+              <button
+                className="appointment-card__button appointment-card__button--success"
+                onClick={() => onConfirm(appointment)}
+              >
+                <CheckCircle size={18} />
+                Confirmar Cita
+              </button>
+            )}
+
+            <div className="appointment-card__actions">
+              {canReschedule && (
+                <button
+                  className="appointment-card__action-button appointment-card__action-button--reschedule"
+                  onClick={() => onReschedule(appointment)}
+                >
+                  <RotateCcw size={20} />
+                </button>
+              )}
+
+              {canCancel && (
+                <button
+                  className="appointment-card__action-button appointment-card__action-button--cancel"
+                  onClick={() => onCancel(appointment)}
+                >
+                  <X size={20} />
+                </button>
+              )}
+
+              {userRole !== 'propietario' &&
+                  ['agendada', 'confirmada', 'en_proceso'].includes(estadoNormalized) && (
+                    <button
+                      className="appointment-card__action-button appointment-card__action-button--triage"
+                      onClick={() => onOpenTriage(appointment)}
+                      title="registrar triage"
+                    >
+                        <Stethoscope size={20} />
+                    </button>
+                  )
+                }
+            </div>
+          </>
         )}
-
-        {/* ℹ️ Mensaje de debugging si el botón no aparece */}
-        {!canConfirm && normalizedEstado === 'AGENDADA' && (
-          <div style={{
-            padding: '8px',
-            background: '#fef3c7',
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            color: '#92400e'
-          }}>
-            ⚠️ Debug: Estado=AGENDADA pero botón oculto. Role={userRole}
-          </div>
-        )}
-
-        {/* Botones de acción secundarios */}
-        <div className="appointment-card__actions">
-          {canReschedule && (
-            <button
-              onClick={() => onReschedule(appointment)}
-              className="appointment-card__action-button appointment-card__action-button--reschedule"
-              title="Reprogramar cita"
-              disabled={isLoading}
-            >
-              <RotateCcw size={20} />
-            </button>
-          )}
-
-          {canCancel && (
-            <button
-              onClick={() => onCancel(appointment)}
-              className="appointment-card__action-button appointment-card__action-button--cancel"
-              title="Cancelar cita"
-              disabled={isLoading}
-            >
-              <X size={20} />
-            </button>
-          )}
-        </div>
       </div>
     </motion.div>
   )

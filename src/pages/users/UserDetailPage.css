@@ -632,3 +632,240 @@
   max-width: 1300px !important;
   margin: 0 auto;
 }
+/* ========================================
+   PERFIL — NUEVO DISEÑO MODERNO
+======================================== */
+
+.user-detail-page {
+  padding: 2.5rem;
+  max-width: 1150px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ========================================
+   HEADER — NUEVO ESTILO
+======================================== */
+
+.user-detail-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  animation: slideDown 0.4s ease;
+}
+
+.user-detail-page__header-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.user-detail-page__avatar {
+  width: 95px;
+  height: 95px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #6d5dfc 0%, #5da4ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.6rem;
+  font-weight: 700;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  animation: popIn 0.4s ease;
+  transition: transform .25s ease;
+}
+
+.user-detail-page__avatar:hover {
+  transform: scale(1.08);
+}
+
+.user-detail-page__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 0.4rem;
+}
+
+.user-detail-page__subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+/* ========================================
+   TABS MODERNOS
+======================================== */
+
+.user-detail-page__tabs {
+  display: flex;
+  gap: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.4s ease;
+}
+
+.user-detail-page__tab {
+  padding: 0.75rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #6b7280;
+  border: none;
+  background: #f9fafb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.user-detail-page__tab:hover {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.user-detail-page__tab--active {
+  background: #4338ca;
+  color: white;
+  box-shadow: 0 4px 12px rgba(67,56,202,0.25);
+}
+
+/* ========================================
+   CARD DE INFORMACIÓN PERSONAL — NUEVO
+======================================== */
+
+.user-detail-page__info-card {
+  padding: 2rem;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  animation: fadeInUp 0.45s ease;
+  border: 1px solid #f3f4f6;
+}
+
+.user-detail-page__section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.user-detail-page__info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4rem;
+}
+
+.user-detail-page__info-item {
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  background: #f9fafb;
+  transition: all .25s ease;
+}
+
+.user-detail-page__info-item:hover {
+  background: #eef2ff;
+  transform: translateY(-4px);
+}
+
+.user-detail-page__info-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.user-detail-page__info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ========================================
+   ESTÉTICA PARA SECCIÓN MASCOTAS
+======================================== */
+
+.user-detail-page__pets-section {
+  animation: fadeInUp 0.45s ease;
+}
+
+/* ========================================
+   ANIMACIONES
+======================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { transform: translateY(25px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes popIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+  .user-detail-page {
+    padding: 1.2rem;
+  }
+
+  .user-detail-page__header {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .user-detail-page__avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 1.9rem;
+  }
+
+  .user-detail-page__title {
+    font-size: 1.6rem;
+  }
+}
+.user-detail-page__security-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.user-detail-page__security-card {
+  animation: fadeInUp 0.4s ease;
+}
+/* ---- CONTENEDOR EN DOS COLUMNAS ---- */
+.user-detail-page__security-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;    /* Dos columnas iguales */
+  gap: 2rem;
+  padding: 1rem;
+  align-items: flex-start;
+}
+
+/* ---- TARJETAS ---- */
+.user-detail-page__security-card {
+  animation: fadeInUp 0.4s ease;
+  height: auto;
+}
+
+/* ---- RESPONSIVE: en móvil vuelven a estar una debajo de otra ---- */
+@media (max-width: 1024px) {
+  .user-detail-page__security-container {
+    grid-template-columns: 1fr;
+  }
+}

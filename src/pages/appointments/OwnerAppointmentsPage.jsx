@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '@/store/authStore'
 import appointmentService from '@/services/appointmentService'
@@ -10,25 +10,16 @@ import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
 import './OwnerAppointmentsPage.css'
 import TriageModal from '@/components/triage/TriageModal'
+
 /**
  * OwnerAppointmentsPage - Página de gestión de citas para propietarios
  *
- * RF-05: Gestión de citas
- *
- * Permisos:
- * - PROPIETARIO: Ver solo sus citas + crear
- * - SUPERADMIN: Ver todas las citas + crear
- *
- * Funcionalidades:
- * - Listar citas del propietario en cards
- * - Ver detalles de cita
- * - Confirmar cita (solo AGENDADA/PENDIENTE)
- * - Cancelar cita (solo no CANCELADA/ATENDIDA)
- * - Reprogramar cita (solo no CANCELADA/ATENDIDA)
- * - Agendar nueva cita
- *
- * @returns {JSX.Element}
+ * Cambios principales:
+ * - Paginación de 6 cards por página (controles prev / pages / next)
+ * - "+ Agendar Cita" visible SOLO para propietarios
+ * - Filtrado case-insensitive
  */
+
 function OwnerAppointmentsPage() {
   const { user: currentUser } = useAuthStore()
 
@@ -38,40 +29,51 @@ function OwnerAppointmentsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
-  const [currentOwner, setCurrentOwner] = useState(null) // ID del propietario actual
+  const [currentOwner, setCurrentOwner] = useState(null) // objeto propietario actual
   const [showTriageModal, setShowTriageModal] = useState(false)
   const [selectedCita, setSelectedCita] = useState(null)
 
   // Estados de filtros
-  const [filterStatus, setFilterStatus] = useState('all') // all, AGENDADA, CONFIRMADA, ATENDIDA, CANCELADA
+  const [filterStatus, setFilterStatus] = useState('all') // all, AGENDADA, CONFIRMADA, EN_PROCESO, COMPLETADA, CANCELADA, CANCELADA_TARDIA
 
   // Estados de modales
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState(null)
 
-  // Verificar permisos
-  const canViewAll = currentUser?.rol === 'superadmin'
-  const canCreate = ['superadmin', 'propietario'].includes(currentUser?.rol)
+  // PAGINACIÓN
+  const ITEMS_PER_PAGE = 6
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Permisos
+  const isSuperadmin = currentUser?.rol === 'superadmin'
+  const isPropietario = currentUser?.rol === 'propietario'
+  // Según tu petición: "+ Agendar Cita" -> SOLO propietario
+  const canCreate = isPropietario
 
   /**
    * Cargar citas al montar componente
    */
   useEffect(() => {
     loadAppointments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /**
-   * Filtrar citas según el estado seleccionado
+   * Filtrar citas según el estado seleccionado (case-insensitive)
    */
   useEffect(() => {
     if (filterStatus === 'all') {
       setFilteredAppointments(appointments)
     } else {
       setFilteredAppointments(
-        appointments.filter(apt => apt.estado === filterStatus)
+        appointments.filter(apt =>
+          apt.estado?.toString().toUpperCase() === filterStatus.toString().toUpperCase()
+        )
       )
     }
+    // Al cambiar el filtro reiniciamos la paginación
+    setCurrentPage(1)
   }, [appointments, filterStatus])
 
   /**
@@ -84,8 +86,6 @@ function OwnerAppointmentsPage() {
 
       // Si es propietario, primero obtener su registro de propietario
       if (currentUser?.rol === 'propietario' && !currentOwner) {
-        console.log('🔍 Obteniendo registro de propietario para usuario:', currentUser.id)
-
         try {
           const owner = await ownerService.getMyOwnerProfile()
 
@@ -96,10 +96,7 @@ function OwnerAppointmentsPage() {
             return
           }
 
-          console.log('✅ Propietario encontrado:', owner.id)
           setCurrentOwner(owner)
-
-          // Continuar con la carga de citas usando el propietario_id correcto
           await loadAppointmentsWithOwner(owner.id)
         } catch (err) {
           console.error('❌ Error al obtener propietario:', err)
@@ -125,92 +122,66 @@ function OwnerAppointmentsPage() {
    * Cargar citas filtradas por propietario
    */
   const loadAppointmentsWithOwner = async (ownerId) => {
-      try {
-        console.log('📅 Cargando citas para propietario:', ownerId)
+    try {
+      // Obtener propietario con mascotas
+      const ownerData = await ownerService.getMyOwnerProfile()
 
-        // 1️⃣ Obtener el propietario CON sus mascotas
-        const ownerData = await ownerService.getMyOwnerProfile()
-
-        if (!ownerData || !ownerData.mascotas || ownerData.mascotas.length === 0) {
-          console.warn('⚠️ El propietario no tiene mascotas registradas')
-          setAppointments([])
-          return
-        }
-
-        // 2️⃣ Extraer los IDs de todas las mascotas del propietario
-        const petIds = ownerData.mascotas.map(pet => pet.id)
-        console.log('🐾 IDs de mascotas del propietario:', petIds)
-
-        // 3️⃣ Obtener todas las citas
-        const response = await appointmentService.getAllAppointments({
-          skip: 0,
-          limit: 100
-        })
-
-        const allAppointments = response.data?.citas || []
-        console.log('📊 Total de citas en el sistema:', allAppointments.length)
-
-        // 4️⃣ Filtrar citas que pertenecen a las mascotas del propietario
-        const ownerAppointments = allAppointments.filter(apt => {
-          if (!apt.mascota_id) {
-            console.warn('⚠️ Cita sin mascota_id:', apt.id)
-            return false
-          }
-
-          // Verificar si el mascota_id de la cita está en la lista de IDs del propietario
-          const belongsToOwner = petIds.includes(apt.mascota_id)
-
-          if (belongsToOwner) {
-            const mascota = ownerData.mascotas.find(p => p.id === apt.mascota_id)
-            console.log('✓ Cita del propietario:', apt.id, '- Mascota:', mascota?.nombre || apt.mascota_id)
-          }
-
-          return belongsToOwner
-        })
-
-        console.log('✅ Citas del propietario encontradas:', ownerAppointments.length)
-        setAppointments(ownerAppointments)
-      } catch (error) {
-        console.error('❌ Error al cargar citas del propietario:', error)
-        throw error
+      if (!ownerData || !ownerData.mascotas || ownerData.mascotas.length === 0) {
+        setAppointments([])
+        return
       }
+
+      // IDs de mascotas del propietario
+      const petIds = ownerData.mascotas.map(p => p.id)
+
+      // Obtener todas las citas
+      const response = await appointmentService.getAllAppointments({
+        skip: 0,
+        limit: 100
+      })
+
+      const allAppointments = response.data?.citas || []
+
+      // Filtrar por mascotas del propietario
+      const ownerAppointments = allAppointments.filter(apt => petIds.includes(apt.mascota_id))
+
+      setAppointments(ownerAppointments)
+    } catch (error) {
+      console.error('❌ Error al cargar citas del propietario:', error)
+      throw error
     }
+  }
 
   /**
    * Cargar todas las citas (para superadmin)
    */
   const loadAllAppointments = async () => {
-    console.log('📅 Cargando todas las citas (superadmin)')
-
-    const response = await appointmentService.getAllAppointments({
-      skip: 0,
-      limit: 100
-    })
-
-    const allAppointments = response.data?.citas || []
-    console.log('✅ Total de citas cargadas:', allAppointments.length)
-
-    setAppointments(allAppointments)
+    try {
+      const response = await appointmentService.getAllAppointments({
+        skip: 0,
+        limit: 100
+      })
+      const allAppointments = response.data?.citas || []
+      setAppointments(allAppointments)
+    } catch (err) {
+      console.error('Error cargando todas las citas:', err)
+      setAppointments([])
+    }
   }
 
   /**
-   * Ver detalles de una cita
+   * Acciones
    */
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment)
     setIsDetailModalOpen(true)
   }
 
-  /**
-   * Confirmar cita
-   */
   const handleConfirmAppointment = async (appointment) => {
     try {
       setLoading(true)
       setError(null)
-
       await appointmentService.confirmAppointment(appointment.id)
-
       setSuccess('Cita confirmada exitosamente')
       await loadAppointments()
     } catch (err) {
@@ -221,26 +192,17 @@ function OwnerAppointmentsPage() {
     }
   }
 
-  /**
-   * Cancelar cita
-   */
   const handleCancelAppointment = async (appointment) => {
-    if (!window.confirm('¿Estás seguro de que deseas cancelar esta cita?')) {
-      return
-    }
-
+    if (!window.confirm('¿Estás seguro de que deseas cancelar esta cita?')) return
     try {
       setLoading(true)
       setError(null)
-
       const motivo = prompt('Por favor, indica el motivo de la cancelación:')
       if (!motivo) {
         setError('Debes proporcionar un motivo de cancelación')
         return
       }
-
       await appointmentService.cancelAppointment(appointment.id, motivo)
-
       setSuccess('Cita cancelada exitosamente')
       await loadAppointments()
     } catch (err) {
@@ -251,24 +213,14 @@ function OwnerAppointmentsPage() {
     }
   }
 
-  /**
-   * Reprogramar cita
-   */
   const handleRescheduleAppointment = (appointment) => {
-    // TODO: Implementar modal de reprogramación
     alert('Funcionalidad de reprogramación en desarrollo')
   }
 
-  /**
-   * Abrir modal de creación de cita
-   */
   const handleCreateAppointment = () => {
     setIsCreateModalOpen(true)
   }
 
-  /**
-   * Callback cuando se crea una cita exitosamente
-   */
   const handleAppointmentCreated = () => {
     setSuccess('Cita agendada exitosamente')
     setIsCreateModalOpen(false)
@@ -276,9 +228,33 @@ function OwnerAppointmentsPage() {
   }
 
   const handleOpenTriage = (cita) => {
-      setSelectedCita(cita)
-      setShowTriageModal(true)
-    }
+    setSelectedCita(cita)
+    setShowTriageModal(true)
+  }
+
+  // ======================
+  // PAGINACIÓN - cálculos
+  // ======================
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(filteredAppointments.length / ITEMS_PER_PAGE))
+  }, [filteredAppointments.length])
+
+  useEffect(() => {
+    // Asegurar que currentPage esté dentro del rango después de cambios
+    if (currentPage > totalPages) setCurrentPage(1)
+  }, [totalPages, currentPage])
+
+  const currentPageAppointments = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return filteredAppointments.slice(start, start + ITEMS_PER_PAGE)
+  }, [filteredAppointments, currentPage])
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return
+    setCurrentPage(page)
+    // opcional: scroll top del container
+    window.scrollTo({ top: 200, behavior: 'smooth' })
+  }
 
   return (
     <div className="owner-appointments-page">
@@ -286,13 +262,14 @@ function OwnerAppointmentsPage() {
       <div className="owner-appointments-page__header">
         <div className="owner-appointments-page__title-section">
           <h1 className="owner-appointments-page__title">
-            {canViewAll ? 'Gestión de Citas' : 'Mis Citas'}
+            {isSuperadmin ? 'Gestión de Citas' : 'Mis Citas'}
           </h1>
           <p className="owner-appointments-page__subtitle">
             {filteredAppointments.length} {filteredAppointments.length === 1 ? 'cita encontrada' : 'citas encontradas'}
           </p>
         </div>
 
+        {/* + Agendar Cita → SOLO propietario */}
         {canCreate && (
           <Button onClick={handleCreateAppointment} size="medium">
             + Agendar Cita
@@ -300,7 +277,7 @@ function OwnerAppointmentsPage() {
         )}
       </div>
 
-      {/* Alertas */}
+      {/* Alerts */}
       <AnimatePresence>
         {error && (
           <Alert
@@ -330,8 +307,10 @@ function OwnerAppointmentsPage() {
             <option value="all">Todos</option>
             <option value="AGENDADA">Agendada</option>
             <option value="CONFIRMADA">Confirmada</option>
-            <option value="ATENDIDA">Atendida</option>
+            <option value="EN_PROCESO">En Proceso</option>
+            <option value="COMPLETADA">Completada</option>
             <option value="CANCELADA">Cancelada</option>
+            <option value="CANCELADA_TARDIA">Cancelación tardía</option>
           </select>
         </div>
       </div>
@@ -360,30 +339,85 @@ function OwnerAppointmentsPage() {
           )}
         </div>
       ) : (
-        <div className="owner-appointments-page__grid">
-          <AnimatePresence>
-            {filteredAppointments.map(appointment => (
-            <div key={appointment.id}>
-              <AppointmentCard
-                key={appointment.id}
-                appointment={appointment}
-                onViewDetails={handleViewDetails}
-                onConfirm={handleConfirmAppointment}
-                onCancel={handleCancelAppointment}
-                onReschedule={handleRescheduleAppointment}
-                userRole={currentUser?.rol}
-              />
-                <Button
-                  variant="secondary"
-                  size="small"
-                  onClick={() => handleOpenTriage(appointment)}
-                >
-                  🩺 Registrar Triage
-                </Button>
+        <>
+          <div className="owner-appointments-page__grid">
+            <AnimatePresence>
+              {currentPageAppointments.map(appointment => (
+                <div key={appointment.id}>
+                  <AppointmentCard
+                    appointment={appointment}
+                    onViewDetails={handleViewDetails}
+                    onConfirm={handleConfirmAppointment}
+                    onCancel={handleCancelAppointment}
+                    onReschedule={handleRescheduleAppointment}
+                    onOpenTriage={handleOpenTriage}
+                    userRole={currentUser?.rol}
+                  />
+                </div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* PAGINACIÓN */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              gap: 8,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 20
+            }}>
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1px solid #e5e7eb',
+                  background: currentPage === 1 ? '#f3f4f6' : 'white',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                &lt;
+              </button>
+
+              {/* Mostrar todos los números de página (totalPages suele ser pequeño) */}
+              {Array.from({ length: totalPages }).map((_, i) => {
+                const pageNum = i + 1
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => goToPage(pageNum)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      border: '1px solid #e5e7eb',
+                      background: pageNum === currentPage ? '#3b82f6' : 'white',
+                      color: pageNum === currentPage ? 'white' : '#111827',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {pageNum}
+                  </button>
+                )
+              })}
+
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1px solid #e5e7eb',
+                  background: currentPage === totalPages ? '#f3f4f6' : 'white',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+                }}
+              >
+                &gt;
+              </button>
             </div>
-            ))}
-          </AnimatePresence>
-        </div>
+          )}
+        </>
       )}
 
       {/* Modales */}
@@ -402,21 +436,19 @@ function OwnerAppointmentsPage() {
       )}
 
       {showTriageModal && selectedCita && (
-          <TriageModal
-            isOpen={showTriageModal}
-            onClose={() => {
-              setShowTriageModal(false)
-              setSelectedCita(null)
-            }}
-            cita={selectedCita}
-            onSuccess={(triage) => {
-              console.log('Triage registrado:', triage)
-              // Opcional: recargar citas
-              loadAppointments()
-            }}
-          />
-        )}
-
+        <TriageModal
+          isOpen={showTriageModal}
+          onClose={() => {
+            setShowTriageModal(false)
+            setSelectedCita(null)
+          }}
+          cita={selectedCita}
+          onSuccess={(triage) => {
+            console.log('Triage registrado:', triage)
+            loadAppointments()
+          }}
+        />
+      )}
     </div>
   )
 }

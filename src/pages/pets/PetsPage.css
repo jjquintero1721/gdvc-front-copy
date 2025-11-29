@@ -225,3 +225,43 @@
     order: -1;
   }
 }
+
+/* ===============================
+   BOTÓN REGISTRAR MASCOTA (HEADER)
+   =============================== */
+.pets-page__header-content button {
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pets-page__header-content button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.pets-page__header-content button:active {
+  transform: scale(0.97);
+}
+
+/* Animación del símbolo "+" */
+.pets-page__header-content button::before {
+
+  font-size: 18px;
+  font-weight: 700;
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.pets-page__header-content button:hover::before {
+  transform: rotate(90deg);
+}

@@ -1,23 +1,36 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { format, addDays, startOfDay } from 'date-fns'
+import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useAuthStore } from '@/store/authStore'
 import appointmentService from '@/services/appointmentService'
 import petService from '@/services/petService'
 import serviceService from '@/services/serviceService'
 import userService from '@/services/userService'
-import ownerService from '@/services/ownerService' // ✅ AGREGAR ESTA IMPORTACIÓN
+import ownerService from '@/services/ownerService' // uso para obtener owner
 import OwnerAvailabilityPanel from './OwnerAvailabilityPanel'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Alert from '@/components/ui/Alert'
 import './CreateAppointmentModal.css'
 
+function emojiForSpecies(especie) {
+  if (!especie) return '🐾'
+  const s = especie.toLowerCase()
+  if (s.includes('gato') || s.includes('cat')) return '🐱'
+  if (s.includes('perro') || s.includes('dog') || s.includes('canino')) return '🐶'
+  if (s.includes('ave') || s.includes('bird')) return '🐦'
+  return '🐾'
+}
+
+function emojiForVet(vet) {
+  // Si hay género o especialidad se pueden adaptar pero por ahora emoji médico
+  return '👩‍⚕️'
+}
+
 function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
   const { user: currentUser } = useAuthStore()
 
-  // Estados del formulario
   const [formData, setFormData] = useState({
     mascota_id: '',
     servicio_id: '',
@@ -26,29 +39,37 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
     motivo: ''
   })
 
-  // Estados de datos
   const [pets, setPets] = useState([])
   const [services, setServices] = useState([])
   const [veterinarians, setVeterinarians] = useState([])
-  const [currentOwner, setCurrentOwner] = useState(null) // ✅ AGREGAR ESTE ESTADO
+  const [currentOwner, setCurrentOwner] = useState(null)
 
-  // Estados de disponibilidad
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null)
 
-  // Estados de UI
   const [loading, setLoading] = useState(false)
   const [loadingData, setLoadingData] = useState(true)
   const [error, setError] = useState(null)
   const [step, setStep] = useState(1)
 
-  /**
-   * ✅ FUNCIÓN CORREGIDA - Cargar datos iniciales
-   */
   useEffect(() => {
     if (isOpen) {
       loadInitialData()
+    } else {
+      // limpiar al cerrar fuera
+      setFormData({
+        mascota_id: '',
+        servicio_id: '',
+        veterinario_id: '',
+        fecha_hora: '',
+        motivo: ''
+      })
+      setSelectedTimeSlot(null)
+      setStep(1)
+      setError(null)
+      setCurrentOwner(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   const loadInitialData = async () => {
@@ -56,88 +77,60 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
       setLoadingData(true)
       setError(null)
 
-      console.log('🔄 Iniciando carga de datos para el formulario...')
-
-      // ✅ PASO 1: Obtener el registro de propietario del usuario autenticado
-      console.log('📌 Paso 1: Obteniendo registro de propietario...')
+      // 1) obtener owner -> luego usar owner.id para obtener mascotas
       const owner = await ownerService.getMyOwnerProfile()
-
       if (!owner) {
         setError('No se encontró tu registro de propietario. Por favor, contacta al administrador.')
         setLoadingData(false)
         return
       }
-
-      console.log(`✅ Propietario encontrado: ${owner.id}`)
       setCurrentOwner(owner)
 
-      // ✅ PASO 2: Cargar mascotas usando el propietario_id correcto
-      console.log('📌 Paso 2: Cargando mascotas del propietario...')
-      const petsResponse = await petService.getPetsByOwner(owner.id) // ✅ USAR owner.id NO currentUser.id
-      const petsData = petsResponse.data?.pets || []
-
-      console.log(`✅ ${petsData.length} mascotas cargadas`)
+      // 2) mascotas del owner
+      const petsResponse = await petService.getPetsByOwner(owner.id)
+      const petsData = petsResponse?.data?.pets || []
       setPets(petsData)
 
-      if (petsData.length === 0) {
-        setError('No tienes mascotas registradas. Por favor, registra una mascota antes de agendar una cita.')
-        setLoadingData(false)
-        return
-      }
-
-      // ✅ PASO 3: Cargar servicios disponibles
-      console.log('📌 Paso 3: Cargando servicios disponibles...')
+      // 3) servicios (filtrar por activos si existe esa propiedad)
       const servicesResponse = await serviceService.getAllServices()
-      const servicesData = servicesResponse.data?.servicios || []
+      const servicesData = servicesResponse?.data?.servicios || []
+      // Filtrar solo activos si existe la propiedad 'activo'
+      const haveActivo = servicesData.some(s => Object.prototype.hasOwnProperty.call(s, 'activo'))
+      const filteredServices = haveActivo ? servicesData.filter(s => s.activo === true) : servicesData
+      setServices(filteredServices)
 
-      console.log(`✅ ${servicesData.length} servicios cargados`)
-      setServices(servicesData)
-
-      // ✅ PASO 4: Cargar veterinarios
-      console.log('📌 Paso 4: Cargando veterinarios...')
+      // 4) veterinarios por rol
       const veterinariansResponse = await userService.getUsersByRole('veterinario')
-      const veterinariansData = veterinariansResponse.data?.usuarios || []
-
-      console.log(`✅ ${veterinariansData.length} veterinarios cargados`)
+      const veterinariansData = veterinariansResponse?.data?.usuarios || []
       setVeterinarians(veterinariansData)
-
-      console.log('✅ Carga de datos completada exitosamente')
-
     } catch (err) {
-      console.error('❌ Error al cargar datos:', err)
-      setError(err.message || 'Error al cargar los datos necesarios')
+      console.error('Error cargando datos del modal', err)
+      setError(err?.message || 'Error al cargar datos del formulario')
     } finally {
       setLoadingData(false)
     }
   }
 
-  // ... resto del código sin cambios ...
-
-  /**
-   * Manejar cambio en inputs del formulario
-   */
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  /**
-   * Seleccionar horario desde el panel de disponibilidad
-   */
+  const handleSelectPet = (petId) => {
+    setFormData(prev => ({ ...prev, mascota_id: petId }))
+    setError(null)
+  }
+  const handleSelectVet = (vetId) => {
+    setFormData(prev => ({ ...prev, veterinario_id: vetId }))
+    setError(null)
+  }
+
   const handleTimeSlotSelected = (dateTime) => {
     setSelectedTimeSlot(dateTime)
-    setFormData(prev => ({
-      ...prev,
-      fecha_hora: dateTime
-    }))
+    setFormData(prev => ({ ...prev, fecha_hora: dateTime }))
+    setError(null)
   }
 
-  /**
-   * Validar paso 1 (datos básicos)
-   */
   const validateStep1 = () => {
     if (!formData.mascota_id) {
       setError('Debes seleccionar una mascota')
@@ -154,30 +147,17 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
     return true
   }
 
-  /**
-   * Avanzar al siguiente paso
-   */
   const handleNextStep = () => {
     setError(null)
-    if (validateStep1()) {
-      setStep(2)
-    }
+    if (validateStep1()) setStep(2)
   }
-
-  /**
-   * Volver al paso anterior
-   */
   const handlePreviousStep = () => {
     setStep(1)
     setError(null)
   }
 
-  /**
-   * Enviar formulario
-   */
   const handleSubmit = async (e) => {
     e.preventDefault()
-
     if (!formData.fecha_hora) {
       setError('Debes seleccionar un horario disponible')
       return
@@ -197,7 +177,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
 
       await appointmentService.createAppointment(appointmentData)
 
-      // Limpiar formulario y cerrar modal
+      // limpiar
       setFormData({
         mascota_id: '',
         servicio_id: '',
@@ -207,20 +187,16 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
       })
       setStep(1)
       setSelectedTimeSlot(null)
-      setCurrentOwner(null) // ✅ LIMPIAR TAMBIÉN EL OWNER
-
+      setCurrentOwner(null)
       onSuccess()
     } catch (err) {
       console.error('Error al crear cita:', err)
-      setError(err.message || 'Error al agendar la cita')
+      setError(err?.message || 'Error al agendar la cita')
     } finally {
       setLoading(false)
     }
   }
 
-  /**
-   * Cerrar modal
-   */
   const handleClose = () => {
     if (!loading) {
       setFormData({
@@ -232,7 +208,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
       })
       setStep(1)
       setSelectedTimeSlot(null)
-      setCurrentOwner(null) // ✅ LIMPIAR TAMBIÉN EL OWNER
+      setCurrentOwner(null)
       setError(null)
       onClose()
     }
@@ -244,13 +220,13 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
     <AnimatePresence>
       <div className="create-appointment-modal__overlay" onClick={handleClose}>
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.18 }}
           className="create-appointment-modal__container"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <div className="create-appointment-modal__header">
             <div>
               <h2 className="create-appointment-modal__title">Agendar Nueva Cita</h2>
@@ -262,6 +238,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
               onClick={handleClose}
               className="create-appointment-modal__close-btn"
               disabled={loading}
+              aria-label="Cerrar"
             >
               <svg className="create-appointment-modal__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -269,94 +246,112 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
             </button>
           </div>
 
-          {/* Alertas */}
           {error && (
-            <Alert
-              type="error"
-              message={error}
-              onClose={() => setError(null)}
-            />
+            <div style={{ padding: '0 24px 12px' }}>
+              <Alert type="error" message={error} onClose={() => setError(null)} />
+            </div>
           )}
 
-          {/* Contenido del modal */}
           <div className="create-appointment-modal__content">
             {loadingData ? (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
+              <div className="create-appointment-modal__loading">
+                <div className="create-appointment-modal__spinner" />
                 <p>Cargando datos...</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit}>
-                {/* PASO 1: Datos básicos */}
+              <form onSubmit={handleSubmit} className="create-appointment-modal__form">
                 {step === 1 && (
                   <div className="create-appointment-modal__step">
-                    {/* Mascota */}
+                    {/* MASCOTAS: cards */}
                     <div className="create-appointment-modal__field">
-                      <label className="create-appointment-modal__label">
-                        Mascota *
-                      </label>
-                      <select
-                        name="mascota_id"
-                        value={formData.mascota_id}
-                        onChange={handleInputChange}
-                        className="create-appointment-modal__select"
-                        required
-                      >
-                        <option value="">Selecciona una mascota</option>
-                        {pets.map(pet => (
-                          <option key={pet.id} value={pet.id}>
-                            {pet.nombre} ({pet.especie} - {pet.raza || 'Sin raza'})
-                          </option>
-                        ))}
-                      </select>
+                      <label className="create-appointment-modal__label">Mascota *</label>
+                      {pets.length === 0 ? (
+                        <div className="create-appointment-modal__info">No tienes mascotas registradas.</div>
+                      ) : (
+                        <div className="card-grid">
+                          {pets.map(pet => {
+                            const selected = formData.mascota_id === pet.id
+                            return (
+                              <motion.button
+                                key={pet.id}
+                                type="button"
+                                className={`pet-card ${selected ? 'selected' : ''}`}
+                                onClick={() => handleSelectPet(pet.id)}
+                                whileHover={{ translateY: -4 }}
+                                whileTap={{ scale: 0.98 }}
+                                layout
+                                aria-pressed={selected}
+                              >
+                                <div className="pet-card__emoji">{emojiForSpecies(pet.especie)}</div>
+                                <div className="pet-card__body">
+                                  <div className="pet-card__name">{pet.nombre}</div>
+                                  <div className="pet-card__meta">{pet.especie} • {pet.raza || 'Sin raza'}</div>
+                                </div>
+                              </motion.button>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Servicio */}
+                    {/* SERVICIOS: select filtrado (solo activos) */}
                     <div className="create-appointment-modal__field">
-                      <label className="create-appointment-modal__label">
-                        Servicio *
-                      </label>
-                      <select
-                        name="servicio_id"
-                        value={formData.servicio_id}
-                        onChange={handleInputChange}
-                        className="create-appointment-modal__select"
-                        required
-                      >
-                        <option value="">Selecciona un servicio</option>
-                        {services.map(service => (
-                          <option key={service.id} value={service.id}>
-                            {service.nombre}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="create-appointment-modal__label">Servicio *</label>
+                      {services.length === 0 ? (
+                        <div className="create-appointment-modal__info error">No hay servicios disponibles.</div>
+                      ) : (
+                        <select
+                          name="servicio_id"
+                          value={formData.servicio_id}
+                          onChange={handleInputChange}
+                          className="create-appointment-modal__select"
+                          required
+                        >
+                          <option value="">Selecciona un servicio</option>
+                          {services.map(service => (
+                            <option key={service.id} value={service.id}>
+                              {service.nombre}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </div>
 
-                    {/* Veterinario */}
+                    {/* VETERINARIOS: cards */}
                     <div className="create-appointment-modal__field">
-                      <label className="create-appointment-modal__label">
-                        Veterinario *
-                      </label>
-                      <select
-                        name="veterinario_id"
-                        value={formData.veterinario_id}
-                        onChange={handleInputChange}
-                        className="create-appointment-modal__select"
-                        required
-                      >
-                        <option value="">Selecciona un veterinario</option>
-                        {veterinarians.map(vet => (
-                          <option key={vet.id} value={vet.id}>
-                            Dr. {vet.nombre}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="create-appointment-modal__label">Veterinario *</label>
+                      {veterinarians.length === 0 ? (
+                        <div className="create-appointment-modal__info">No hay veterinarios disponibles.</div>
+                      ) : (
+                        <div className="card-grid card-grid--vets">
+                          {veterinarians.map(vet => {
+                            const selected = formData.veterinario_id === vet.id
+                            return (
+                              <motion.button
+                                key={vet.id}
+                                type="button"
+                                className={`vet-card ${selected ? 'selected' : ''}`}
+                                onClick={() => handleSelectVet(vet.id)}
+                                whileHover={{ translateY: -4 }}
+                                whileTap={{ scale: 0.98 }}
+                                layout
+                                aria-pressed={selected}
+                              >
+                                <div className="vet-card__emoji">👨‍⚕️</div>
+                                <div className="vet-card__body">
+                                  <div className="vet-card__name">Dr. {vet.nombre}</div>
+                                  <div className="vet-card__meta">{vet.especialidad || 'Veterinario'}</div>
+                                </div>
+                              </motion.button>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Motivo (opcional) */}
+                    {/* Motivo */}
                     <div className="create-appointment-modal__field">
-                      <label className="create-appointment-modal__label">
-                        Motivo de la consulta (opcional)
-                      </label>
+                      <label className="create-appointment-modal__label">Motivo de la consulta (opcional)</label>
                       <textarea
                         name="motivo"
                         value={formData.motivo}
@@ -369,13 +364,10 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                   </div>
                 )}
 
-                {/* PASO 2: Seleccionar horario */}
                 {step === 2 && (
                   <div className="create-appointment-modal__step">
                     <div className="create-appointment-modal__availability-section">
-                      <h3 className="create-appointment-modal__section-title">
-                        Selecciona un horario disponible
-                      </h3>
+                      <h3 className="create-appointment-modal__section-title">Selecciona un horario disponible</h3>
                       <p className="create-appointment-modal__section-subtitle">
                         {selectedTimeSlot
                           ? `Horario seleccionado: ${format(new Date(selectedTimeSlot), "d 'de' MMMM, yyyy 'a las' HH:mm", { locale: es })}`
@@ -393,7 +385,6 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                   </div>
                 )}
 
-                {/* Footer con botones */}
                 <div className="create-appointment-modal__footer">
                   {step === 1 ? (
                     <>
@@ -402,6 +393,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                         variant="outline"
                         onClick={handleClose}
                         disabled={loading}
+                        className="app-btn app-btn--ghost"
                       >
                         Cancelar
                       </Button>
@@ -410,6 +402,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                         variant="primary"
                         onClick={handleNextStep}
                         disabled={loading}
+                        className="app-btn app-btn--primary"
                       >
                         Siguiente
                       </Button>
@@ -421,6 +414,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                         variant="outline"
                         onClick={handlePreviousStep}
                         disabled={loading}
+                        className="app-btn app-btn--ghost"
                       >
                         Anterior
                       </Button>
@@ -428,6 +422,7 @@ function CreateAppointmentModal({ isOpen, onClose, onSuccess }) {
                         type="submit"
                         variant="primary"
                         disabled={loading || !selectedTimeSlot}
+                        className="app-btn app-btn--primary"
                       >
                         {loading ? 'Agendando...' : 'Agendar Cita'}
                       </Button>

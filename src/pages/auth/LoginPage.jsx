@@ -31,13 +31,17 @@ function LoginPage() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
+
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: null }))
     }
+
+    if (error) setError(null)
   }
 
   const validateForm = () => {
@@ -58,9 +62,42 @@ function LoginPage() {
     return errors
   }
 
+  const parseBackendError = (err) => {
+    if (!err.response) {
+      return 'No hay conexión con el servidor. Revisa tu internet.'
+    }
+
+    const status = err.response.status
+    const data = err.response.data
+
+    switch (status) {
+      case 400:
+        return data?.message || 'Solicitud inválida.'
+      case 401:
+        return 'Credenciales incorrectas. Intenta de nuevo.'
+      case 403:
+        return 'No tienes permisos para acceder.'
+      case 422:
+        if (data?.errors) {
+          const formatted = {}
+          Object.keys(data.errors).forEach(key => {
+            formatted[key] = data.errors[key][0]
+          })
+          setFieldErrors(formatted)
+          return 'Corrige los campos marcados.'
+        }
+        return data?.message || 'Datos inválidos.'
+      case 500:
+        return 'Error interno del servidor. Intenta más tarde.'
+      default:
+        return data?.message || 'Ocurrió un error inesperado.'
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
+    setFieldErrors({})
 
     const errors = validateForm()
     if (Object.keys(errors).length > 0) {
@@ -71,93 +108,123 @@ function LoginPage() {
     setLoading(true)
 
     try {
-      const response = await authService.login(formData.email, formData.password)
+      const payload = await authService.login(formData.email, formData.password)
 
-      login(
-        response.data.usuario,
-        {
-          access_token: response.data.access_token,
-          refresh_token: response.data.refresh_token || null
-        },
-        formData.rememberMe
-      )
+      if (payload && payload.success === false) {
+        throw new Error(payload.message || 'Credenciales inválidas')
+      }
+        // Extraer datos reales (depende de tu backend; aquí asumo payload.data.usuario y tokens)
+        const usuario = payload.data?.usuario || payload.data?.user || null
+        const access_token = payload.data?.access_token || payload.data?.token || null
+        const refresh_token = payload.data?.refresh_token || null
 
-      navigate('/dashboard')
-    } catch (err) {
-      setError(err.message || 'Error al iniciar sesión. Intenta nuevamente.')
-    } finally {
-      setLoading(false)
+        if (!usuario || !access_token) {
+          // defensivo: si faltan datos, lanzar
+          throw new Error('Respuesta inválida del servidor al iniciar sesión')
+        }
+
+        login(
+          usuario,
+          {
+            access_token,
+            refresh_token
+          },
+          formData.rememberMe
+        )
+
+        navigate('/dashboard')
+      } catch (err) {
+        // log para depuración (opcional, eliminar en producción)
+        console.error('Login error ->', err)
+
+        // Mostrar el mensaje ya normalizado en authService
+        setError(err.message || 'Error al iniciar sesión. Intenta nuevamente.')
+
+        // Si hay errores de validación estructurados desde backend (422) los podemos mostrar en los campos
+        if (err.validation) {
+          // Mapear errores a fieldErrors si vienen en formato conocido
+          // Ejemplo: { email: ['msg1'], password: ['msg2'] } o Pydantic detail array
+          if (typeof err.validation === 'object' && !Array.isArray(err.validation)) {
+            const fieldErrs = {}
+            Object.keys(err.validation).forEach(k => {
+              const v = err.validation[k]
+              fieldErrs[k] = Array.isArray(v) ? v[0] : String(v)
+            })
+            setFieldErrors(fieldErrs)
+          } else if (Array.isArray(err.validation)) {
+            // pydantic detail -> convertir a mensajes generales
+            setError(prev => `${prev} ${err.validation.map(d => d.msg || d.message).join(', ')}`)
+          }
+        }
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
   return (
-      <div className="login-page-modern">
-        <div className="login-card-modern">
+    <div className="login-page-modern">
+      <div className="login-card-modern">
 
-          <div className="login-card-modern__header">
-            <h1 className="login-card-modern__title">Bienvenido de vuelta</h1>
-            <p className="login-card-modern__subtitle">
-              Accede a tu cuenta de clínica veterinaria
-            </p>
+        <div className="login-card-modern__header">
+          <h1 className="login-card-modern__title">Bienvenido de vuelta</h1>
+          <p className="login-card-modern__subtitle">
+            Accede a tu cuenta de clínica veterinaria
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="login-form-modern">
+
+          {error && (
+            <Alert type="error" message={error} onClose={() => setError(null)} />
+          )}
+
+          <Input
+            label="Correo Electrónico"
+            type="email"
+            name="email"
+            placeholder="admin@gdcv.com"
+            value={formData.email}
+            onChange={handleChange}
+            error={fieldErrors.email}
+            icon={<AtSignIcon />}
+          />
+
+          <Input
+            label="Contraseña"
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            error={fieldErrors.password}
+            icon={<LockIcon />}
+          />
+
+          <div className="login-form-modern__options">
+            <Checkbox
+              label="Recordarme"
+              name="rememberMe"
+              checked={formData.rememberMe}
+              onChange={handleChange}
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="login-form-modern">
+          <Button fullWidth type="submit" loading={loading}>
+            {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+          </Button>
 
-            {error && (
-              <Alert type="error" message={error} onClose={() => setError(null)} />
-            )}
+          <div className="login-form-modern__divider">
+            <span>¿Primera vez aquí?</span>
+          </div>
 
-            <Input
-              label="Correo Electrónico"
-              type="email"
-              name="email"
-              placeholder="admin@gdcv.com"
-              value={formData.email}
-              onChange={handleChange}
-              error={fieldErrors.email}
-              icon={<AtSignIcon />}
-            />
+          <Link to="/registro" className="login-form-modern__register-link">
+            Crear una cuenta nueva
+          </Link>
+        </form>
 
-            <Input
-              label="Contraseña"
-              type="password"
-              name="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              error={fieldErrors.password}
-              icon={<LockIcon />}
-            />
-
-            <div className="login-form-modern__options">
-              <Checkbox
-                label="Recordarme"
-                name="rememberMe"
-                checked={formData.rememberMe}
-                onChange={handleChange}
-              />
-              <Link to="/cambiar-contrasena" className="login-form-modern__forgot">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
-
-            <Button fullWidth type="submit" loading={loading}>
-              {loading ? 'Iniciando...' : 'Iniciar Sesión'}
-            </Button>
-
-            <div className="login-form-modern__divider">
-              <span>¿Primera vez aquí?</span>
-            </div>
-
-            <Link to="/registro" className="login-form-modern__register-link">
-              Crear una cuenta nueva
-            </Link>
-
-          </form>
-        </div>
       </div>
-    )
-
+    </div>
+  )
 }
 
 export default LoginPage

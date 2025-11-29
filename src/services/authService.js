@@ -31,12 +31,55 @@ const authService = {
         correo: email,
         contrasena: password
       })
+      const  payload = response.data
+      if (payload && payload.success === false) {
+        const err = new Error(payload.message || 'Credenciales inválidas')
+        err.status = response.status
+        err.payload = payload
+        throw err
+      }
 
       // response.data contiene: { success: true, message: "...", data: { access_token, token_type, usuario } }
-      return response.data
+      return payload
     } catch (error) {
-      throw handleAuthError(error)
-    }
+
+      if (error?.response){
+          const { status, data } = error.response
+
+          const backendMessage = data?.message || (data && data.success === false && data.message) || null
+            // Error de validación que podría estar en data.data o data.errors
+            let validation = null
+            if (data?.data && typeof data.data === 'object') {
+              validation = data.data
+            } else if (data?.errors) {
+              validation = data.errors
+            } else if (Array.isArray(data?.detail)) {
+              validation = data.detail
+            }
+
+            const err = new Error(
+              backendMessage ||
+              (status === 401 ? 'Credenciales inválidas. Verifica tu correo y contraseña.' :
+                status === 422 ? 'Errores de validación. Revisa los campos.' :
+                'Ocurrió un error en el servidor.')
+            )
+            err.status = status
+            if (validation) err.validation = validation
+            err.responseData = data
+            throw err
+          }
+
+          // Si no hubo response pero sí request => problema de red
+          if (error?.request) {
+            const err = new Error('No se pudo conectar con el servidor. Verifica tu conexión a internet.')
+            err.isNetworkError = true
+            throw err
+          }
+
+          // Otro tipo de error inesperado
+          const err = new Error(error?.message || 'Error inesperado al procesar la solicitud')
+          throw err
+        }
   },
 
   /**

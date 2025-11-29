@@ -68,8 +68,10 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         // Si falla el refresh, cerrar sesión
         useAuthStore.getState().logout()
-        window.location.href = '/login'
-        return Promise.reject(refreshError)
+        return Promise.reject({
+          ...refreshError,
+          forcedLogout: true
+        })
       }
     }
 
