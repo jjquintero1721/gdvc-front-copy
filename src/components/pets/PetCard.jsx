@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { calculateAge } from '@/utils/dateUtils'
 import Button from '@/components/ui/Button'
+import PropTypes from 'prop-types'
+import { useAuthStore } from '@/store/AuthStore'
 import './PetCard.css'
 
 /**
@@ -46,23 +48,20 @@ const GenericPetIcon = () => (
 /**
  * Componente PetCard - Tarjeta de mascota mejorada
  *
- * Características:
- * - Diseño profesional con animaciones
- * - Iconos SVG personalizados por especie
- * - Hover effects sutiles
- * - Acciones rápidas (ver, editar)
- * - Información organizada jerárquicamente
- *
  * @param {Object} pet - Datos de la mascota
  * @param {Function} onEdit - Callback para editar mascota
+ * @param {Function} onViewHistory - Callback opcional para ver historia clínica (si se pasa, mostrará botón)
  * @param {boolean} showActions - Mostrar botones de acción
  */
-function PetCard({ pet, onEdit, showActions = true }) {
+function PetCard({ pet, onEdit, onViewHistory, showActions = true }) {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
+ const isPropietario = user?.rol === 'propietario'
+
 
   // Determinar el icono según la especie
   const renderPetIcon = () => {
-    const especie = pet.especie?.toLowerCase() || ''
+    const especie = (pet.especie || '').toLowerCase()
     if (especie.includes('perro') || especie === 'canino') {
       return <DogIcon />
     } else if (especie.includes('gato') || especie === 'felino') {
@@ -81,9 +80,9 @@ function PetCard({ pet, onEdit, showActions = true }) {
   }
 
   return (
-    <div className="pet-card">
+    <div className="pet-card" role="article" aria-label={`Mascota ${pet.nombre}`}>
       {/* Icono de la mascota */}
-      <div className="pet-card__icon-container">
+      <div className="pet-card__icon-container" aria-hidden="true">
         {renderPetIcon()}
       </div>
 
@@ -106,6 +105,30 @@ function PetCard({ pet, onEdit, showActions = true }) {
             </div>
           )}
 
+          {/* NUESTROS NUEVOS CAMPOS - mantenemos clases existentes para no romper CSS */}
+          {pet.color && (
+            <div className="pet-card__info-item">
+              <span className="pet-card__info-label">Color:</span>
+              <span className="pet-card__info-value">{pet.color}</span>
+            </div>
+          )}
+
+          {pet.sexo && (
+            <div className="pet-card__info-item">
+              <span className="pet-card__info-label">Sexo:</span>
+              <span className="pet-card__info-value">
+                {pet.sexo === 'macho' ? 'Macho' : pet.sexo === 'hembra' ? 'Hembra' : pet.sexo}
+              </span>
+            </div>
+          )}
+
+          {typeof pet.peso !== 'undefined' && pet.peso !== null && pet.peso !== '' && (
+            <div className="pet-card__info-item">
+              <span className="pet-card__info-label">Peso:</span>
+              <span className="pet-card__info-value">{Number(pet.peso)} kg</span>
+            </div>
+          )}
+
           {edad && (
             <div className="pet-card__info-item">
               <span className="pet-card__info-label">Edad:</span>
@@ -124,22 +147,19 @@ function PetCard({ pet, onEdit, showActions = true }) {
         {/* Acciones */}
         {showActions && (
           <div className="pet-card__actions">
-            <Button
-              variant="outline"
-              size="small"
-              onClick={handleViewDetails}
-            >
-              Ver Detalles
-            </Button>
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="small"
-                onClick={() => onEdit(pet)}
-              >
-                Editar
-              </Button>
-            )}
+
+            {/* Botón de ver historia clínica - solo si pasaron onViewHistory */}
+              {isPropietario && onViewHistory && (
+                  <Button
+                    variant="primary"
+                    size="small"
+                    onClick={() => onViewHistory(pet)}
+                    className="pet-card__history-button"
+                  >
+                    📘 Historia Clínica
+                  </Button>
+                )}
+
           </div>
         )}
       </div>
@@ -152,6 +172,13 @@ function PetCard({ pet, onEdit, showActions = true }) {
       )}
     </div>
   )
+}
+
+PetCard.propTypes = {
+  pet: PropTypes.object.isRequired,
+  onEdit: PropTypes.func,
+  onViewHistory: PropTypes.func, // opcional
+  showActions: PropTypes.bool
 }
 
 export default PetCard

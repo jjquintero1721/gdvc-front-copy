@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/AuthStore.jsx'
 import petService from '@/services/petService'
+import medicalHistoryService from '@/services/medicalHistoryService'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Alert from '@/components/ui/Alert'
 import PetGrid from '@/components/pets/PetGrid'
+import MedicalHistoryModal from '@/components/medical-history/MedicalHistoryModal'
 import './PetsPage.css'
 
 /**
@@ -23,10 +25,12 @@ import './PetsPage.css'
  * - Filtrar por estado (activo/inactivo)
  * - Crear nueva mascota
  * - Ver detalles de mascota
+ * - Ver historia clínica (NUEVO)
  *
  * Integrado con:
  * - PetGrid: Grid responsivo con tarjetas profesionales
  * - Backend: /patients/pets endpoints
+ * - MedicalHistoryModal: Modal para ver historia clínica
  */
 function PetsPage() {
   const navigate = useNavigate()
@@ -49,6 +53,12 @@ function PetsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalPets, setTotalPets] = useState(0)
   const pageSize = 6 // Mascotas por página
+
+  // Estados del modal de historia clínica
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedPet, setSelectedPet] = useState(null)
+  const [medicalHistory, setMedicalHistory] = useState(null)
+  const [loadingHistory, setLoadingHistory] = useState(false)
 
   // Verificar permisos
   const canViewAll = ['superadmin', 'veterinario', 'auxiliar'].includes(currentUser?.rol)
@@ -151,6 +161,38 @@ function PetsPage() {
    */
   const handleEditPet = (pet) => {
     navigate(`/mascotas/${pet.id}/editar`)
+  }
+
+  /**
+   * Ver historia clínica de la mascota
+   */
+  const handleViewHistory = async (pet) => {
+    try {
+      setSelectedPet(pet)
+      setIsModalOpen(true)
+      setLoadingHistory(true)
+
+      // Obtener la historia clínica de la mascota
+      const response = await medicalHistoryService.getMedicalHistoryByPet(pet.id, true)
+
+      if (response.success && response.data) {
+        setMedicalHistory(response.data)
+      }
+    } catch (err) {
+      console.error('Error al cargar historia clínica:', err)
+      setError('Error al cargar la historia clínica. Por favor, intenta nuevamente.')
+    } finally {
+      setLoadingHistory(false)
+    }
+  }
+
+  /**
+   * Cerrar modal de historia clínica
+   */
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedPet(null)
+    setMedicalHistory(null)
   }
 
   /**
@@ -258,6 +300,7 @@ function PetsPage() {
           loading={loading}
           onAddPet={canCreate ? handleCreatePet : null}
           onEditPet={handleEditPet}
+          onViewHistory={handleViewHistory}
           emptyMessage={
             searchTerm || filterSpecies !== 'all'
               ? 'No se encontraron mascotas con los filtros aplicados'
@@ -294,6 +337,15 @@ function PetsPage() {
           </Button>
         </div>
       )}
+
+      {/* Modal de Historia Clínica */}
+      <MedicalHistoryModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        pet={selectedPet}
+        medicalHistory={medicalHistory}
+        loading={loadingHistory}
+      />
     </div>
   )
 }

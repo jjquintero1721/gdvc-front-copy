@@ -62,8 +62,6 @@ const navigationByRole = {
     { name: 'Dashboard', path: '/dashboard', icon: 'home' },
     { name: 'Mis Mascotas', path: '/mascotas', icon: 'paw' },
     { name: 'Citas', path: '/citas', icon: 'calendar' },
-    { name: 'Historias Clínicas', path: '/historias-clinicas', icon: 'clipboard' }
-
   ]
 }
 

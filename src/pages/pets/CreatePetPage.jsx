@@ -21,7 +21,10 @@ function CreatePetPage() {
     especie: '',
     raza: '',
     microchip: '',
-    fecha_nacimiento: ''
+    fecha_nacimiento: '',
+    color: '',
+    sexo: '',
+    peso: ''
   })
 
   const [loading, setLoading] = useState(false)
@@ -72,6 +75,7 @@ function CreatePetPage() {
     if (!formData.propietario_id) errors.propietario_id = 'Debes seleccionar un propietario'
     if (!formData.nombre.trim()) errors.nombre = 'El nombre es obligatorio'
     if (!formData.especie.trim()) errors.especie = 'La especie es obligatoria'
+    if (!formData.sexo.trim()) errors.sexo = 'El sexo es obligatorio'
 
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
@@ -86,14 +90,21 @@ function CreatePetPage() {
 
     try {
       setLoading(true)
+
       const petData = {
         propietario_id: formData.propietario_id,
         nombre: formData.nombre.trim(),
         especie: formData.especie.trim().toLowerCase(),
         raza: formData.raza?.trim() || null,
         microchip: formData.microchip?.trim() || null,
-        fecha_nacimiento: formData.fecha_nacimiento || null
+        fecha_nacimiento: formData.fecha_nacimiento || null,
+
+        // NUEVOS CAMPOS
+        color: formData.color || null,
+        sexo: formData.sexo,
+        peso: formData.peso ? parseFloat(formData.peso) : null
       }
+
       const response = await petService.createPet(petData)
 
       if (response.success) {
@@ -186,6 +197,45 @@ function CreatePetPage() {
                   value={formData.raza}
                   onChange={handleChange}
                   placeholder="Golden Retriever, Siamés…"
+                />
+              </div>
+
+              {/* NUEVOS CAMPOS */}
+              <div className="form-group">
+                <label>Color</label>
+                <Input
+                  name="color"
+                  value={formData.color}
+                  onChange={handleChange}
+                  placeholder="Blanco, negro, café..."
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Sexo *</label>
+                <select
+                  name="sexo"
+                  value={formData.sexo}
+                  onChange={handleChange}
+                  className={fieldErrors.sexo ? "input-error" : ""}
+                >
+                  <option value="">Selecciona sexo</option>
+                  <option value="macho">Macho</option>
+                  <option value="hembra">Hembra</option>
+                </select>
+                {fieldErrors.sexo &&
+                  <span className="error-text">{fieldErrors.sexo}</span>}
+              </div>
+
+              <div className="form-group">
+                <label>Peso (kg)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  name="peso"
+                  value={formData.peso}
+                  onChange={handleChange}
+                  placeholder="Ej: 12.5"
                 />
               </div>
 

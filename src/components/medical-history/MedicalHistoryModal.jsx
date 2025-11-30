@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import Button from '@/components/ui/Button'
+import { exportarHistoriaClinica } from '@/services/exportService'
 import './MedicalHistoryModal.css'
 
 /**
@@ -18,6 +19,8 @@ import './MedicalHistoryModal.css'
 function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) {
   const modalContentRef = useRef(null)
   const [expandedConsultations, setExpandedConsultations] = useState([])
+  const [exportingPDF, setExportingPDF] = useState(false)
+  const [exportingCSV, setExportingCSV] = useState(false)
 
   // Cerrar modal al presionar Escape
   useEffect(() => {
@@ -123,6 +126,38 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
     return `${years} ${years === 1 ? 'año' : 'años'}`
   }
 
+  /**
+   * Maneja la exportación en formato PDF
+   */
+  const handleExportPDF = async () => {
+    if (!medicalHistory?.id) return
+
+    setExportingPDF(true)
+    try {
+      await exportarHistoriaClinica(medicalHistory.id, 'pdf')
+    } catch (error) {
+      alert(error.message || 'Error al exportar a PDF')
+    } finally {
+      setExportingPDF(false)
+    }
+  }
+
+  /**
+   * Maneja la exportación en formato CSV
+   */
+  const handleExportCSV = async () => {
+    if (!medicalHistory?.id) return
+
+    setExportingCSV(true)
+    try {
+      await exportarHistoriaClinica(medicalHistory.id, 'csv')
+    } catch (error) {
+      alert(error.message || 'Error al exportar a CSV')
+    } finally {
+      setExportingCSV(false)
+    }
+  }
+
   const consultas = medicalHistory?.consultas || []
   const edad = pet?.fecha_nacimiento ? calculateAge(pet.fecha_nacimiento) : null
 
@@ -178,7 +213,7 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
             ) : (
               <>
                 {/* ============================================
-                    INFORMACIÓN DEL PACIENTE
+                    INFORMACIÓN DEL PACIENTE - CON NUEVOS CAMPOS
                     ============================================ */}
                 {pet && (
                   <div className="medical-history-modal__patient-section">
@@ -212,6 +247,42 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
                           {pet.raza || 'No especificada'}
                         </span>
                       </div>
+
+                      {/* NUEVO CAMPO: Color */}
+                      {pet.color && (
+                        <div className="medical-history-modal__field-group">
+                          <label className="medical-history-modal__field-label">
+                            Color
+                          </label>
+                          <span className="medical-history-modal__field-value">
+                            {pet.color}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* NUEVO CAMPO: Sexo */}
+                      {pet.sexo && (
+                        <div className="medical-history-modal__field-group">
+                          <label className="medical-history-modal__field-label">
+                            Sexo
+                          </label>
+                          <span className="medical-history-modal__field-value">
+                            {pet.sexo === 'macho' ? 'Macho ♂' : pet.sexo === 'hembra' ? 'Hembra ♀' : pet.sexo}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* NUEVO CAMPO: Peso */}
+                      {(typeof pet.peso !== 'undefined' && pet.peso !== null && pet.peso !== '') && (
+                        <div className="medical-history-modal__field-group">
+                          <label className="medical-history-modal__field-label">
+                            Peso
+                          </label>
+                          <span className="medical-history-modal__field-value">
+                            {Number(pet.peso)} kg
+                          </span>
+                        </div>
+                      )}
 
                       <div className="medical-history-modal__field-group">
                         <label className="medical-history-modal__field-label">
@@ -248,50 +319,42 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
                 )}
 
                 {/* ============================================
-                    REGISTRO DE CONSULTAS MÉDICAS (ACCORDION)
+                    HISTORIAL DE CONSULTAS
                     ============================================ */}
-                <div className="medical-history-modal__consultations-section">
+                <div className="medical-history-modal__history-section">
                   <h2 className="medical-history-modal__section-title">
-                    Registro de Consultas Médicas
+                    Historial de Consultas
                   </h2>
 
                   {consultas.length === 0 ? (
-                    // Estado vacío - Sin consultas
                     <div className="medical-history-modal__empty-state">
-                      <div className="medical-history-modal__empty-icon">
-                        📋
-                      </div>
-                      <p className="medical-history-modal__empty-title">
-                        Sin consultas registradas
-                      </p>
+                      <div className="medical-history-modal__empty-icon">📋</div>
                       <p className="medical-history-modal__empty-text">
-                        Este paciente aún no tiene consultas médicas registradas en su historial.
+                        Esta mascota aún no tiene consultas registradas
                       </p>
                     </div>
                   ) : (
-                    // Lista de consultas con accordion
-                    <div className="medical-history-modal__consultations-list">
+                    <div className="medical-history-modal__accordion">
                       {consultas.map((consulta, index) => {
-                        const consultaId = consulta.id || index
-                        const expanded = isExpanded(consultaId)
+                        const expanded = isExpanded(consulta.id)
 
                         return (
                           <div
-                            key={consultaId}
-                            className="medical-history-modal__consultation-accordion"
+                            key={consulta.id}
+                            className={`medical-history-modal__accordion-item ${
+                              expanded ? 'medical-history-modal__accordion-item--expanded' : ''
+                            }`}
                           >
-                            {/* Header clickeable del accordion */}
+                            {/* Header de la consulta */}
                             <div
-                              className={`medical-history-modal__accordion-header ${
-                                expanded ? 'medical-history-modal__accordion-header--active' : ''
-                              }`}
-                              onClick={() => toggleConsultation(consultaId)}
+                              className="medical-history-modal__accordion-header"
+                              onClick={() => toggleConsultation(consulta.id)}
                               role="button"
-                              aria-expanded={expanded}
                               tabIndex={0}
                               onKeyPress={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
-                                  toggleConsultation(consultaId)
+                                  e.preventDefault()
+                                  toggleConsultation(consulta.id)
                                 }
                               }}
                             >
@@ -451,6 +514,54 @@ function MedicalHistoryModal({ isOpen, onClose, pet, medicalHistory, loading }) 
               )}
             </div>
             <div className="medical-history-modal__footer-actions">
+              <button
+                className="export-btn export-btn--pdf"
+                onClick={handleExportPDF}
+                disabled={exportingPDF || !medicalHistory?.id}
+                title="Exportar a PDF"
+              >
+                {exportingPDF ? (
+                  <>
+                    <span className="export-btn__spinner"></span>
+                    <span>Exportando...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="export-btn__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7 18H17V16H7V18Z" fill="currentColor"/>
+                      <path d="M17 14H7V12H17V14Z" fill="currentColor"/>
+                      <path d="M7 10H11V8H7V10Z" fill="currentColor"/>
+                      <path fillRule="evenodd" clipRule="evenodd" d="M6 2C4.34315 2 3 3.34315 3 5V19C3 20.6569 4.34315 22 6 22H18C19.6569 22 21 20.6569 21 19V9C21 5.13401 17.866 2 14 2H6ZM6 4H13V9H19V19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V5C5 4.44772 5.44772 4 6 4ZM15 4.10002C16.6113 4.4271 17.9413 5.52906 18.584 7H15V4.10002Z" fill="currentColor"/>
+                    </svg>
+                    <span>Exportar PDF</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                className="export-btn export-btn--csv"
+                onClick={handleExportCSV}
+                disabled={exportingCSV || !medicalHistory?.id}
+                title="Exportar a CSV"
+              >
+                {exportingCSV ? (
+                  <>
+                    <span className="export-btn__spinner"></span>
+                    <span>Exportando...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="export-btn__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M8 13H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M8 17H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span>Exportar CSV</span>
+                  </>
+                )}
+              </button>
+
               <Button onClick={onClose} variant="primary">
                 Cerrar
               </Button>
@@ -470,6 +581,9 @@ MedicalHistoryModal.propTypes = {
     nombre: PropTypes.string,
     especie: PropTypes.string,
     raza: PropTypes.string,
+    color: PropTypes.string,
+    sexo: PropTypes.string,
+    peso: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     microchip: PropTypes.string,
     fecha_nacimiento: PropTypes.string
   }),

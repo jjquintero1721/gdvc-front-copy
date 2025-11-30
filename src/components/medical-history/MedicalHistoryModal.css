@@ -537,6 +537,135 @@
 .medical-history-modal__footer-actions {
   display: flex;
   gap: 12px;
+  align-items: center;
+}
+
+/* ============================================
+   BOTONES DE EXPORTACIÓN - NUEVO
+   ============================================ */
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.export-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.export-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.export-btn:active {
+  transform: scale(0.95);
+}
+
+.export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.export-btn:disabled::before {
+  display: none;
+}
+
+/* Botón PDF - Rojo */
+.export-btn--pdf {
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+  color: white;
+}
+
+.export-btn--pdf:hover:not(:disabled) {
+  background: linear-gradient(135deg, #B91C1C, #991B1B);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+  transform: translateY(-2px);
+}
+
+.export-btn--pdf:active:not(:disabled) {
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Botón CSV - Verde */
+.export-btn--csv {
+  background: linear-gradient(135deg, #16A34A, #15803D);
+  color: white;
+}
+
+.export-btn--csv:hover:not(:disabled) {
+  background: linear-gradient(135deg, #15803D, #166534);
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.4);
+  transform: translateY(-2px);
+}
+
+.export-btn--csv:active:not(:disabled) {
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+}
+
+/* Icono del botón */
+.export-btn__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.export-btn:hover:not(:disabled) .export-btn__icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* Spinner de carga */
+.export-btn__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Animación de pulso para botones */
+@keyframes pulse-export {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.export-btn:not(:disabled):hover {
+  animation: pulse-export 2s ease-in-out infinite;
 }
 
 /* ============================================
@@ -583,10 +712,16 @@
 
   .medical-history-modal__footer-actions {
     width: 100%;
+    flex-wrap: wrap;
   }
 
   .medical-history-modal__footer-actions button {
     flex: 1;
+    min-width: 140px;
+  }
+
+  .export-btn {
+    padding: 12px 16px;
   }
 
   .medical-history-modal__accordion-title {

@@ -28,6 +28,7 @@ const EmptyPetsIcon = () => (
  * @param {Array} pets - Lista de mascotas
  * @param {Function} onAddPet - Callback para agregar mascota
  * @param {Function} onEditPet - Callback para editar mascota
+ * @param {Function} onViewHistory - Callback para ver historia clínica
  * @param {boolean} loading - Estado de carga
  * @param {string} emptyMessage - Mensaje personalizado de estado vacío
  */
@@ -35,6 +36,7 @@ function PetGrid({
   pets = [],
   onAddPet,
   onEditPet,
+  onViewHistory,
   loading = false,
   emptyMessage = 'No hay mascotas registradas'
 }) {
@@ -72,7 +74,8 @@ function PetGrid({
           key={pet.id}
           pet={pet}
           onEdit={onEditPet}
-          showActions={false}
+          onViewHistory={onViewHistory}
+          showActions={true}
         />
       ))}
     </div>
