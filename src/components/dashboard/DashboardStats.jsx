@@ -124,12 +124,7 @@ function DashboardStats() {
           icon: 'users',
           color: 'green'
         },
-        {
-          title: 'Stock Bajo',
-          value: stats.stockBajo || 0,
-          icon: 'alert',
-          color: 'orange'
-        },
+
       ],
       auxiliar: [
         {

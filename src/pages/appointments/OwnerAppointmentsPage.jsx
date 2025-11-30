@@ -6,6 +6,8 @@ import ownerService from '@/services/ownerService'
 import AppointmentCard from '@/components/appointments/AppointmentCard'
 import AppointmentDetailModal from '@/components/calender/AppointmentDetailModal'
 import CreateAppointmentModal from '@/components/appointments/CreateAppointmentModal'
+import CancelAppointmentModal from '@/components/appointments/CancelAppointmentModal'
+import RescheduleAppointmentModal from '@/components/appointments/RescheduleAppointmentModal'
 import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
 import './OwnerAppointmentsPage.css'
@@ -34,6 +36,8 @@ function OwnerAppointmentsPage() {
   // Estados de modales
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState(null)
 
   // PAGINACIÓN
@@ -187,29 +191,57 @@ function OwnerAppointmentsPage() {
     }
   }
 
-  const handleCancelAppointment = async (appointment) => {
-    if (!window.confirm('¿Estás seguro de que deseas cancelar esta cita?')) return
+  const handleCancelAppointment = (appointment) => {
+    setSelectedAppointment(appointment)
+    setIsCancelModalOpen(true)
+  }
+
+  const handleConfirmCancel = async (motivo) => {
     try {
       setLoading(true)
       setError(null)
-      const motivo = prompt('Por favor, indica el motivo de la cancelación:')
-      if (!motivo) {
-        setError('Debes proporcionar un motivo de cancelación')
-        return
-      }
-      await appointmentService.cancelAppointment(appointment.id, motivo)
-      setSuccess('Cita cancelada exitosamente')
+
+      await appointmentService.cancelAppointment(selectedAppointment.id, motivo)
+
+      setSuccess('✅ Cita cancelada exitosamente')
+      setIsCancelModalOpen(false)
+      setSelectedAppointment(null)
       await loadAppointments()
     } catch (err) {
       console.error('Error al cancelar cita:', err)
       setError(err.message || 'Error al cancelar la cita')
+      throw err  // Re-throw para que el modal lo maneje
     } finally {
       setLoading(false)
     }
   }
 
   const handleRescheduleAppointment = (appointment) => {
-    alert('Funcionalidad de reprogramación en desarrollo')
+    setSelectedAppointment(appointment)
+    setIsRescheduleModalOpen(true)
+  }
+
+  const handleConfirmReschedule = async (nuevaFechaHora) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      await appointmentService.rescheduleAppointment(
+        selectedAppointment.id,
+        nuevaFechaHora
+      )
+
+      setSuccess('✅ Cita reprogramada exitosamente')
+      setIsRescheduleModalOpen(false)
+      setSelectedAppointment(null)
+      await loadAppointments()
+    } catch (err) {
+      console.error('Error al reprogramar cita:', err)
+      setError(err.message || 'Error al reprogramar la cita')
+      throw err  // Re-throw para que el modal lo maneje
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleCreateAppointment = () => {
@@ -427,6 +459,29 @@ function OwnerAppointmentsPage() {
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSuccess={handleAppointmentCreated}
+        />
+      )}
+      {isCancelModalOpen && selectedAppointment && (
+        <CancelAppointmentModal
+          isOpen={isCancelModalOpen}
+          onClose={() => {
+            setIsCancelModalOpen(false)
+            setSelectedAppointment(null)
+          }}
+          onConfirm={handleConfirmCancel}
+          appointment={selectedAppointment}
+        />
+      )}
+
+      {isRescheduleModalOpen && selectedAppointment && (
+        <RescheduleAppointmentModal
+          isOpen={isRescheduleModalOpen}
+          onClose={() => {
+            setIsRescheduleModalOpen(false)
+            setSelectedAppointment(null)
+          }}
+          onConfirm={handleConfirmReschedule}
+          appointment={selectedAppointment}
         />
       )}
 
