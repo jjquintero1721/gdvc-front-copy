@@ -1,6 +1,6 @@
 /* ============================================
    APPOINTMENT CARD - ESTILOS ACTUALIZADOS
-   Con botón de CONFIRMAR más visible
+   Con botón de CONFIRMAR más visible + Decoradores
    ============================================ */
 
 .appointment-card {
@@ -385,3 +385,18 @@
   transform: scale(1.08);
 }
 
+/* ============================================
+   BOTÓN ACCIÓN: AÑADIR DECORADOR
+============================================ */
+
+.appointment-card__action-button--decorator {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.appointment-card__action-button--decorator:hover:not(:disabled) {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}

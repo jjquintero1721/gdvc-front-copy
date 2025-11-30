@@ -1,0 +1,376 @@
+/* ============================================
+   DECORATORS VIEW - ESTILOS
+   Vista de decoradores de una cita
+   ============================================ */
+
+.decorators-view {
+  width: 100%;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.decorators-view__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 20px 0;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.decorators-view__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: #6b7280;
+}
+
+.decorators-view__loading span {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.decorators-view__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 20px;
+  color: #9ca3af;
+}
+
+.decorators-view__empty svg {
+  opacity: 0.4;
+}
+
+.decorators-view__empty p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ============================================
+   DECORATORS LIST
+   ============================================ */
+
+.decorators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ============================================
+   DECORATOR CARD
+   ============================================ */
+
+.decorator-card {
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.decorator-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Variantes de color */
+.decorator-card--blue {
+  border-left: 4px solid #3b82f6;
+}
+
+.decorator-card--purple {
+  border-left: 4px solid #8b5cf6;
+}
+
+.decorator-card--orange {
+  border-left: 4px solid #f59e0b;
+}
+
+.decorator-card--gray {
+  border-left: 4px solid #6b7280;
+}
+
+/* Header del card */
+.decorator-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+}
+
+.decorator-card__icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.decorator-card--blue .decorator-card__icon {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+}
+
+.decorator-card--purple .decorator-card__icon {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  color: #6d28d9;
+}
+
+.decorator-card--orange .decorator-card__icon {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  color: #9a3412;
+}
+
+.decorator-card--gray .decorator-card__icon {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  color: #374151;
+}
+
+.decorator-card__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.decorator-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.decorator-card__date {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.decorator-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.decorator-card__toggle,
+.decorator-card__remove {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.decorator-card__toggle {
+  color: #6b7280;
+}
+
+.decorator-card__toggle:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.decorator-card__remove {
+  color: #ef4444;
+}
+
+.decorator-card__remove:hover:not(:disabled) {
+  background: #fee2e2;
+  transform: scale(1.05);
+}
+
+.decorator-card__remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Body del card (expandible) */
+.decorator-card__body {
+  overflow: hidden;
+}
+
+/* ============================================
+   DECORATOR CONTENT
+   ============================================ */
+
+.decorator-content {
+  padding: 16px;
+  border-top: 1px solid #f3f4f6;
+  background: #fafbfc;
+}
+
+.decorator-content__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.decorator-content__item:last-child {
+  margin-bottom: 0;
+}
+
+.decorator-content__item svg {
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.decorator-content__item .status {
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.decorator-content__item .status.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.decorator-content__item .status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.decorator-content__field {
+  margin-bottom: 12px;
+}
+
+.decorator-content__field:last-child {
+  margin-bottom: 0;
+}
+
+.decorator-content__field strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.decorator-content__field p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.decorator-content__field ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.decorator-content__field ul li {
+  position: relative;
+  padding: 6px 0 6px 20px;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.decorator-content__field ul li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #8b5cf6;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* ============================================
+   PRIORITY CONTENT
+   ============================================ */
+
+.decorator-content__priority {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.priority-badge--alta {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 2px solid #ef4444;
+}
+
+.priority-badge--media {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  color: #9a3412;
+  border: 2px solid #f59e0b;
+}
+
+.priority-badge--baja {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 2px solid #10b981;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .decorators-view {
+    padding: 16px;
+  }
+
+  .decorator-card__header {
+    padding: 12px;
+  }
+
+  .decorator-card__icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .decorator-card__title {
+    font-size: 0.9375rem;
+  }
+
+  .decorator-content {
+    padding: 12px;
+  }
+}

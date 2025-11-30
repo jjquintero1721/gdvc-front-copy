@@ -1,25 +1,74 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import './AppointmentDetailModal.css';
+import DecoratorsView from '@/components/appointments/DecoratorsView.jsx'
+import decoratorService from "@services/decoratorService";
 
 /**
  * AppointmentDetailModal - Modal para mostrar detalles de una cita
+ *
+ * Props:
+ *  - isOpen
+ *  - onClose
+ *  - appointment (obj)
+ *  - userRole (string)  <-- Importante: debe pasarse desde el padre
+ *  - onDecoratorsChanged (opcional) callback cuando cambian decoradores
  */
-const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
+const AppointmentDetailModal = ({ isOpen, onClose, appointment, userRole, onDecoratorsChanged }) => {
   if (!appointment) return null;
 
   // Formatear fecha y hora
   const fechaHora = parseISO(appointment.fecha_hora);
   const fechaFormateada = format(fechaHora, "EEEE, d 'de' MMMM 'de' yyyy", { locale: es });
   const horaFormateada = format(fechaHora, 'h:mm a', { locale: es });
+  const [decorators, setDecorators] = useState([]);
+  const [loadingDecorators, setLoadingDecorators] = useState(true);
+
+  useEffect(() => {
+    if (!isOpen || !appointment?.id) return;
+
+    const load = async () => {
+      try {
+        setLoadingDecorators(true);
+        const response = await decoratorService.getDecorators(appointment.id);
+
+        console.log("📦 Respuesta completa del backend:", response);
+        console.log("📦 response.data:", response.data);
+
+        // El backend devuelve: { success: true, message: "...", data: { decoradores: [...], id, mascota_id, etc. } }
+        // Necesitamos extraer response.data.data.decoradores
+        let list = [];
+        
+        if (response?.data?.data?.decoradores) {
+          // Estructura: response.data.data.decoradores
+          list = response.data.data.decoradores;
+        } else if (response?.data?.decoradores) {
+          // Fallback: response.data.decoradores
+          list = response.data.decoradores;
+        } else {
+          console.warn("⚠️ No se encontraron decoradores en la respuesta");
+        }
+
+        console.log("✅ Decoradores extraídos:", list);
+        setDecorators(list);
+      } catch (err) {
+        console.error("❌ Error cargando decoradores:", err);
+        setDecorators([]);
+      } finally {
+        setLoadingDecorators(false);
+      }
+    };
+
+    load();
+  }, [isOpen, appointment?.id]);
+
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay - ✅ z-index: 10000 en CSS */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -27,7 +76,6 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
             className="appointment-modal__overlay"
             onClick={onClose}
           >
-            {/* Modal Container */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -36,7 +84,6 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
               onClick={(e) => e.stopPropagation()}
               className="appointment-modal__container"
             >
-              {/* Header */}
               <div className="appointment-modal__header">
                 <div className="appointment-modal__header-content">
                   <div>
@@ -55,11 +102,9 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
                 </div>
               </div>
 
-              {/* Contenido */}
               <div className="appointment-modal__content">
-                {/* Grid de información principal */}
+                {/* --- Información principal (igual que antes) --- */}
                 <div className="appointment-modal__grid">
-                  {/* Mascota */}
                   <div className="appointment-modal__section">
                     <h3 className="appointment-modal__section-title">Mascota</h3>
                     <div className="appointment-modal__section-content">
@@ -79,7 +124,6 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
                     </div>
                   </div>
 
-                  {/* Propietario */}
                   <div className="appointment-modal__section">
                     <h3 className="appointment-modal__section-title">Propietario</h3>
                     <div className="appointment-modal__section-content">
@@ -118,7 +162,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
                   </div>
                 )}
 
-                {/* Horario y Estado */}
+                {/* Horario / Estado / Servicio / Motivo (igual que antes) */}
                 <div className="appointment-modal__grid">
                   <div className="appointment-modal__section appointment-modal__section--blue">
                     <h3 className="appointment-modal__section-title">Horario</h3>
@@ -138,7 +182,6 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
                   </div>
                 </div>
 
-                {/* Servicio */}
                 {appointment.servicio && (
                   <div className="appointment-modal__section appointment-modal__section--purple appointment-modal__section--full">
                     <h3 className="appointment-modal__section-title">Servicio</h3>
@@ -149,7 +192,6 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
                   </div>
                 )}
 
-                {/* Motivo */}
                 {appointment.motivo && (
                   <div className="appointment-modal__section appointment-modal__section--full">
                     <h3 className="appointment-modal__section-title">Motivo de la consulta</h3>
@@ -157,7 +199,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
                   </div>
                 )}
 
-                {/* Notas */}
+                {/* Notas adicionales */}
                 {appointment.notas && appointment.notas.trim() !== '' && (
                   <div className="appointment-modal__section appointment-modal__section--amber appointment-modal__section--full">
                     <div className="appointment-modal__alert">
@@ -172,48 +214,51 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
                   </div>
                 )}
 
-                {/* Información adicional */}
+                {/* Información adicional (fechas) */}
                 <div className="appointment-modal__data-grid">
                   <div>
                     <p className="appointment-modal__data-label">Fecha de creación:</p>
                     <p className="appointment-modal__data-value">
-                      {format(parseISO(appointment.fecha_creacion), "d 'de' MMMM 'de' yyyy", { locale: es })}
+                      {appointment.fecha_creacion ? format(parseISO(appointment.fecha_creacion), "d 'de' MMMM 'de' yyyy", { locale: es }) : '-'}
                     </p>
                   </div>
-                  {appointment.fecha_actualizacion && (
-                    <div>
-                      <p className="appointment-modal__data-label">Última actualización:</p>
-                      <p className="appointment-modal__data-value">
-                        {format(parseISO(appointment.fecha_actualizacion), "d 'de' MMMM 'de' yyyy", { locale: es })}
-                      </p>
-                    </div>
+                  <div>
+                    <p className="appointment-modal__data-label">Última actualización:</p>
+                    <p className="appointment-modal__data-value">
+                      {appointment.fecha_actualizacion ? format(parseISO(appointment.fecha_actualizacion), "d 'de' MMMM 'de' yyyy", { locale: es }) : '-'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* ============================
+                    Sección de Decoradores
+                ============================= */}
+                <div className="appointment-modal__section appointment-modal__section--full" style={{ marginTop: 16 }}>
+                  <h3 className="appointment-modal__section-title">Decoradores</h3>
+
+                  {loadingDecorators ? (
+                    <p style={{ padding: "8px 12px", opacity: 0.7 }}>Cargando decoradores...</p>
+                  ) : (
+                    <DecoratorsView
+                      appointment={appointment}
+                      userRole={userRole}
+                      decoratorsList={decorators}     // ⭐ se los pasamos directamente
+                      onDecoratorRemoved={(id) => {
+                        // Eliminar de la UI
+                        setDecorators(prev => prev.filter(d => d.id !== id));
+
+                        if (typeof onDecoratorsChanged === 'function') {
+                          onDecoratorsChanged();
+                        }
+                      }}
+                    />
                   )}
                 </div>
 
-                {/* Advertencia de cancelación tardía */}
-                {appointment.cancelacion_tardia && (
-                  <div className="appointment-modal__section appointment-modal__section--orange appointment-modal__section--full">
-                    <div className="appointment-modal__alert">
-                      <svg className="appointment-modal__alert-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      <div className="appointment-modal__alert-content">
-                        <p className="appointment-modal__alert-title">Cancelación tardía</p>
-                        <p className="appointment-modal__alert-text">Esta cita fue cancelada con poco tiempo de anticipación.</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Footer */}
-              <div className="appointment-modal__footer">
-                <button
-                  onClick={onClose}
-                  className="appointment-modal__btn appointment-modal__btn--close"
-                >
-                  Cerrar
-                </button>
+                {/* Botón Cerrar (en footer por si quieres) */}
+                <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                  <button className="appointment-modal__close-btn" onClick={onClose}>Cerrar</button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -221,6 +266,6 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment }) => {
       )}
     </AnimatePresence>
   );
-};
+}
 
 export default AppointmentDetailModal;

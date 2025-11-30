@@ -3,13 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '@/store/AuthStore.jsx'
 import appointmentService from '@/services/appointmentService'
 import ownerService from '@/services/ownerService'
+import decoratorService from '@/services/decoratorService'
 import AppointmentCard from '@/components/appointments/AppointmentCard'
 import AppointmentDetailModal from '@/components/calender/AppointmentDetailModal'
 import CreateAppointmentModal from '@/components/appointments/CreateAppointmentModal'
 import CancelAppointmentModal from '@/components/appointments/CancelAppointmentModal'
 import RescheduleAppointmentModal from '@/components/appointments/RescheduleAppointmentModal'
+import DecoratorModal from '@/components/appointments/DecoratorModal'
 import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
+import { toast } from 'react-hot-toast'
 import './OwnerAppointmentsPage.css'
 import TriageModal from '@/components/triage/TriageModal'
 
@@ -38,6 +41,7 @@ function OwnerAppointmentsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false)
+  const [isDecoratorModalOpen, setIsDecoratorModalOpen] = useState(false) // ⭐ NUEVO
   const [selectedAppointment, setSelectedAppointment] = useState(null)
 
   // PAGINACIÓN
@@ -238,7 +242,7 @@ function OwnerAppointmentsPage() {
     } catch (err) {
       console.error('Error al reprogramar cita:', err)
       setError(err.message || 'Error al reprogramar la cita')
-      throw err  // Re-throw para que el modal lo maneje
+      throw err
     } finally {
       setLoading(false)
     }
@@ -248,10 +252,10 @@ function OwnerAppointmentsPage() {
     setIsCreateModalOpen(true)
   }
 
-  const handleAppointmentCreated = () => {
-    setSuccess('Cita agendada exitosamente')
+  const handleAppointmentCreated = async () => {
+    setSuccess('✅ Cita creada exitosamente')
     setIsCreateModalOpen(false)
-    loadAppointments()
+    await loadAppointments()
   }
 
   const handleOpenTriage = (cita) => {
@@ -259,16 +263,95 @@ function OwnerAppointmentsPage() {
     setShowTriageModal(true)
   }
 
-  // ======================
-  // PAGINACIÓN - cálculos
-  // ======================
+  // ==================== FUNCIONES PARA DECORADORES ====================
+
+  /**
+   * Abre el modal de decoradores para una cita
+   * @param {Object} appointment - Cita seleccionada
+   */
+  const handleOpenDecorators = (appointment) => {
+    console.log('🎨 Abriendo modal de decoradores para cita:', appointment.id)
+    setSelectedAppointment(appointment)
+    setIsDecoratorModalOpen(true)
+  }
+
+  /**
+   * Cierra el modal de decoradores
+   */
+  const handleCloseDecorators = () => {
+    setIsDecoratorModalOpen(false)
+    setSelectedAppointment(null)
+  }
+
+  /**
+   * Maneja la adición de un decorador a una cita
+   * @param {string} type - Tipo de decorador: 'recordatorio', 'notas', 'prioridad'
+   * @param {Object} data - Datos del decorador
+   */
+  const handleAddDecorator = async (type, data) => {
+    try {
+      console.log(`📝 Añadiendo decorador tipo ${type}:`, data)
+
+      let response
+
+      // Llamar al endpoint correspondiente según el tipo
+      switch (type) {
+        case 'recordatorio':
+          response = await decoratorService.addRecordatorio(
+            selectedAppointment.id,
+            data
+          )
+          toast.success('✅ Recordatorios añadidos exitosamente')
+          break
+
+        case 'notas':
+          response = await decoratorService.addNotas(
+            selectedAppointment.id,
+            data
+          )
+          toast.success('✅ Notas especiales añadidas exitosamente')
+          break
+
+        case 'prioridad':
+          response = await decoratorService.addPrioridad(
+            selectedAppointment.id,
+            data
+          )
+          toast.success(`✅ Prioridad ${data.nivel_prioridad} asignada exitosamente`)
+          break
+
+        default:
+          throw new Error('Tipo de decorador no válido')
+      }
+
+      console.log('✅ Decorador añadido:', response)
+
+      // Cerrar modal después de éxito
+      handleCloseDecorators()
+
+      // Opcional: Refrescar la lista de citas
+      // await loadAppointments()
+
+    } catch (error) {
+      console.error('❌ Error al añadir decorador:', error)
+      toast.error(error.message || 'Error al añadir decorador')
+      throw error // Re-lanzar para que el modal maneje el estado de loading
+    }
+  }
+
+  // ==================== FIN FUNCIONES DECORADORES ====================
+
+  /**
+   * PAGINACIÓN
+   */
   const totalPages = useMemo(() => {
-    return Math.max(1, Math.ceil(filteredAppointments.length / ITEMS_PER_PAGE))
+    return Math.ceil(filteredAppointments.length / ITEMS_PER_PAGE)
   }, [filteredAppointments.length])
 
   useEffect(() => {
-    // Asegurar que currentPage esté dentro del rango después de cambios
-    if (currentPage > totalPages) setCurrentPage(1)
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages)
+    }
   }, [totalPages, currentPage])
 
   const currentPageAppointments = useMemo(() => {
@@ -378,6 +461,7 @@ function OwnerAppointmentsPage() {
                     onCancel={handleCancelAppointment}
                     onReschedule={handleRescheduleAppointment}
                     onOpenTriage={handleOpenTriage}
+                    onOpenDecorators={handleOpenDecorators}
                     userRole={currentUser?.rol}
                   />
                 </div>
@@ -452,6 +536,8 @@ function OwnerAppointmentsPage() {
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         appointment={selectedAppointment}
+        userRole={currentUser?.rol}     // ⭐ Muy importante
+        onDecoratorsChanged={loadAppointments}
       />
 
       {isCreateModalOpen && (
@@ -461,6 +547,7 @@ function OwnerAppointmentsPage() {
           onSuccess={handleAppointmentCreated}
         />
       )}
+
       {isCancelModalOpen && selectedAppointment && (
         <CancelAppointmentModal
           isOpen={isCancelModalOpen}
@@ -497,6 +584,17 @@ function OwnerAppointmentsPage() {
             console.log('Triage registrado:', triage)
             loadAppointments()
           }}
+        />
+      )}
+
+      {/*  Modal de Decoradores */}
+      {isDecoratorModalOpen && selectedAppointment && (
+        <DecoratorModal
+          isOpen={isDecoratorModalOpen}
+          onClose={handleCloseDecorators}
+          appointment={selectedAppointment}
+          onAddDecorator={handleAddDecorator}
+          userRole={currentUser?.rol}
         />
       )}
     </div>

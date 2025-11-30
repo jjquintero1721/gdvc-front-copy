@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { motion } from 'framer-motion'
-import { CheckCircle, Eye, X, RotateCcw } from 'lucide-react'
-import { Stethoscope } from 'lucide-react'
+import { CheckCircle, Eye, X, RotateCcw, Stethoscope, Star } from 'lucide-react'
 import './AppointmentCard.css'
+import './DecoratorModal.jsx'
 
 function AppointmentCard({
   appointment,
@@ -13,6 +13,7 @@ function AppointmentCard({
   onCancel,
   onReschedule,
   onOpenTriage,
+  onOpenDecorators,
   userRole
 }) {
   const [isLoading, setIsLoading] = useState(false)
@@ -88,6 +89,11 @@ function AppointmentCard({
     !showOnlyDetails &&
     normalizedEstado === 'EN_PROCESO' &&
     userRole !== 'superadmin'
+
+  // Decoradores: permitir en estados donde se puedan gestionar
+  const canAddDecorators =
+    !showOnlyDetails &&
+    ['AGENDADA', 'CONFIRMADA', 'EN_PROCESO'].includes(normalizedEstado)
 
   return (
     <motion.div
@@ -179,6 +185,7 @@ function AppointmentCard({
                 <button
                   className="appointment-card__action-button appointment-card__action-button--reschedule"
                   onClick={() => onReschedule(appointment)}
+                  title="Reprogramar cita"
                 >
                   <RotateCcw size={20} />
                 </button>
@@ -188,6 +195,7 @@ function AppointmentCard({
                 <button
                   className="appointment-card__action-button appointment-card__action-button--cancel"
                   onClick={() => onCancel(appointment)}
+                  title="Cancelar cita"
                 >
                   <X size={20} />
                 </button>
@@ -198,12 +206,22 @@ function AppointmentCard({
                     <button
                       className="appointment-card__action-button appointment-card__action-button--triage"
                       onClick={() => onOpenTriage(appointment)}
-                      title="registrar triage"
+                      title="Registrar triage"
                     >
                         <Stethoscope size={20} />
                     </button>
                   )
                 }
+
+              {canAddDecorators && (
+                <button
+                  className="appointment-card__action-button appointment-card__action-button--decorator"
+                  onClick={() => onOpenDecorators(appointment)}
+                  title="Añadir decorador"
+                >
+                  <Star size={20} />
+                </button>
+              )}
             </div>
           </>
         )}
