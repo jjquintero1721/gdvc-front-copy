@@ -9,6 +9,7 @@ import Alert from '@/components/ui/Alert'
 import PetGrid from '@/components/pets/PetGrid'
 import MedicalHistoryModal from '@/components/medical-history/MedicalHistoryModal'
 import './PetsPage.css'
+import {useToastContext} from "@components/ui/ToastProvider.jsx";
 
 /**
  * Página de Gestión de Mascotas
@@ -35,6 +36,7 @@ import './PetsPage.css'
 function PetsPage() {
   const navigate = useNavigate()
   const { user: currentUser } = useAuthStore()
+  const toast = useToastContext()
 
   // Estados de datos
   const [pets, setPets] = useState([])
@@ -109,7 +111,7 @@ function PetsPage() {
       }
     } catch (err) {
       console.error('Error al cargar mascotas:', err)
-      setError(err.message || 'Error al cargar las mascotas')
+      toast("error", 'Error al cargar las mascotas')
     } finally {
       setLoading(false)
     }
@@ -180,7 +182,7 @@ function PetsPage() {
       }
     } catch (err) {
       console.error('Error al cargar historia clínica:', err)
-      setError('Error al cargar la historia clínica. Por favor, intenta nuevamente.')
+      toast("error",'Error al cargar la historia clínica. Por favor, intenta nuevamente.')
     } finally {
       setLoadingHistory(false)
     }
@@ -232,18 +234,6 @@ function PetsPage() {
         </div>
       </div>
 
-      {/* Alertas */}
-      {error && (
-        <Alert type="error" onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert type="success" onClose={() => setSuccess(null)}>
-          {success}
-        </Alert>
-      )}
 
       {/* Filtros y búsqueda - ESTRUCTURA MEJORADA */}
         <div className="pets-page__filters">

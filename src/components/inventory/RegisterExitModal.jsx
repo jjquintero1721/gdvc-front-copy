@@ -27,6 +27,19 @@ const RegisterExitModal = ({ isOpen, onClose, onSuccess, medication }) => {
     setLoading(true);
     setError(null);
 
+    if (formData.cantidad <= 0) {
+      setError("La cantidad debe ser mayor a 0.");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.cantidad > medication.stock_actual) {
+      setError("La cantidad supera el stock disponible.");
+      setLoading(false);
+      return;
+    }
+
+
     try {
       const dataToSend = {
         medicamento_id: medication.id,

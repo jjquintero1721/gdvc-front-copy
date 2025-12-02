@@ -14,7 +14,7 @@ import './AppointmentManagementPanel.css';
  * AppointmentManagementPanel - Panel principal de gestión de citas
  *
  * Este componente se abre cuando el veterinario inicia una cita (/start)
- * y permite gestionar todo el ciclo de vida de la consulta:
+ * y permite gestionar el ciclo de vida de la consulta:
  *
  * - Crear la primera consulta
  * - Editar consulta existente

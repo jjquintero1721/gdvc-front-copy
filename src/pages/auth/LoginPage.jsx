@@ -7,17 +7,20 @@ import authService from '@/services/authService'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import Checkbox from '@/components/ui/Checkbox'
-import Alert from '@/components/ui/Alert'
 
 // Icons
 import AtSignIcon from '@/assets/icons/AtSignIcon'
 import LockIcon from '@/assets/icons/LockIcon'
+
+// Toast
+import { useToastContext } from '@/components/ui/ToastProvider'
 
 import './LoginPage.css'
 
 function LoginPage() {
   const navigate = useNavigate()
   const login = useAuthStore((state) => state.login)
+  const toast = useToastContext()   // ← usamos el ToastProvider
 
   const [formData, setFormData] = useState({
     email: '',
@@ -26,7 +29,6 @@ function LoginPage() {
   })
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
   const [fieldErrors, setFieldErrors] = useState({})
 
   const handleChange = (e) => {
@@ -40,8 +42,6 @@ function LoginPage() {
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: null }))
     }
-
-    if (error) setError(null)
   }
 
   const validateForm = () => {
@@ -62,46 +62,14 @@ function LoginPage() {
     return errors
   }
 
-  const parseBackendError = (err) => {
-    if (!err.response) {
-      return 'No hay conexión con el servidor. Revisa tu internet.'
-    }
-
-    const status = err.response.status
-    const data = err.response.data
-
-    switch (status) {
-      case 400:
-        return data?.message || 'Solicitud inválida.'
-      case 401:
-        return 'Credenciales incorrectas. Intenta de nuevo.'
-      case 403:
-        return 'No tienes permisos para acceder.'
-      case 422:
-        if (data?.errors) {
-          const formatted = {}
-          Object.keys(data.errors).forEach(key => {
-            formatted[key] = data.errors[key][0]
-          })
-          setFieldErrors(formatted)
-          return 'Corrige los campos marcados.'
-        }
-        return data?.message || 'Datos inválidos.'
-      case 500:
-        return 'Error interno del servidor. Intenta más tarde.'
-      default:
-        return data?.message || 'Ocurrió un error inesperado.'
-    }
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError(null)
     setFieldErrors({})
 
     const errors = validateForm()
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors)
+      toast("error", "Corrige los campos marcados.")
       return
     }
 
@@ -113,53 +81,56 @@ function LoginPage() {
       if (payload && payload.success === false) {
         throw new Error(payload.message || 'Credenciales inválidas')
       }
-        // Extraer datos reales (depende de tu backend; aquí asumo payload.data.usuario y tokens)
-        const usuario = payload.data?.usuario || payload.data?.user || null
-        const access_token = payload.data?.access_token || payload.data?.token || null
-        const refresh_token = payload.data?.refresh_token || null
 
-        if (!usuario || !access_token) {
-          // defensivo: si faltan datos, lanzar
-          throw new Error('Respuesta inválida del servidor al iniciar sesión')
-        }
+      const usuario = payload.data?.usuario || payload.data?.user || null
+      const access_token = payload.data?.access_token || payload.data?.token || null
+      const refresh_token = payload.data?.refresh_token || null
 
-        login(
-          usuario,
-          {
-            access_token,
-            refresh_token
-          },
-          formData.rememberMe
-        )
-
-        navigate('/dashboard')
-      } catch (err) {
-        // log para depuración (opcional, eliminar en producción)
-        console.error('Login error ->', err)
-
-        // Mostrar el mensaje ya normalizado en authService
-        setError(err.message || 'Error al iniciar sesión. Intenta nuevamente.')
-
-        // Si hay errores de validación estructurados desde backend (422) los podemos mostrar en los campos
-        if (err.validation) {
-          // Mapear errores a fieldErrors si vienen en formato conocido
-          // Ejemplo: { email: ['msg1'], password: ['msg2'] } o Pydantic detail array
-          if (typeof err.validation === 'object' && !Array.isArray(err.validation)) {
-            const fieldErrs = {}
-            Object.keys(err.validation).forEach(k => {
-              const v = err.validation[k]
-              fieldErrs[k] = Array.isArray(v) ? v[0] : String(v)
-            })
-            setFieldErrors(fieldErrs)
-          } else if (Array.isArray(err.validation)) {
-            // pydantic detail -> convertir a mensajes generales
-            setError(prev => `${prev} ${err.validation.map(d => d.msg || d.message).join(', ')}`)
-          }
-        }
-      } finally {
-        setLoading(false)
+      if (!usuario || !access_token) {
+        throw new Error('Respuesta inválida del servidor al iniciar sesión')
       }
+
+      login(
+        usuario,
+        {
+          access_token,
+          refresh_token
+        },
+        formData.rememberMe
+      )
+
+      toast("success", "Inicio de sesión exitoso.")
+      navigate('/dashboard')
+
+    } catch (err) {
+      console.error('Login error ->', err)
+
+      if (err.status === 429) {
+        toast("error", err.message || "Cuenta bloqueada temporalmente por intentos fallidos.")
+        return
+      }
+
+      // errores backend con validaciones 422
+      if (err.validation) {
+        const fieldErrs = {}
+
+        if (typeof err.validation === 'object' && !Array.isArray(err.validation)) {
+          Object.keys(err.validation).forEach(k => {
+            const v = err.validation[k]
+            fieldErrs[k] = Array.isArray(v) ? v[0] : String(v)
+          })
+          setFieldErrors(fieldErrs)
+        }
+
+        toast("error", "Corrige los campos marcados.")
+      } else {
+        toast("error", err.message || "Error al iniciar sesión.")
+      }
+
+    } finally {
+      setLoading(false)
     }
+  }
 
   return (
     <div className="login-page-modern">
@@ -173,10 +144,6 @@ function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="login-form-modern">
-
-          {error && (
-            <Alert type="error" message={error} onClose={() => setError(null)} />
-          )}
 
           <Input
             label="Correo Electrónico"
@@ -201,6 +168,13 @@ function LoginPage() {
           />
 
           <div className="login-form-modern__options">
+            <Link
+              to="/reset-password"
+              className="login-form-modern__forgot"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+
             <Checkbox
               label="Recordarme"
               name="rememberMe"

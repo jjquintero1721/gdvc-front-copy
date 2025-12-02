@@ -176,7 +176,7 @@ export default function LandingPage() {
           >
             <motion.div className="hero__badge" variants={scaleIn}>
               <span className="hero__badge-icon">🐾</span>
-              <span>PatFlow</span>
+              <span>PawFlow</span>
             </motion.div>
 
             <motion.h1 className="hero__title" variants={cinematicReveal}>

@@ -138,6 +138,8 @@ function CreateServiceModal({ isOpen, onClose, onSubmit, service = null, loading
                 value={formData.duracion_minutos}
                 onChange={handleChange}
                 placeholder="30"
+                min="1"
+                step="1"
                 error={fieldErrors.duracion_minutos}
               />
             </div>
@@ -150,6 +152,8 @@ function CreateServiceModal({ isOpen, onClose, onSubmit, service = null, loading
                 value={formData.costo}
                 onChange={handleChange}
                 placeholder="50000"
+                min="0"
+                step="0.01"
                 error={fieldErrors.costo}
               />
             </div>

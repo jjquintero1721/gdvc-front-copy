@@ -1,7 +1,12 @@
 import { CheckCircle, AlertTriangle, XCircle, Info, X } from "lucide-react"
 import "./Alert.css"
 
-function Alert({ variant = "info", children, onClose }) {
+function Alert({ type = "info", children, onClose }) {
+
+  if (!children || (typeof children === 'string' && !children.trim())) {
+    return null
+  }
+
   const icons = {
     success: <CheckCircle size={20} />,
     error: <XCircle size={20} />,
@@ -10,8 +15,8 @@ function Alert({ variant = "info", children, onClose }) {
   }
 
   return (
-    <div className={`alert alert--${variant}`}>
-      <div className="alert__icon">{icons[variant]}</div>
+    <div className={`alert alert--${type}`}>
+      <div className="alert__icon">{icons[type]}</div>
 
       <div className="alert__message">{children}</div>
 

@@ -12,6 +12,7 @@ import {
   TRIAGE_PRIORITY_LABELS
 } from '@/utils/triageConstants'
 import './TriagePage.css'
+import {useToastContext} from "@components/ui/ToastProvider.jsx";
 
 /**
  * Página de Triage - Cola de Urgencias
@@ -33,7 +34,7 @@ function TriagePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
-
+  const toast  = useToastContext()
   // Estados de filtros
   const [filterPriority, setFilterPriority] = useState('all')
 
@@ -54,7 +55,7 @@ function TriagePage() {
    */
   const loadAllTriages = async () => {
     setLoading(true)
-    setError(null)
+    toast("error",null)
 
     try {
       console.log('🩺 Cargando TODOS los triages...')
@@ -86,7 +87,7 @@ function TriagePage() {
       setTriages(triagesOrdenados)
     } catch (err) {
       console.error('❌ Error al cargar triages:', err)
-      setError(err.message || 'Error al cargar los triages')
+      toast("error",err.message ||"error", 'Error al cargar los triages')
     } finally {
       setLoading(false)
     }
@@ -148,7 +149,7 @@ function TriagePage() {
 
       console.log('✅ Triage eliminado exitosamente')
 
-      setSuccess('Triage eliminado exitosamente')
+      toast("success",'Triage eliminado exitosamente')
       setShowDeleteConfirm(false)
       setTriageToDelete(null)
 
@@ -160,7 +161,7 @@ function TriagePage() {
 
     } catch (err) {
       console.error('❌ Error al eliminar triage:', err)
-      setError(err.message || 'Error al eliminar el triage')
+      toast("error",err.message || "error" ,'Error al eliminar el triage')
       setShowDeleteConfirm(false)
     }
   }
@@ -197,14 +198,6 @@ function TriagePage() {
         </Button>
       </div>
 
-      {/* Alertas */}
-      {error && (
-        <Alert type="error" message={error} onClose={() => setError(null)} />
-      )}
-
-      {success && (
-        <Alert type="success" message={success} onClose={() => setSuccess(null)} />
-      )}
 
       {/* Estadísticas */}
       <div className="triage-page__stats">

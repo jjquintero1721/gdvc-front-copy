@@ -66,10 +66,11 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
     return 'medication-card__stock--ok';
   };
 
+  // NOTE: usamos las clases con sufijo 2 para evitar colisiones
   const getBadgeClass = () => {
-    if (isExpired()) return 'medication-card__badge--expired';
-    if (isLowStock) return 'medication-card__badge--low';
-    return 'medication-card__badge--ok2';
+    if (isExpired()) return 'medication-card__badge2--expired2';
+    if (isLowStock) return 'medication-card__badge2--low2';
+    return 'medication-card__badge2--ok2';
   };
 
   const getBadgeText = () => {
@@ -101,14 +102,19 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
                 <Pill size={24} className="medication-card__icon" />
               </div>
               <div className="medication-card__title-content">
-                <h3 className="medication-card__name">{medication.nombre}</h3>
-                <p className="medication-card__type">{medication.tipo}</p>
-              </div>
-            </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <h3 className="medication-card__name">{medication.nombre}</h3>
 
-            <span className={`medication-card__badge2 ${getBadgeClass()}`}>
-              {getBadgeText()}
-            </span>
+                    {/* badge ahora AL LADO del nombre */}
+                    <span className={`medication-card__badge2 ${getBadgeClass()}`}>
+                      {getBadgeText()}
+                    </span>
+                  </div>
+
+                  {/* tipo queda abajo */}
+                  <p className="medication-card__type">{medication.tipo}</p>
+                </div>
+            </div>
           </div>
         </div>
 
@@ -177,6 +183,18 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
               <p className="medication-card__lab-value">{medication.laboratorio}</p>
             </div>
           )}
+          {medication.tipo === 'antibiotico' && medication.principio_activo && (
+              <div className="medication-card__info-item">
+                <Pill size={16} />
+                <div>
+                  <p className="medication-card__info-label">Principio Activo</p>
+                  <p className="medication-card__info-value">
+                    {medication.principio_activo}
+                  </p>
+                </div>
+              </div>
+            )}
+
 
           {(medication.requiere_refrigeracion || medication.controlado) && (
             <div className="medication-card__special-badges">
@@ -197,10 +215,9 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
           )}
         </div>
 
-        {/* 🟦 FOOTER NUEVO Y MEJORADO */}
+        {/* FOOTER */}
         <div className="medication-card__footer">
 
-          {/* FILA 1 */}
           <div className="medication-card__footer-row">
             <button className="medication-card__action-button" onClick={() => setIsUpdateModalOpen(true)}>
               <Edit size={16} /> Actualizar
@@ -211,7 +228,6 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
             </button>
           </div>
 
-          {/* FILA 2 */}
           <div className="medication-card__footer-row">
             <button className="medication-card__action-button medication-card__action-button--entry"
               onClick={() => setIsEntryModalOpen(true)}>
@@ -224,7 +240,6 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
             </button>
           </div>
 
-          {/* BOTÓN DESTRUCTIVO – ANCHO COMPLETO */}
           <button
             className="medication-card__action-button medication-card__action-button--deactivate-full"
             onClick={() => setIsDeactivateModalOpen(true)}
@@ -264,10 +279,13 @@ const MedicationCard = ({ medication, onUpdate, onInventoryChange }) => {
       />
 
       <DeactivateMedicationModal
-        isOpen={isDeactivateModalOpen}
-        onClose={() => setIsDeactivateModalOpen(false)}
-        onSuccess={() => { setIsDeactivateModalOpen(false); handleModalSuccess(); }}
-        medication={medication}
+          isOpen={isDeactivateModalOpen}
+          onClose={() => setIsDeactivateModalOpen(false)}
+          onSuccess={() => {
+              setIsDeactivateModalOpen(false);
+              handleModalSuccess();
+          }}
+          medication={medication}
       />
     </>
   );

@@ -4,11 +4,13 @@ import { useAuthStore } from '@/store/AuthStore.jsx'
 import userService from '@/services/userService'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Alert from '@/components/ui/Alert'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import UserActionsMenu from '@/components/users/UserActionsMenu'
 import UserModal from '@/components/users/UserModal'
 import './UsersPage.css'
+
+// Toast
+import { useToastContext } from '@/components/ui/ToastProvider'
 
 /**
  * Página de Gestión de Usuarios - Versión Actualizada
@@ -34,6 +36,7 @@ import './UsersPage.css'
 function UsersPage() {
   const navigate = useNavigate()
   const { user: currentUser } = useAuthStore()
+  const toast = useToastContext()
 
   // Estados de datos
   const [users, setUsers] = useState([])
@@ -100,7 +103,9 @@ function UsersPage() {
       }
     } catch (err) {
       console.error('Error al cargar usuarios:', err)
-      setError(err.message || 'Error al cargar los usuarios')
+      const msg = err?.message || 'Error al cargar los usuarios'
+      setError(msg)
+      toast('error', msg)
     } finally {
       setLoading(false)
     }
@@ -159,7 +164,9 @@ function UsersPage() {
       }
     } catch (err) {
       console.error('Error en búsqueda:', err)
-      setError(err.message || 'Error al buscar usuarios')
+      const msg = err?.message || 'Error al buscar usuarios'
+      setError(msg)
+      toast('error', msg)
     } finally {
       setLoading(false)
     }
@@ -224,7 +231,9 @@ function UsersPage() {
         : await userService.activateUser(user.id)
 
       if (response.success) {
-        setSuccess(`Usuario ${user.activo ? 'desactivado' : 'activado'} exitosamente`)
+        const message = `Usuario ${user.activo ? 'desactivado' : 'activado'} exitosamente`
+        setSuccess(message)
+        toast('success', message)
 
         // Cerrar modal
         setConfirmModal({
@@ -241,7 +250,9 @@ function UsersPage() {
       }
     } catch (err) {
       console.error('Error al cambiar estado:', err)
-      setError(err.message || 'Error al cambiar el estado del usuario')
+      const msg = err?.message || 'Error al cambiar el estado del usuario'
+      setError(msg)
+      toast('error', msg)
 
       // Cerrar modal incluso si hay error
       setConfirmModal({
@@ -266,12 +277,15 @@ function UsersPage() {
 
       if (response.success) {
         setSuccess('Usuario actualizado exitosamente')
+        toast('success', 'Usuario actualizado exitosamente')
         setModalOpen(false)
         await loadUsers()
       }
     } catch (err) {
       console.error('Error al actualizar usuario:', err)
-      setError(err.message || 'Error al actualizar el usuario')
+      const msg = err?.message || 'Error al actualizar el usuario'
+      setError(msg)
+      toast('error', msg)
     }
   }
 
@@ -309,17 +323,7 @@ function UsersPage() {
         </div>
       </div>
 
-      {/* Mensajes de éxito/error */}
-      {success && (
-        <Alert variant="success" onClose={() => setSuccess(null)}>
-          {success}
-        </Alert>
-      )}
-      {error && (
-        <Alert variant="error" onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+      {/* NOTE: ahora usamos toasts para mostrar mensajes; los <Alert /> se eliminaron para centralizar notificaciones */}
 
       {/* Filtros - ESTRUCTURA MEJORADA */}
         <div className="users-page__filters">

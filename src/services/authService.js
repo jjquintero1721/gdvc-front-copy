@@ -61,6 +61,7 @@ const authService = {
               backendMessage ||
               (status === 401 ? 'Credenciales inválidas. Verifica tu correo y contraseña.' :
                 status === 422 ? 'Errores de validación. Revisa los campos.' :
+                status === 429 ? 'Cuenta bloqueada temporalmente por intentos fallidos.' :  // ✅ AGREGADO
                 'Ocurrió un error en el servidor.')
             )
             err.status = status
@@ -77,7 +78,7 @@ const authService = {
           }
 
           // Otro tipo de error inesperado
-          const err = new Error(error?.message || 'Error inesperado al procesar la solicitud')
+          const err = new Error(error?.message || 'Contraseña o correo inválidos.')
           throw err
         }
   },
@@ -130,6 +131,21 @@ const authService = {
       throw handleAuthError(error)
     }
   },
+
+  resetPassword: async (email, newPassword, confirmPassword) => {
+      try {
+        const response = await apiClient.post('/auth/reset-password', {
+          correo: email,
+          nueva_contrasena: newPassword,
+          confirmar: confirmPassword
+        });
+        return response.data;
+      } catch (error) {
+        throw new Error(error.response?.data?.detail || "Error al restablecer la contraseña");
+      }
+    },
+
+
 
   /**
    * Cerrar sesión
@@ -186,6 +202,8 @@ function handleAuthError(error) {
           return new Error(`Errores de validación: ${messages}`)
         }
         return new Error(errorMessage || 'Error de validación. Verifica los datos ingresados.')
+      case 429:
+        return new Error(errorMessage || 'Cuenta bloqueada temporalmente. Intenta más tarde.')
       case 500:
         return new Error('Error interno del servidor. Por favor, intenta más tarde.')
       default:

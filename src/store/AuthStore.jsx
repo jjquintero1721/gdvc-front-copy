@@ -4,7 +4,6 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 /**
  * Store de Autenticación - VERSIÓN DEFINITIVA QUE SÍ FUNCIONA
  *
- * ✅ SOLUCIÓN REAL AL PROBLEMA:
  * - Usa SOLO sessionStorage (que se mantiene al recargar)
  * - Cuando rememberMe = true, TAMBIÉN copia a localStorage
  * - Al cargar, primero intenta desde localStorage, luego sessionStorage

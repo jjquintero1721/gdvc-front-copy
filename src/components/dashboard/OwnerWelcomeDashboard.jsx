@@ -44,7 +44,7 @@ function OwnerWelcomeDashboard() {
     const cleanEspecie = especie?.toLowerCase() || 'perro'
 
     if (cleanEspecie.includes('perro') || cleanEspecie.includes('dog')) {
-      return '🐕'
+      return '🐶'
     } else if (cleanEspecie.includes('gato') || cleanEspecie.includes('cat')) {
       return '🐱'
     } else {

@@ -1,6 +1,5 @@
 /* ============================================
-   MEDICATION CARD - ESTILOS
-   Tarjeta de medicamento con información detallada
+   MEDICATION CARD - ESTILOS (BADGES con sufijo 2)
    ============================================ */
 
 .medication-card {
@@ -13,6 +12,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .medication-card:hover {
@@ -21,11 +21,9 @@
   border-color: #3b82f6;
 }
 
-/* ============================================
-   HEADER DE LA TARJETA
-   ============================================ */
-
+/* HEADER */
 .medication-card__header {
+  position: relative;
   background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
@@ -72,9 +70,11 @@
   color: #1f2937;
   margin: 0;
   line-height: 1.3;
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;   /* máximo 2 líneas */
+  -webkit-box-orient: vertical;
 }
 
 .medication-card__type {
@@ -84,71 +84,54 @@
   text-transform: capitalize;
 }
 
+/* BADGE debajo del nombre (con sufijo 2) */
+/* fuerza apariencia sólida, evita mezclas y stacking issues */
 .medication-card__badge2 {
-  padding: 0.375rem 0.75rem;
+  position: absolute;       /* relativo al contenedor posicionado más cercano */
+  top: 3.6rem;                /* ajusta según necesites */
+  right: 0.5rem;              /* lo pones a la derecha del header */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: #fff;
   white-space: nowrap;
-  flex-shrink: 0;
+
+  /* IMPORTANTES para forzar solidez */
+  background-color: #ef4444; /* color por defecto — no uses rgba() */
+  mix-blend-mode: normal !important; /* evita mezcla con fondo */
+  opacity: 1 !important;             /* fuerza opacidad total */
+  z-index: 50;                        /* encima de otras capas */
+  isolation: isolate;                /* evita heredar compositing */
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+
+  /* permite transform sin crear problemas */
+  transform-origin: center;
+  will-change: transform;
 }
 
-.medication-card__badge--ok2 {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+/* variantes (usa colores sólidos HEX, nada con alpha) */
+.medication-card__badge2--ok2     { background-color: #059669; }
+.medication-card__badge2--low2    { background-color: #f97316; }
+.medication-card__badge2--expired2{ background-color: #dc2626; }
 
-  background: #10b981;
-  color: white;
-
-  padding: 4px 10px;
-  border-radius: 12px;
-
-  font-size: 0.75rem;
-  font-weight: 600;
-
-  white-space: nowrap; /* evita que se quiebre */
+/* animación por escala (no toca opacidad) */
+@keyframes badge-pulse-scale {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.06); }
+}
+.medication-card__badge2--ok2,
+.medication-card__badge2--low2,
+.medication-card__badge2--expired2 {
+  animation: badge-pulse-scale 1.8s ease-in-out infinite;
 }
 
 
-.medication-card__badge--low {
-  position: absolute;
-  top: 12px;
-  right: 12px;
 
-  background: #10b981;
-  color: white;
-
-  padding: 4px 10px;
-  border-radius: 12px;
-
-  font-size: 0.75rem;
-  font-weight: 600;
-
-  white-space: nowrap; /* evita que se quiebre */
-}
-
-.medication-card__badge--expired {
-  background: #dc2626;
-  color: white;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  position: absolute;
-  top: 12px;
-  right: 12px;
-
-  padding: 4px 10px;
-  border-radius: 12px;
-
-  font-size: 0.75rem;
-  font-weight: 600;
-
-  white-space: nowrap; /* evita que se quiebre */
-}
-
-/* ============================================
-   BODY DE LA TARJETA
-   ============================================ */
-
+/* BODY */
 .medication-card__body {
   padding: 1rem;
   display: flex;
@@ -157,7 +140,6 @@
   flex: 1;
 }
 
-/* Stock principal */
 .medication-card__stock {
   display: flex;
   align-items: center;
@@ -192,23 +174,17 @@
   flex-shrink: 0;
 }
 
-.medication-card__stock-info {
-  display: flex;
-  flex-direction: column;
-}
-
 .medication-card__stock-label {
   font-size: 0.75rem;
   font-weight: 500;
-  margin: 0 0 0.125rem 0;
   opacity: 0.9;
+  margin: 0;
 }
 
 .medication-card__stock-value {
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
-  line-height: 1;
 }
 
 .medication-card__stock-right {
@@ -217,18 +193,17 @@
 
 .medication-card__stock-unit-label {
   font-size: 0.75rem;
-  margin: 0 0 0.125rem 0;
   opacity: 0.9;
+  margin: 0;
 }
 
 .medication-card__stock-unit {
   font-size: 0.875rem;
   font-weight: 600;
-  text-transform: capitalize;
   margin: 0;
 }
 
-/* Grid de límites de stock */
+/* limits */
 .medication-card__limits {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -244,17 +219,14 @@
 .medication-card__limit-label {
   font-size: 0.75rem;
   color: #6b7280;
-  margin: 0 0 0.25rem 0;
 }
 
 .medication-card__limit-value {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
-  margin: 0;
 }
 
-/* Precio */
+/* price */
 .medication-card__price {
   display: flex;
   align-items: center;
@@ -262,21 +234,6 @@
   background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
   padding: 0.75rem;
   border-radius: 0.5rem;
-}
-
-.medication-card__price-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.medication-card__price-icon {
-  color: #059669;
-}
-
-.medication-card__price-info {
-  display: flex;
-  flex-direction: column;
 }
 
 .medication-card__price-label {
@@ -292,7 +249,7 @@
   margin: 0;
 }
 
-/* Información adicional */
+/* extra info */
 .medication-card__info-item {
   display: flex;
   align-items: flex-start;
@@ -309,24 +266,6 @@
   background: #f9fafb;
 }
 
-.medication-card__info-icon {
-  flex-shrink: 0;
-  margin-top: 0.125rem;
-}
-
-.medication-card__info-icon--date {
-  color: #3b82f6;
-}
-
-.medication-card__info-icon--location {
-  color: #9ca3af;
-}
-
-.medication-card__info-content {
-  flex: 1;
-  min-width: 0;
-}
-
 .medication-card__info-label {
   font-size: 0.75rem;
   color: #6b7280;
@@ -336,7 +275,6 @@
 .medication-card__info-value {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #1f2937;
   margin: 0;
 }
 
@@ -349,27 +287,23 @@
   font-weight: 600;
 }
 
-/* Laboratorio */
+/* lab */
 .medication-card__lab {
-  font-size: 0.875rem;
-  padding: 0.5rem;
   background: #f9fafb;
+  padding: 0.5rem;
   border-radius: 0.5rem;
 }
 
 .medication-card__lab-label {
   font-size: 0.75rem;
   color: #6b7280;
-  margin: 0;
 }
 
 .medication-card__lab-value {
   font-weight: 500;
-  color: #1f2937;
-  margin: 0;
 }
 
-/* Badges especiales */
+/* special badges */
 .medication-card__special-badges {
   display: flex;
   flex-wrap: wrap;
@@ -383,7 +317,6 @@
   padding: 0.25rem 0.5rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 500;
 }
 
 .medication-card__special-badge--refrigeration {
@@ -396,20 +329,21 @@
   color: #991b1b;
 }
 
-/* ============================================
-   FOOTER DE LA TARJETA (ACCIONES)
-   ============================================ */
-
+/* footer */
 .medication-card__footer {
   background: #f9fafb;
   padding: 1rem;
   border-top: 1px solid #e5e7eb;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.medication-card__actions {
+.medication-card__footer-row {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .medication-card__action-button {
@@ -431,96 +365,14 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.medication-card__action-button--update {
-  background: #eff6ff;
-  color: #1e40af;
-}
-
-.medication-card__action-button--update:hover {
-  background: #dbeafe;
-}
-
-.medication-card__action-button--history {
-  background: #f5f3ff;
-  color: #6b21a8;
-}
-
-.medication-card__action-button--history:hover {
-  background: #ede9fe;
-}
-
 .medication-card__action-button--entry {
   background: #d1fae5;
   color: #065f46;
 }
 
-.medication-card__action-button--entry:hover {
-  background: #a7f3d0;
-}
-
 .medication-card__action-button--exit {
   background: #fed7aa;
   color: #92400e;
-}
-
-.medication-card__action-button--exit:hover {
-  background: #fdba74;
-}
-
-.medication-card__action-button--deactivate {
-  grid-column: 1 / -1;
-  background: #fee2e2;
-  color: #991b1b;
-  margin-top: 0.5rem;
-}
-
-.medication-card__action-button--deactivate:hover {
-  background: #fecaca;
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
-@media (max-width: 640px) {
-  .medication-card__header-top {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .medication-card__badge {
-    align-self: flex-start;
-  }
-
-  .medication-card__limits {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ============================================
-   ANIMACIONES
-   ============================================ */
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-.medication-card__footer {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.medication-card__footer-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
 }
 
 .medication-card__action-button--deactivate-full {
@@ -533,3 +385,30 @@
 .medication-card__action-button--deactivate-full:hover {
   background: #ffb3b3;
 }
+
+/* responsive */
+@media (max-width: 640px) {
+  .medication-card__header-top {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .medication-card__badge2 {
+    align-self: flex-start;
+  }
+
+  .medication-card__limits {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* animations */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+

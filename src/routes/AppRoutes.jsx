@@ -17,6 +17,7 @@ import DashboardHome from '@/pages/dashboard/DashboardHome'
 import UsersPage from '@/pages/users/UsersPage'
 import UserDetailPage from '@/pages/users/UserDetailPage'
 import PropietariosPage from '@pages/owners/PropietariosPage.jsx'
+import TeamPage from '@pages/public/TeamPage.jsx'
 
 
 // Pets Pages
@@ -31,12 +32,17 @@ import MedicalHistoryPage from "@pages/medical-history/MedicalHistoryPage.jsx";
 import InventoryPage from "@pages/inventory/InventoryPage.jsx";
 import TriagePage from "@pages/triage/TriagePage.jsx";
 import LandingPage from "@pages/LandingPage.jsx";
+import ResetPasswordPage from "@pages/auth/ResetPasswordPage.jsx";
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const currentUser = useAuthStore((state) => state.user)
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
+  }
+  if (allowedRoles && !allowedRoles.includes(currentUser?.rol)) {
+    return <Navigate to="/dashboard" replace />
   }
 
   return children
@@ -63,6 +69,13 @@ function AppRoutes() {
           <PublicRoute>
             <LandingPage />
           </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/equipo"
+        element={
+                    <TeamPage />
         }
       />
 
@@ -281,6 +294,18 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+      <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <AuthLayout>
+                <ResetPasswordPage />
+              </AuthLayout>
+            </PublicRoute>
+          }
+        />
+
 
       {/* Redireccionamiento por defecto */}
       <Route path="/" element={<Navigate to="/login" replace />} />

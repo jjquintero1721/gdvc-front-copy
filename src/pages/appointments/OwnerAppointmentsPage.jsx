@@ -109,10 +109,22 @@ function OwnerAppointmentsPage() {
       } else if (currentUser?.rol === 'propietario' && currentOwner) {
         // Ya tenemos el propietario, solo cargar citas
         await loadAppointmentsWithOwner(currentOwner.id)
-      } else {
-        // No es propietario (superadmin), cargar todas las citas
-        await loadAllAppointments()
-      }
+      } else if (currentUser?.rol === 'veterinario') {
+
+          // ⭐ Cargar solo citas del veterinario actual
+          const response = await appointmentService.getAppointmentsByVeterinarian(
+            currentUser.id,      // este es el id del veterinario logueado
+            { skip: 0, limit: 100 }
+          )
+
+          const vetAppointments = response.data?.citas || []
+          setAppointments(vetAppointments)
+
+        } else {
+          // superadmin → sí puede ver todas
+          await loadAllAppointments()
+        }
+
     } catch (err) {
       console.error('Error al cargar citas:', err)
       setError(err.message || 'Error al cargar las citas')

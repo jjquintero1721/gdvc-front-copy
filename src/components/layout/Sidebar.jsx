@@ -15,7 +15,7 @@ import {
 } from '@/assets/icons/DashboardIcons'
 
 import './Sidebar.css'
-import LogoPawFlow from '../../assets/images/pawflow-logo.jpeg'  // <-- AQUI VA TU LOGO
+import LogoPawFlow from '../../assets/images/pawflow-logo.png'  // <-- AQUI VA TU LOGO
 
 const navigationByRole = {
   superadmin: [
@@ -154,8 +154,12 @@ export default function Sidebar() {
 
                 {/* DESPLEGABLE */}
                 <div className={`sidebar-dropdown ${open ? 'open' : ''}`}>
-                  <button className="dropdown-item" onClick={navigateToProfile}>
-                    Ver mi perfil
+                    <button className="dropdown-item" onClick={navigateToProfile}>
+                        Ver mi perfil
+                      </button>
+
+                    <button className="dropdown-item" onClick={() => navigate('/equipo')}>
+                         Nuestro Equipo
                   </button>
 
                   <button className="dropdown-item logout" onClick={logout}>

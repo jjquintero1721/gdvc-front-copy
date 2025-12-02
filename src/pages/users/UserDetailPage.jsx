@@ -14,6 +14,7 @@ import './UserDetailPage.css'
 import AuxiliarCard from '@/components/users/AuxiliarCard.jsx'
 import VeterinarioInfoCard from '@/components/users/VeterinarioInfoCard.jsx'
 import userMeService from "@/services/userMeService.js";
+import {useToastContext} from "@components/ui/ToastProvider.jsx";
 
 /**
  * Página de Detalle de Usuario - MEJORADA
@@ -31,6 +32,7 @@ function UserDetailPage() {
   const { userId } = useParams() // Si viene de la URL
   const navigate = useNavigate()
   const currentUser = useAuthStore(state => state.user)
+  const toast = useToastContext()
   const [auxiliares, setAuxiliares] = useState([])
   const [veterinario, setVeterinario] = useState(null)
 
@@ -82,7 +84,6 @@ function UserDetailPage() {
   const loadUserData = async () => {
     try {
       setLoading(true)
-      setError(null)
 
       // Obtener datos del usuario
       const userResponse = await userService.getUserById(targetUserId)
@@ -118,7 +119,7 @@ function UserDetailPage() {
       }
     } catch (err) {
       console.error('Error al cargar usuario:', err)
-      setError(err.message || 'Error al cargar la información del usuario')
+      toast(err.message || 'Error al cargar la información del usuario')
     } finally {
       setLoading(false)
     }
@@ -226,7 +227,7 @@ function UserDetailPage() {
       )
 
       // Éxito
-      setSuccess('Contraseña actualizada correctamente')
+      toast("success",'Contraseña actualizada correctamente')
       setPasswordData({
         oldPassword: '',
         newPassword: '',
@@ -238,7 +239,7 @@ function UserDetailPage() {
         setActiveTab('informacion')
       }, 2000)
     } catch (err) {
-      console.error('Error al cambiar contraseña:', err)
+      toast('Error al cambiar contraseña:')
       setPasswordError(err.message || 'Error al cambiar la contraseña')
     } finally {
       setPasswordLoading(false)
@@ -625,13 +626,13 @@ function UserDetailPage() {
                     const response = await userService.updateUser(user.id, updatedData)
 
                     if (response.success) {
-                      setSuccess("Información actualizada correctamente")
+                      toast("succes","Información actualizada correctamente")
                       loadUserData()   // recargar datos en pantalla
                     } else {
-                      setError("No se pudo actualizar la información")
+                      toast("error","No se pudo actualizar la información")
                     }
                   } catch (err) {
-                    setError(err.message || "Error al actualizar información")
+                    toast(err.message || "Error al actualizar información")
                   } finally {
                     setLoading(false)
                   }
@@ -667,70 +668,6 @@ function UserDetailPage() {
 
                 <Button type="submit" fullWidth>
                   Guardar Cambios
-                </Button>
-              </form>
-            </Card>
-
-            {/* ========================================
-                🟣 CAMBIAR CONTRASEÑA (EXISTENTE)
-            ======================================== */}
-            <Card className="user-detail-page__security-card">
-              <h2 className="user-detail-page__section-title">Cambiar Contraseña</h2>
-              <p className="user-detail-page__section-subtitle">
-                Actualiza tu contraseña regularmente para mantener tu cuenta segura
-              </p>
-
-              {passwordError && (
-                <Alert variant="error" onClose={() => setPasswordError(null)}>
-                  {passwordError}
-                </Alert>
-              )}
-
-              <form onSubmit={handleChangePassword} className="user-detail-page__password-form">
-                <Input
-                  label="Contraseña Actual"
-                  type="password"
-                  name="oldPassword"
-                  value={passwordData.oldPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Ingresa tu contraseña actual"
-                  required
-                />
-
-                <Input
-                  label="Nueva Contraseña"
-                  type="password"
-                  name="newPassword"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Ingresa tu nueva contraseña"
-                  required
-                />
-
-                <Input
-                  label="Confirmar Nueva Contraseña"
-                  type="password"
-                  name="confirmPassword"
-                  value={passwordData.confirmPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Confirma tu nueva contraseña"
-                  required
-                />
-
-                <div className="user-detail-page__password-requirements">
-                  <p className="user-detail-page__password-requirements-title">
-                    Requisitos de la contraseña:
-                  </p>
-                  <ul>
-                    <li>Mínimo 8 caracteres</li>
-                    <li>Al menos una letra mayúscula</li>
-                    <li>Al menos una letra minúscula</li>
-                    <li>Al menos un número</li>
-                  </ul>
-                </div>
-
-                <Button type="submit" loading={passwordLoading} fullWidth>
-                  Actualizar Contraseña
                 </Button>
               </form>
             </Card>

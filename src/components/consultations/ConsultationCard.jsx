@@ -118,7 +118,7 @@ function ConsultationCard({
             {appointment.mascota?.nombre || 'Paciente'}
           </h3>
           <p className="consultation-card__patient-owner">
-            Propietario: {appointment.mascota?.propietario?.nombre || 'No especificado'}
+            Propietario: {appointment.propietario?.nombre || 'No especificado'}
           </p>
         </div>
 

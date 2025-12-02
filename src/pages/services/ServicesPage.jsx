@@ -8,6 +8,7 @@ import ConfirmModal from '@/components/ui/ConfirmModal'
 import ServiceGrid from '@/components/services/ServiceGrid'
 import CreateServiceModal from '@/components/services/CreateServiceModal'
 import './ServicesPage.css'
+import {useToastContext} from "@components/ui/ToastProvider.jsx";
 
 /**
  * Página de Gestión de Servicios - Versión Actualizada
@@ -34,7 +35,7 @@ function ServicesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
-
+  const toast = useToastContext()
   // Estados de filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('active') // active, all
@@ -94,7 +95,7 @@ function ServicesPage() {
         setFilteredServices(servicesList)
       }
     } catch (err) {
-      setError(err.message || 'Error al cargar servicios')
+      toast("error",'Error al cargar servicios')
       console.error('Error loading services:', err)
     } finally {
       setLoading(false)
@@ -164,11 +165,11 @@ function ServicesPage() {
       if (selectedService) {
         // Editar servicio existente
         response = await serviceService.updateService(selectedService.id, formData)
-        setSuccess('Servicio actualizado exitosamente')
+        toast("success",'Servicio actualizado exitosamente')
       } else {
         // Crear nuevo servicio
         response = await serviceService.createService(formData)
-        setSuccess('Servicio registrado exitosamente')
+        toast("success",'Servicio registrado exitosamente')
       }
 
       // Recargar lista
@@ -180,7 +181,7 @@ function ServicesPage() {
       // Limpiar mensaje de éxito después de 3 segundos
       setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
-      setError(err.message || 'Error al guardar servicio')
+      toast( "error",'Error al guardar servicio')
       console.error('Error saving service:', err)
     } finally {
       setModalLoading(false)
@@ -219,7 +220,7 @@ function ServicesPage() {
         : await serviceService.activateService(service.id)
 
       if (response.success) {
-        setSuccess(`Servicio ${service.activo ? 'desactivado' : 'activado'} exitosamente`)
+        toast("success",`Servicio ${service.activo ? 'desactivado' : 'activado'} exitosamente`)
 
         // Cerrar modal
         setConfirmModal({
@@ -239,7 +240,7 @@ function ServicesPage() {
       }
     } catch (err) {
       console.error('Error al cambiar estado:', err)
-      setError(err.message || 'Error al cambiar el estado del servicio')
+      toast( "error",'Error al cambiar el estado del servicio')
 
       // Cerrar modal incluso si hay error
       setConfirmModal({
@@ -286,18 +287,6 @@ function ServicesPage() {
         )}
       </div>
 
-      {/* Mensajes */}
-      {error && (
-        <Alert variant="error" onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert variant="success" onClose={() => setSuccess(null)}>
-          {success}
-        </Alert>
-      )}
 
       {/* Filtros y búsqueda */}
       <div className="services-page__filters">

@@ -497,6 +497,10 @@ body {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra icono, título y texto */
+  text-align: center;
 }
 
 .feature-card::before {

@@ -26,6 +26,7 @@ const petService = {
    */
   getPetsByOwner: async (ownerId) => {
     try {
+      // ✅ CORREGIDO: Comillas invertidas correctas
       const response = await apiClient.get(`/patients/pets/owner/${ownerId}`)
       // response.data contiene: { success: true, message: "...", data: { mascotas: [...] } }
       return response.data
@@ -56,6 +57,7 @@ const petService = {
         queryParams.append('activo', activo.toString())
       }
 
+      // ✅ CORREGIDO: Comillas invertidas correctas
       const response = await apiClient.get(`/patients/pets?${queryParams}`)
       return response.data
     } catch (error) {
@@ -80,17 +82,35 @@ const petService = {
 
 /**
  * Manejo de errores del servicio de mascotas
+ * Convierte errores de Axios/Backend en objetos Error con mensajes legibles
+ *
  * @param {Error} error - Error capturado
  * @returns {Error} Error procesado con mensaje amigable
  */
 function handlePetError(error) {
+  // 🔧 MEJORADO: Manejar errores de Axios correctamente
   if (error.response) {
     const status = error.response.status
     const data = error.response.data
 
+    // 🔧 NUEVO: Manejar arrays de errores de validación de Pydantic
+    if (data.detail && Array.isArray(data.detail)) {
+      const messages = data.detail.map(err => {
+        // Formato de error de Pydantic: { msg: "...", loc: [...], type: "..." }
+        return err.msg || err.message || JSON.stringify(err)
+      })
+      return new Error(messages.join('. '))
+    }
+
+    // 🔧 NUEVO: Manejar objetos de error con 'detail' como string
+    if (data.detail && typeof data.detail === 'string') {
+      return new Error(data.detail)
+    }
+
+    // Mensajes específicos por código de estado
     switch (status) {
       case 400:
-        return new Error(data.detail || 'Datos inválidos. Verifica la información de la mascota.')
+        return new Error(data.message || data.detail || 'Datos inválidos. Verifica la información de la mascota.')
       case 401:
         return new Error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.')
       case 403:
@@ -99,6 +119,9 @@ function handlePetError(error) {
         return new Error('Mascota o propietario no encontrado.')
       case 409:
         return new Error('Ya existe una mascota con el mismo nombre y especie para este propietario.')
+      case 422:
+        // Error de validación de Pydantic
+        return new Error(data.message || 'Error de validación. Verifica los datos ingresados.')
       case 500:
         return new Error('Error del servidor. Por favor, intenta nuevamente.')
       default:
@@ -106,10 +129,12 @@ function handlePetError(error) {
     }
   }
 
+  // Error de red (sin respuesta del servidor)
   if (error.request) {
     return new Error('No se pudo conectar con el servidor. Verifica tu conexión.')
   }
 
+  // Otros errores
   return new Error(error.message || 'Error desconocido.')
 }
 

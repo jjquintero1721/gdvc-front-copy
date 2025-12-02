@@ -7,11 +7,13 @@ import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
-import './CreatePetPage.css'
+import '@pages/pets/CreatePetPage.css'
+import {useToastContext} from "@components/ui/ToastProvider.jsx";
 
 function CreatePetPage() {
   const navigate = useNavigate()
   const { user: currentUser } = useAuthStore()
+  const toast = useToastContext()
 
   const isStaff = ['superadmin', 'veterinario', 'auxiliar'].includes(currentUser?.rol)
 
@@ -57,7 +59,7 @@ function CreatePetPage() {
         setOwners(mapped)
       }
     } catch (err) {
-      setError('Error al cargar propietarios')
+      toast("error",'Error al cargar propietarios')
     } finally {
       setLoadingOwners(false)
     }
@@ -76,20 +78,44 @@ function CreatePetPage() {
     if (!formData.nombre.trim()) errors.nombre = 'El nombre es obligatorio'
     if (!formData.especie.trim()) errors.especie = 'La especie es obligatoria'
     if (!formData.sexo.trim()) errors.sexo = 'El sexo es obligatorio'
+    if (!formData.fecha_nacimiento) errors.fecha_nacimiento = 'La fecha de nacimiento es obligatoria'
+
+    // Validar que el peso sea positivo si se proporciona
+    if (formData.peso && parseFloat(formData.peso) <= 0) {
+      errors.peso = 'El peso debe ser mayor a 0 kg'
+    }
 
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
   }
 
+  // 🔧 FUNCIÓN MEJORADA PARA CONVERTIR ERRORES A STRING
+  const formatErrorMessage = (err) => {
+    // Si ya es un string, devolverlo directamente
+    if (typeof err === 'string') return err
+
+    // Si es un objeto Error de JavaScript (ya procesado por petService)
+    if (err instanceof Error) return err.message
+
+    // Si es un objeto con propiedad 'message'
+    if (err && typeof err === 'object' && err.message) {
+      return typeof err.message === 'string' ? err.message : 'Error al procesar la solicitud'
+    }
+
+    // Fallback
+    return 'Error inesperado al registrar mascota'
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) {
-      setError('Corrige los errores del formulario')
+      toast("error",'Corrige los errores del formulario')
       return
     }
 
     try {
       setLoading(true)
+      setError(null) // Limpiar errores previos
 
       const petData = {
         propietario_id: formData.propietario_id,
@@ -98,9 +124,7 @@ function CreatePetPage() {
         raza: formData.raza?.trim() || null,
         microchip: formData.microchip?.trim() || null,
         fecha_nacimiento: formData.fecha_nacimiento || null,
-
-        // NUEVOS CAMPOS
-        color: formData.color || null,
+        color: formData.color?.trim() || null,
         sexo: formData.sexo,
         peso: formData.peso ? parseFloat(formData.peso) : null
       }
@@ -108,14 +132,17 @@ function CreatePetPage() {
       const response = await petService.createPet(petData)
 
       if (response.success) {
-        navigate('/mascotas', {
-          state: { success: 'Mascota registrada exitosamente' }
-        })
+        toast("success", "Mascota registrada exitosamente");
+
+        navigate("/mascotas");
       } else {
-        setError(response.message)
+        // El backend respondió pero con success: false
+        toast("error",'Error al registrar la mascota')
       }
     } catch (err) {
-      setError(err.message)
+      // 🔧 SIMPLIFICADO: petService ya maneja los errores y devuelve Error con mensaje legible
+      console.error('Error al registrar mascota:', err)
+      setError(formatErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -232,21 +259,24 @@ function CreatePetPage() {
                 <Input
                   type="number"
                   step="0.01"
+                  min="0.01"
                   name="peso"
                   value={formData.peso}
                   onChange={handleChange}
                   placeholder="Ej: 12.5"
+                  error={fieldErrors.peso}
                 />
               </div>
 
               <div className="form-group">
-                <label>Fecha de Nacimiento</label>
+                <label>Fecha de Nacimiento *</label>
                 <Input
                   type="date"
                   name="fecha_nacimiento"
                   value={formData.fecha_nacimiento}
                   onChange={handleChange}
                   max={new Date().toISOString().split("T")[0]}
+                  error={fieldErrors.fecha_nacimiento}
                 />
               </div>
 

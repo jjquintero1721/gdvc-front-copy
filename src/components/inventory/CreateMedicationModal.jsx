@@ -6,7 +6,7 @@ import './CreateMedicationModal.css';
 const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     nombre: '',
-    tipo: 'medicamento',
+    tipo: '',
     descripcion: '',
     laboratorio: '',
     stock_actual: 0,
@@ -56,10 +56,37 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
         dataToSend.fecha_vencimiento = new Date(dataToSend.fecha_vencimiento).toISOString();
       }
 
+      const allowedTypes = ['vacuna','antibiotico','suplemento','insumo_clinico'];
+
+        // Normalizar tipo: string, trim y toLowerCase
+        dataToSend.tipo = String(dataToSend.tipo ?? '').trim().toLowerCase();
+
+        // Debug — opcional (quita en producción)
+        console.log('[CreateMedicationModal] dataToSend.tipo ->', dataToSend.tipo);
+        console.log('[CreateMedicationModal] dataToSend ->', dataToSend);
+
+        // Validación local
+        if (!allowedTypes.includes(dataToSend.tipo)) {
+          setError(
+            ` Debe ecoger uno de estos tipos de medicamento: ${allowedTypes.join(', ')}.`
+          );
+          setLoading(false);
+          return;
+        }
+
       await inventoryService.createMedication(dataToSend);
       onSuccess();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error al crear el medicamento');
+        const detail = err.response?.data?.detail;
+
+        if (Array.isArray(detail)) {
+          // tomar solo el mensaje del backend
+          setError(detail[0].msg || 'Error al crear el medicamento');
+        } else if (typeof detail === 'string') {
+          setError(detail);
+        } else {
+          setError('Error al crear el medicamento');
+        }
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -134,13 +161,11 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     required
                     className="medication-form__select"
                   >
-                    <option value="medicamento">Medicamento</option>
+                    <option value="">Seleccion un tipo de medicamento</option>
                     <option value="vacuna">Vacuna</option>
-                    <option value="suplemento">Suplemento</option>
-                    <option value="antiparasitario">Antiparasitario</option>
-                    <option value="anestesico">Anestésico</option>
                     <option value="antibiotico">Antibiótico</option>
-                    <option value="otro">Otro</option>
+                    <option value="suplemento">Suplemento</option>
+                    <option value="insumo_clinico">Insumo Clínico</option>
                   </select>
                 </div>
 
@@ -191,6 +216,49 @@ const CreateMedicationModal = ({ isOpen, onClose, onSuccess }) => {
                     <option value="capsulas">Cápsulas</option>
                   </select>
                 </div>
+
+                {/* Campos específicos para antibióticos */}
+                {formData.tipo === 'antibiotico' && (
+                  <>
+                    <div className="medication-form__section">
+                      <h3 className="medication-form__section-title">
+                        Información del Antibiótico
+                      </h3>
+
+                      <div className="medication-form__grid">
+                        <div className="medication-form__field">
+                          <label className="medication-form__label">
+                            Principio Activo <span className="medication-form__required">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="principio_activo"
+                            value={formData.principio_activo || ''}
+                            onChange={handleChange}
+                            required
+                            className="medication-form__input"
+                            placeholder="Ej: Amoxicilina trihidratada"
+                          />
+                        </div>
+
+                        <div className="medication-form__field">
+                          <label className="medication-form__label">
+                            Concentración <span className="medication-form__required">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="concentracion"
+                            value={formData.concentracion || ''}
+                            onChange={handleChange}
+                            required
+                            className="medication-form__input"
+                            placeholder="Ej: 500mg/5ml"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
